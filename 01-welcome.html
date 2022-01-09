@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Welcome: From Correlation to Causation</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lucy D’Agostino McGowan" />
+    <meta name="date" content="2022-01-09" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+
+class: center middle main-title section-title-1
+
+# From Correlation&lt;br&gt;to Causation
+
+.class-info[
+
+**Session 1**
+
+.light[STA 379/679: Causal Inference&lt;br&gt;
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+## 👋
+
+##  Lucy D'Agostino McGowan
+
+&lt;i class="fa fa-envelope"&gt;&lt;/i&gt; &amp;nbsp; [mcgowald@wfu.edu](mailto:mcgowald@wfu.edu) &lt;br&gt;
+&lt;i class="fa fa-calendar"&gt;&lt;/i&gt; &amp;nbsp; Wed 11a-12p
+---
+
+class: middle, center
+
+Everything you will need will be posted at:
+
+# [bit.ly/sta-679-s22](http://bit.ly/sta-679-s22)
+---
+
+class: center, middle
+![](https://imgs.xkcd.com/comics/correlation.png)
+
+.tiny[https://xkcd.com/552]
+---
+
+class: title title-1
+
+# Correlation v Causation
+
+.pull-left[
+.box-inv-1.medium[What is correlation?]
+]
+
+.pull-right[
+.box-inv-1.medium[What is causation?]
+]
+---
+
+class: title title-1
+
+# Correlation v Causation
+
+.pull-left[
+.box-inv-1.medium[What is correlation?]
+
+&lt;img src="01-welcome_files/figure-html/unnamed-chunk-1-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+.box-inv-1.medium[What is causation?]
+]
+---
+class: title title-1
+
+# Correlation v Causation
+
+.pull-left[
+.box-inv-1.medium[What is correlation?]
+
+&lt;img src="01-welcome_files/figure-html/unnamed-chunk-2-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+.box-inv-1.medium[What is causation?]
+
+.box-1[Does x cause y?]
+]
+
+
+---
+class: title title-1
+
+# Correlation v Causation
+
+.pull-left[
+.box-inv-1.medium[What is correlation?]
+
+&lt;img src="01-welcome_files/figure-html/unnamed-chunk-3-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+.box-inv-1.medium[What is causation?]
+
+.box-1[Does x cause y?]
+
+.box-1[Does y cause x?]
+]
+
+---
+
+class: title title-1
+
+# Correlation v Causation
+
+.pull-left[
+.box-inv-1.medium[What is correlation?]
+
+&lt;img src="01-welcome_files/figure-html/unnamed-chunk-4-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+.box-inv-1.medium[What is causation?]
+
+.box-1[Does x cause y?]
+
+.box-1[Does y cause x?]
+
+.box-1[Is there a third variable z that makes it look like x causes y?]
+]
+---
+
+class: title title-1
+
+# Correlation v Causation
+
+.box-inv-1.medium[ice cream sales, crime]
+
+--
+
+.box-inv-1.medium[smoking, lung cancer]
+
+--
+
+.box-inv-1.medium[coffee, cancer]
+
+
+---
+
+class: title title-1, center
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+&lt;br&gt;&lt;br&gt;
+
+.box-inv-1.medium[Causal assumptions]
+
+.huge[https://bit.ly/sta-679-ae1]
+
+---
+
+
+class: title title-1, center
+
+# Sir Austin Bradford Hill
+
+Epidemiologist created a list of guidelines for evaluating whether there is evidence of a causal relationship
+
+---
+
+class: title title-1
+
+# Strength
+
+.center[
+&lt;figure&gt;
+  &lt;img src = "https://imgs.xkcd.com/comics/boyfriend.png" height = "50%"&gt;
+&lt;/figure&gt;
+]
+.pull-right[.tiny[https://xkcd.com/539/]]
+
+
+--
+
+* How big is the effect you are seeing?
+
+--
+* Note: Hill suggests that huge effects can suggest causality, however this does not mean small effects cannot
+
+---
+class: title title-1
+
+# Consistency
+
+.pull-left[
+&lt;figure&gt;
+  &lt;img src = "https://imgs.xkcd.com/comics/the_difference.png" width = "45%"&gt;
+&lt;/figure&gt;
+.tiny[https://xkcd.com/242/]
+]
+
+
+
+--
+
+* Can your analysis be reproduced?
+
+--
+* Has anyone been able to replicate your findings?
+
+---
+
+class: title title-1
+
+# Specificity
+
+.pull-left[
+&lt;figure&gt;
+  &lt;img src = "https://imgs.xkcd.com/comics/cells_2x.png" width = "55%"&gt;
+&lt;/figure&gt;
+.tiny[https://xkcd.com/1217/]
+]
+
+--
+
+* Can the association be pinpointed to a specific cause with no other plausible explanation?
+
+--
+* I appreciate Hill’s caveat here, *“if specificity exists we may be able to draw conclusions without hesitation; if it is not apparent, we are not thereby necessarily left sitting irresolutely on the fence.”*
+
+---
+
+class: title title-1
+
+# Temporality
+
+.center[
+![](https://imgs.xkcd.com/comics/cell_phones.png)
+]
+.pull-right[.tiny[https://xkcd.com/925/]]
+
+
+--
+
+* Causes need to occur before effects
+
+---
+
+
+class: title title-1
+
+# Biological gradient
+
+.pull-left[
+&lt;figure&gt;
+  &lt;img src = "https://imgs.xkcd.com/comics/ballmer_peak.png" width = "95%"&gt;
+&lt;/figure&gt;
+.tiny[https://xkcd.com/323/]
+]
+
+
+
+--
+
+* "Dose effect"
+
+--
+* Does increasing an exposure yield a change in the outcome?
+
+---
+
+class: title title-1
+
+# Plausibility
+
+.center[
+![](https://imgs.xkcd.com/comics/extrapolating.png)
+]
+.pull-right[.tiny[https://xkcd.com/605/]]
+
+
+--
+
+* Does the causal relationship make sense?
+
+--
+
+* *This is also a tricky one since plausibility depends on knowledge at the time.*
+
+---
+
+class: title title-1
+
+# Coherence
+
+.center[
+&lt;figure&gt; 
+  &lt;img src="https://imgs.xkcd.com/comics/bridge_2x.png" width = "70%"&gt;
+&lt;/figure&gt;
+]
+.pull-right[.tiny[https://xkcd.com/1170/]]
+
+
+--
+
+* Similar to plausibility, is there a logical argument that can be made by/to experts in the field regarding causality.
+
+--
+
+* Does it fit into the understanding of the field (*this should have caveats too…the field could be wrong!*).
+
+---
+class: title title-1
+
+# Experiment
+
+.pull-left[
+&lt;figure&gt; 
+  &lt;img src = "https://imgs.xkcd.com/comics/blind_trials_2x.png" width = "65%"&gt;
+&lt;/figure&gt;
+.tiny[https://xkcd.com/1462/]
+]
+
+
+--
+* If a controlled experiment can take place, this can strengthen the argument for causality
+
+---
+
+class: title title-1
+
+# Analogy
+
+.pull-left[
+&lt;figure&gt;
+  &lt;img src = "https://imgs.xkcd.com/comics/significant.png" width = "60%"&gt;
+&lt;/figure&gt;
+.tiny[https://xkcd.com/882/]
+]
+
+--
+* Have we seen a similar effect from a similar exposure?
+
+---
+class: title title-1 center
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+&lt;br&gt;&lt;br&gt;
+.box-inv-1.medium[Causal assumptions in practice]
+.huge[[bit.ly/sta-679-ae2](https://bit.ly/sta-679-ae2)]
+---
+
+layout: false
+
+class: center middle section-title section-title-1
+
+# Class details
+
+---
+class: title title-1
+
+# Create a GitHub account
+
+Go to https://github.com/, and create an account (unless you already have one). Tips for selecting a username:&lt;sup&gt;1&lt;/sup&gt;
+
+.tiny[
+- Incorporate your actual name! People like to know who they’re dealing with. Also makes your username easier for people to guess or remember.
+- Reuse your username from other contexts if you can, e.g., Twitter or Slack.
+- Pick a username you will be comfortable revealing to your future boss.
+- Shorter is better than longer.
+- Be as unique as possible in as few characters as possible. In some settings GitHub auto-completes or suggests usernames.
+- Make it timeless. Don’t highlight your current university, employer, or place of residence.
+- Avoid words laden with special meaning in programming, like `NA`.
+]
+
+.footnote[ [1] Source: [Happy git with R](http://happygitwithr.com/github-acct.html#username-advice) by Jenny Bryan.]
+
+---
+
+class: title title-1 center
+
+# Download R and RStudio
+
+
+.huge[rstudio.com]
+
+---
+class: title title-1
+# Let's take a tour - class website
+
+- Concepts introduced:
+  - How to find slides
+  - How to find assignments
+  - How to get help
+  - How to find policies
+---
+
+class: center, middle
+
+# Course structure and policies
+---
+class: title title-1
+
+# Class meetings
+
+- Interactive
+- Some lectures, lots of learn-by-doing
+- Bring your laptop to class every day
+
+---
+class: title title-1
+# Diversity &amp; Inclusiveness:
+
+- Intent: Students from all diverse backgrounds and perspectives be well-served by this course, that students' learning needs be addressed both in and out of class, and that the diversity that the students bring to this class be viewed as a resource, strength and benefit. It is my intent to present materials and activities that are respectful of diversity: gender identity, sexuality, disability, age, socioeconomic status, ethnicity, race, nationality, religion, and culture. Let me know ways to improve the effectiveness of the course for you personally, or for other students or student groups.
+
+---
+class: title title-1
+# Diversity &amp; Inclusiveness: 
+
+- If you feel like your performance in the class is being impacted by your experiences outside of class, please don't hesitate to come and talk with me. I want to be a resource for you. If you prefer to speak with someone outside of the course, your academic dean is an excellent resource. 
+- I (like many people) am still in the process of learning about diverse perspectives and identities. If something was said in class (by anyone) that made you feel uncomfortable, please talk to me about it.
+
+---
+class: title title-1
+# Disability Policy
+
+Students with disabilities who believe that they may need accommodations in the class are encouraged to contact Learning Assistance Center &amp; Disability Services at 336-758-5929 or [lacds@wfu.edu](mailto:lacds@wfu.edu) as soon as possible to better ensure that such accommodations are implemented in a timely fashion. 
+
+---
+class: title title-1
+# How to get help
+
+All course discussion will be via GitHub: [sta-679-s22/discussion](https://github.com/sta-679-s22/discussion/discussions/) 
+    
+- See course policies for tips on posting questions.
+- For personal and grade related questions, use email.
+
+---
+class: title title-1
+# How to get help 
+
+- Go to https://github.com/sta-679-s22/discussion/discussions/ and bookmark this page.
+- In the issues tab find the issue created by Dr. D'Agostino McGowan (`@LucyMcGowan`) and click on it to view it.
+- Respond to it with a hello, or something else. Feel free to add some code formatted text, inline surrounded by a single backtick or on a new line surrounded by three backtics, or a hyperlink. Or try bolding or italicizing. You could also tag someone if you know their GitHub username. Your post doesn't have to be meaningful.
+
+---
+class: title title-1
+
+# How to get help 
+
+- Hit Comment when you're done.
+- Read the "How to get help" section on the course policies page.
+
+---
+class: title title-1
+
+# How to get help
+
+#### Math &amp; Stats center
+
+* Located in Kirby Hall 117
+* Make an appointment:  [https://mathandstatscenter.wfu.edu/](https://mathandstatscenter.wfu.edu/)
+
+---
+class: title title-1
+
+# Academic integrity
+
+Adhere to the Wake Forest Honor Code. Academic dishonesty will not be tolerated.
+
+---
+class: title title-1
+
+# Sharing/reusing code
+
+* There are many online resources for sharing code (for example, StackOverflow) - you **may** use these resources but **must explicitly cite** where you have obtained code (both code you used directly and "paraphrased" code / code used as inspiration). Any reused code that is not explicitly cited will be treated as plagiarism.
+---
+class: title title-1
+
+# Sharing/reusing code
+
+* You **may** discuss the content of assignments with others in this class. If you do so, please acknowledge your collaborator(s) at the top of your assignment, for example: "Collaborators: Gertrude Cox, Florence Nightingale David". Failure to acknowledge collaborators will result in a grade of 0. You **may not** copy code and/or answers **directly** from another student. If you copy someone else's work, both parties will receive a grade of 0.
+--
+
+* Rather than copying someone else's work, ask for help. You are not alone in this course!
+
+---
+class: title title-1
+
+# Course components:
+
+- Reflections
+- Application exercises: Usually start in class and finish in teams by the next class period, check/no check
+- Assessment
+- Lab: start in class,
+- Midterm
+- Final Projects
+
+---
+class: title title-1
+
+# Grading
+
+
+Component             | Weight
+----------------------|----------------
+Reflections | 5%  
+Application exercises | 10%  
+Midterm | 15%  
+Assessments | 20%  
+Labs | 30%  
+Final Project | 20%
+
+---
+class: title title-1
+
+# Late/missed work policy
+
+
+- Late work policy for homework and lab assignments:
+    - late, but within 24 hours of due date/time: -50%
+    - any later: no credit
+
+---
+class: title title-1
+
+# Next Class
+
+* Getting to know you / tech set up
+
+Please book a 10 minute slot with me here:
+
+[bit.ly/sta-679-appt](https://bit.ly/sta-679-appt)
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
