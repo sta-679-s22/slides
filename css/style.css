@@ -354,6 +354,16 @@ figcaption {
   border-top-color: #FFF2CE;
 }
 
+.footer {
+    background-color: #6667AB;
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    height: 25px;
+    font-size: 12pt; 
+    color: #fff;
+}
+
 /*
   General color classes
 */

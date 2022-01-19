@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Asking Causal Questions</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lucy D’Agostino McGowan" />
+    <meta name="date" content="2022-01-19" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+
+class: center middle main-title section-title-1
+
+# Asking Causal Questions
+
+.class-info[
+
+**Session 3**
+
+.light[STA 379/679: Causal Inference&lt;br&gt;
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+## 👋
+
+##  Lucy D'Agostino McGowan
+
+&lt;i class="fa fa-envelope"&gt;&lt;/i&gt; &amp;nbsp; [mcgowald@wfu.edu](mailto:mcgowald@wfu.edu) &lt;br&gt;
+&lt;i class="fa fa-calendar"&gt;&lt;/i&gt; &amp;nbsp; Office hours: Tuesday 10a-11a, 1p-2p
+---
+
+class: middle, center
+
+Everything you will need will be posted at:
+
+# [bit.ly/sta-679-s22](http://bit.ly/sta-679-s22)
+
+---
+
+class: title title-1, center
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Lab 00
+&lt;br&gt;&lt;br&gt;
+
+---
+
+layout: false
+
+class: center middle section-title section-title-1
+
+# Class details
+
+---
+class: title title-1
+
+# Academic integrity
+
+Adhere to the Wake Forest Honor Code. Academic dishonesty will not be tolerated.
+
+---
+class: title title-1
+
+# Sharing/reusing code
+
+* There are many online resources for sharing code (for example, StackOverflow) - you **may** use these resources but **must explicitly cite** where you have obtained code (both code you used directly and "paraphrased" code / code used as inspiration). Any reused code that is not explicitly cited will be treated as plagiarism.
+---
+class: title title-1
+
+# Sharing/reusing code
+
+* You **may** discuss the content of assignments with others in this class. If you do so, please acknowledge your collaborator(s) at the top of your assignment, for example: "Collaborators: Gertrude Cox, Florence Nightingale David". Failure to acknowledge collaborators will result in a grade of 0. You **may not** copy code and/or answers **directly** from another student. If you copy someone else's work, both parties will receive a grade of 0.
+--
+
+* Rather than copying someone else's work, ask for help. You are not alone in this course!
+
+---
+class: title title-1
+
+# Course components:
+
+- Reflections
+- Application exercises: Usually start in class and finish in teams by the next class period, check/no check
+- Assessment
+- Lab: start in class,
+- Midterm
+- Final Projects
+
+---
+class: title title-1
+
+# Grading
+
+
+Component             | Weight
+----------------------|----------------
+Reflections | 5%  
+Application exercises | 10%  
+Midterm | 15%  
+Assessments | 20%  
+Labs | 30%  
+Final Project | 20%
+
+---
+class: title title-1
+
+# Late/missed work policy
+
+
+- Late work policy for homework and lab assignments:
+    - late, but within 24 hours of due date/time: -50%
+    - any later: no credit
+
+---
+
+class: title title-1
+
+# Goals of Analysis
+
+.box-inv-1.medium[description]
+
+--
+
+.box-inv-1.medium[prediction]
+
+--
+
+.box-1.medium[explanation]
+
+---
+
+class: title title-1
+
+# Description
+
+* What phenomena occur / occurred in the past?  
+
+--
+* What is the prevalence of diabetes in the United States?  
+
+--
+* What are the demographics of our customers?
+
+---
+
+class: title title-1
+
+# Prediction
+
+* This often involves predicting *whether* a certain phenomena will occur given a set of circumstances  
+
+--
+* How many people will buy our product?  
+
+--
+* How much will this house sell for next year?
+
+---
+
+class: title title-1
+
+# Explanation
+
+* Involves understanding *why* a phenomena occurs  
+
+--
+* Does smoking cause lung cancer?  
+
+--
+* Does a SARS-CoV-2 infection increase the likelihood of diabetes diagnosis in kids?
+
+---
+class: section-title-1 center middle title-1
+
+# The first step is asking a good causal question
+
+---
+
+class: title title-1
+
+# Diagramming a causal claim
+
+![](img/diagramming/d1.png)
+
+---
+
+class: title title-1
+
+# Diagramming a causal claim
+
+![](img/diagramming/d2.png)
+
+---
+
+class: title title-1
+
+# Diagramming a causal claim
+
+![](img/diagramming/d3.png)
+
+---
+
+class: title title-1
+
+# Diagramming a causal claim
+
+![](img/diagramming/d4.png)
+
+---
+
+class: title title-1
+
+# Diagramming a causal claim
+
+![](img/diagramming/d5.png)
+
+---
+
+class: title title-1
+
+# Diagramming a causal claim
+
+![](img/diagramming/d6.png)
+
+---
+
+class: title title-1
+
+# Diagramming a causal claim
+
+![](img/diagramming/d7.png)
+
+---
+
+class: title title-1
+
+# Diagramming a causal claim
+
+![](img/diagramming/d8.png)
+
+---
+
+class: title title-1
+
+# Diagramming a causal claim
+
+![](img/diagramming/d9.png)
+
+---
+
+class: title title-1
+
+# Diagramming a causal claim
+
+![](img/diagramming/d10.png)
+
+---
+
+class: title title-1
+
+# Diagramming a causal claim
+
+![](img/diagramming/d11.png)
+
+---
+
+
+![](img/diagramming/d12.png)
+
+---
+
+
+![](img/diagramming/d13.png)
+
+---
+
+
+![](img/diagramming/d14.png)
+
+---
+
+
+![](img/diagramming/d15.png)
+
+---
+
+class: title title-1
+
+# Asking good causal questions
+
+![](img/diagramming/d16.png)
+
+
+---
+
+class: title title-1
+
+# Asking good causal questions
+
+![](img/diagramming/d17.png)
+
+---
+
+class: title title-1
+
+# Asking good causal questions
+
+![](img/diagramming/d18.png)
+
+---
+
+class: title title-1
+
+# Asking good causal questions
+
+![](img/diagramming/d19.png)
+
+---
+
+class: title title-1
+
+# Asking good causal questions
+
+![](img/diagramming/d20.png)
+
+---
+
+class: title title-1
+
+# Asking good causal questions
+
+.pull-left[
+
+.box-inv-1.medium[the claim]
+
+]
+
+
+.pull-right[
+
+.box-inv-1.medium[the evidence]
+
+]
+
+---
+
+class: title title-1
+
+# Asking good causal questions
+
+.pull-left[
+
+.box-inv-1.medium[the claim]
+Smoking causes lung cancer
+]
+
+
+.pull-right[
+
+.box-inv-1.medium[the evidence]
+
+]
+
+---
+class: title title-1
+
+# Asking good causal questions
+
+.pull-left[
+
+.box-inv-1.medium[the claim]
+Smoking causes lung cancer
+]
+
+
+.pull-right[
+
+.box-inv-1.medium[the evidence]
+For people who smoking 15+cigarettes a day, reducing smoking by 50% reduces the risk of lung cancer over 5-10 years
+]
+
+--
+
+.box-1.medium[do these match?]
+--
+
+.center[.huge[🙅]]
+
+---
+class: title title-1
+
+# Asking good causal questions
+
+.pull-left[
+
+.box-1.medium[the question]
+Does smoking cause lung cancer?
+]
+
+
+.pull-right[
+
+.box-inv-1.medium[the evidence]
+For people who smoking 15+cigarettes a day, reducing smoking by 50% reduces the risk of lung cancer over 5-10 years
+]
+
+
+.box-1.medium[do these match?]
+
+.center[.huge[🙅]]
+---
+
+class: title title-1
+
+# Asking good causal questions
+
+.pull-left[
+
+.box-inv-1.medium[the question]
+For people who smoke 15+ cigarettes a day, does reducing smoking by 50% reduce the lung cancer risk over 5-10 years? 
+]
+
+
+.pull-right[
+
+.box-inv-1.medium[the evidence]
+For people who smoking 15+cigarettes a day, reducing smoking by 50% reduces the risk of lung cancer over 5-10 years
+]
+
+
+.box-1.medium[do these match?]
+
+.center[.huge[🙌]]
+---
+class: title title-1, center
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+&lt;br&gt;&lt;br&gt;
+
+.huge[[bit.ly/sta-679-s22-ae3](https://bit.ly/sta-679-s22-ae3)]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
