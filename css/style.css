@@ -290,6 +290,12 @@ figcaption {
   margin-bottom: 50px;
 }
 
+.title h2 {
+  margin-top: -85px;
+  margin-bottom: 50px;
+  color: #fff;
+}
+
 .title-1 {
   border-top-color: #6667AB;
 }
@@ -441,7 +447,7 @@ figcaption {
 
 .box-2,
 .section-title-2 {
-  background-color: #480B6A;
+  background-color: #D3D3D3;
 }
 
 .box-3,

@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Causal Assumptions</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lucy D’Agostino McGowan" />
+    <meta name="date" content="2022-01-22" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+class: center middle main-title section-title-1
+
+# Causal Assumptions
+
+.class-info[
+
+**Session 4**
+
+.light[STA 379/679: Causal Inference &lt;br&gt;
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+
+class: title title-1
+
+# Dichotomous exposure &amp; outcome
+
+.box-inv-1.medium[X (1: exposed, 0: unexposed)]
+
+--
+
+.box-inv-1.medium[Y (1: died, 0: survived)]
+
+---
+
+class: title title-1 center
+
+# Potential Outcome
+
+ &lt;br&gt; &lt;br&gt;
+.box-1[
+
+What *will* happen to you in the future given you have a particular exposure
+
+]  
+
+&lt;br&gt;
+
+--
+
+.box-inv-1.medium[
+
+**fixed** but **unknown**
+
+]
+---
+
+class: title title-1 center
+
+# Potential Outcomes
+
+.box-1.medium[
+
+`\(\large Y(x)\)`
+
+]
+
+&lt;br&gt;
+
+--
+
+.box-inv-1.medium[
+
+The outcome `\((Y)\)` under a specific exposure `\((X=x)\)`
+
+]
+---
+
+class: title title-1 center
+
+# Potential Outcomes
+
+
+.box-1.medium[
+
+`\(\large Y(1)\)`
+
+]
+
+&lt;br&gt;
+
+--
+
+.box-inv-1.medium[
+
+The outcome `\((Y)\)` with exposure `\((X=1)\)`
+
+]
+
+---
+
+
+class: title title-1 center
+
+# Potential Outcomes
+
+
+.box-1.medium[
+
+`\(\large Y(0)\)`
+
+]
+
+&lt;br&gt;
+
+--
+
+.box-inv-1.medium[
+
+The outcome `\((Y)\)` without exposure `\((X=0)\)`
+
+]
+
+
+---
+
+
+class: title title-1 center
+
+# Potential Outcomes
+
+
+.box-1.medium[
+
+`\(\large Y(1) = 0\)`
+
+]
+
+&lt;br&gt;
+
+--
+
+.box-inv-1.medium[
+
+The outcome `\((Y)\)` with exposure `\((X=1)\)` is **"survival"**
+
+]
+
+---
+
+
+class: title title-1 center
+
+# Potential Outcomes
+
+
+.box-1.medium[
+
+`\(\large Y(0) = 1\)`
+
+]
+
+&lt;br&gt;
+
+--
+
+.box-inv-1.medium[
+
+The outcome `\((Y)\)` without exposure `\((X=0)\)` is **"death"**
+
+]
+
+
+---
+
+class: title title-1
+# Potential Outcomes
+
+.box-inv-1.medium[
+Will eating ice cream make me happy?
+]
+
+--
+
+.box-1.medium[Four options:]
+
+(1) I am happy only with ice cream
+
+--
+
+.box-inv-1[
+`\(Y\)`(🍦) = 😀, `\(Y\)`(no 🍦) = 😠
+]
+
+---
+
+class: title title-1
+# Potential Outcomes
+
+.box-inv-1.medium[
+Will eating ice cream make me happy?
+]
+
+
+.box-1.medium[Four options:]
+
+(2) No effect of ice cream, I am happy either way
+
+--
+
+.box-inv-1[
+`\(Y\)`(🍦) = 😀, `\(Y\)`(no 🍦) = 😀
+]
+
+---
+
+class: title title-1
+# Potential Outcomes
+
+.box-inv-1.medium[
+Will eating ice cream make me happy?
+]
+
+
+.box-1.medium[Four options:]
+
+(3) No effect of ice cream, I am angry either way
+
+--
+
+.box-inv-1[
+`\(Y\)`(🍦) = 😠, `\(Y\)`(no 🍦) = 😠
+]
+---
+
+class: title title-1
+# Potential Outcomes
+
+.box-inv-1.medium[
+Will eating ice cream make me happy?
+]
+
+
+.box-1.medium[Four options:]
+
+(4) I am happy only without ice cream
+
+--
+
+.box-inv-1[
+`\(Y\)`(🍦) = 😠, `\(Y\)`(no 🍦) = 😀
+]
+
+---
+
+class: title title-1
+
+# Potential Outcomes
+
+.pull-left[
+.box-1.medium[No Causal Effect]
+&lt;br&gt;
+.box-inv-1[
+`\(Y\)`(🍦) = 😠, `\(Y\)`(no 🍦) = 😠
+]
+&lt;br&gt;
+.box-inv-1[
+`\(Y\)`(🍦) = 😀, `\(Y\)`(no 🍦) = 😀
+]
+]
+
+--
+
+.pull-right[
+.box-1.medium[Causal Effect]
+&lt;br&gt;
+.box-inv-1[
+`\(Y\)`(🍦) = 😀, `\(Y\)`(no 🍦) = 😠
+]
+&lt;br&gt;
+.box-inv-1[
+`\(Y\)`(🍦) = 😠, `\(Y\)`(no 🍦) = 😀
+]
+]
+---
+
+class: title title-1
+
+# Potential Outcome
+
+ &lt;br&gt; &lt;br&gt;
+.box-1[
+
+What *will* happen to you in the future given you have a particular exposure
+
+]  
+
+&lt;br&gt;
+
+--
+
+.box-inv-1.medium[
+
+**fixed** but **unknown**
+
+]
+
+---
+
+class: title title-1
+
+# What is a causal effect
+
+
+.box-inv-1.medium[The causal effect is the comparison of the potential outcomes for the same unit at the same moment in time post-exposure]
+
+--
+
+.box-inv-1.medium[Whether the effect is **causal** depends on the potential outcomes but it **does not** depend on which outcome is actually observed]
+
+---
+class: title title-1 center
+
+# Outcome for an individual
+
+.box-1.medium[
+Individual *i* has a pair of potential outcomes
+]
+
+&lt;br&gt;
+--
+
+.box-inv-1.medium[
+`\((Y_i(1), Y_i(0))\)`
+]
+
+---
+
+class: title title-1 center
+
+# Outcome for an individual
+
+.box-1.medium[
+Individual *i* has a pair of potential outcomes
+]
+
+&lt;br&gt;
+
+.box-inv-1.medium[
+`\(Y_i\)`(🍦), `\(Y_i\)`(no 🍦)
+]
+
+---
+
+class: title title-1
+
+# Potential Outcome
+
+ &lt;br&gt; &lt;br&gt;
+.box-1[
+
+What *will* happen to you in the future given you have a particular exposure
+
+]  
+
+&lt;br&gt;
+
+--
+
+.box-inv-1.medium[
+
+again...**fixed** but **unknown**
+
+]
+
+---
+
+class: title title-1
+
+# What do we observe?
+
+.box-inv-1.medium[Recall: The causal effect is the comparison of the potential outcomes for the same unit at the same moment in time post-exposure]
+
+---
+
+
+class: title title-1
+
+# What do we observe?
+
+.box-inv-1.medium[Recall: The causal effect is the comparison of the potential outcomes for the same unit **at the same moment** in time post-exposure]
+
+--
+
+.center[
+![](img/time-turner.gif)
+]
+
+---
+
+class: title title-1
+# Observed outcome for an individual
+
+.pull-left[
+.box-inv-1[
+Individual `\(i\)` eats 🍦
+]
+]
+
+---
+
+class: title title-1
+# Observed outcome for an individual
+
+.pull-left[
+.box-inv-1[
+Individual `\(i\)` eats 🍦
+]
+&lt;br&gt;
+.box-1.medium[
+`\(Y_i^{obs}\)`(🍦)
+]
+]
+
+--
+
+.pull-right[
+.box-inv-1[
+Individual `\(i\)` does **not** eat 🍦
+]
+]
+---
+
+class: title title-1
+# Observed outcome for an individual
+
+.pull-left[
+.box-inv-1[
+Individual `\(i\)` eats 🍦
+]
+&lt;br&gt;
+.box-1.medium[
+`\(Y_i^{obs}\)`(🍦)
+]
+]
+
+
+
+.pull-right[
+.box-inv-1[
+Individual `\(i\)` does **not** eat 🍦
+]
+&lt;br&gt;
+.box-1.medium[
+`\(Y_i^{obs}\)`(no 🍦)
+]
+]
+
+---
+
+class: title title-1
+# Observed outcome for an individual
+
+.pull-left[
+.box-inv-1[
+Individual `\(i\)` eats 🍦
+]
+&lt;br&gt;
+.box-1.medium[
+`\(Y_i^{obs}\)`(🍦)
+]
+]
+
+
+
+.pull-right[
+.box-2[
+Individual `\(i\)` does **not** eat 🍦
+]
+&lt;br&gt;
+.box-2.medium[
+`\(Y_i^{obs}\)`(no 🍦)
+]
+]
+
+---
+
+class: title title-1
+# Observed outcome for an individual
+
+.pull-left[
+.box-2[
+Individual `\(i\)` eats 🍦
+]
+&lt;br&gt;
+.box-2.medium[
+`\(Y_i^{obs}\)`(🍦)
+]
+]
+
+
+
+.pull-right[
+.box-inv-1[
+Individual `\(i\)` does **not** eat 🍦
+]
+&lt;br&gt;
+.box-1.medium[
+`\(Y_i^{obs}\)`(no 🍦)
+]
+]
+
+---
+
+
+class: title title-1
+# Missing outcome for an individual
+
+.pull-left[
+.box-inv-1[
+Individual `\(i\)` eats 🍦
+]
+]
+
+---
+
+class: title title-1
+# Missing outcome for an individual
+
+.pull-left[
+.box-inv-1[
+Individual `\(i\)` eats 🍦
+]
+&lt;br&gt;
+.box-1.medium[
+`\(Y_i^{mis}\)`(no 🍦)
+]
+]
+
+--
+
+.pull-right[
+.box-inv-1[
+Individual `\(i\)` does **not** eat 🍦
+]
+]
+---
+
+class: title title-1
+# Missing outcome for an individual
+
+.pull-left[
+.box-inv-1[
+Individual `\(i\)` eats 🍦
+]
+&lt;br&gt;
+.box-1.medium[
+`\(Y_i^{mis}\)`(no 🍦)
+]
+]
+
+
+
+.pull-right[
+.box-inv-1[
+Individual `\(i\)` does **not** eat 🍦
+]
+&lt;br&gt;
+.box-1.medium[
+`\(Y_i^{mis}\)`(🍦)
+]
+]
+
+---
+
+class: title title-1
+# Missing outcome for an individual
+
+.pull-left[
+.box-inv-1[
+Individual `\(i\)` eats 🍦
+]
+&lt;br&gt;
+.box-1.medium[
+`\(Y_i^{mis}\)`(no 🍦)
+]
+]
+
+
+
+.pull-right[
+.box-2[
+Individual `\(i\)` does **not** eat 🍦
+]
+&lt;br&gt;
+.box-2.medium[
+`\(Y_i^{mis}\)`(🍦)
+]
+]
+
+---
+
+class: title title-1
+# Missing outcome for an individual
+
+.pull-left[
+.box-2[
+Individual `\(i\)` eats 🍦
+]
+&lt;br&gt;
+.box-2.medium[
+`\(Y_i^{mis}\)`(no 🍦)
+]
+]
+
+
+
+.pull-right[
+.box-inv-1[
+Individual `\(i\)` does **not** eat 🍦
+]
+&lt;br&gt;
+.box-1.medium[
+`\(Y_i^{mis}\)`(🍦)
+]
+]
+
+---
+
+class: title title-1
+
+# Outcomes for an individual
+
+
+.box-inv-1[
+`\(Y_i^{obs}= Y_i(X_i)=\begin{cases}Y_i(0)&amp;\textrm{if }X_i=0\\Y_i(1)&amp;\textrm{if }X_i = 1\end{cases}\)`
+]
+
+--
+&lt;br&gt;
+
+.box-1[
+`\(Y_i^{mis}= Y_i(1-X_i)=\begin{cases}Y_i(1)&amp;\textrm{if }X_i=0\\Y_i(0)&amp;\textrm{if }X_i = 1\end{cases}\)`
+]
+
+---
+
+class: section-title-1 title-1 middle
+
+# Causal inference is fundamentally a missing data problem
+
+.footer[Rubin (1974) Journal of Educational Psychology doi:10.1037/h0037350]
+
+---
+class: title title-1
+
+# Does ice cream make us happy?
+
+.box-inv-1[Without a time turner, how can we try to answer our ice cream // happiness question?]
+
+--
+
+.box-1.medium[Let's add some data!]
+
+---
+
+class: title title-1
+
+# Does ice cream make us happy?
+
+.pull-left[
+.box-inv-1.medium[My possibilities]
+]
+
+---
+class: title title-1
+
+# Does ice cream make us happy?
+
+.pull-left[
+.box-inv-1.medium[My possibilities]
+&lt;br&gt;
+.box-1.small[
+`\(Y_{me}\)`(🍦) = 😀, `\(Y_{me}\)`(no 🍦) = 😠
+]
+
+.box-1.small[
+`\(Y_{me}\)`(🍦) = 😀, `\(Y_{me}\)`(no 🍦) = 😀
+]
+
+.box-1.small[
+`\(Y_{me}\)`(🍦) = 😠, `\(Y_{me}\)`(no 🍦) = 😠
+]
+
+.box-1.small[
+`\(Y_{me}\)`(🍦) = 😠, `\(Y_{me}\)`(no 🍦) = 😀
+]
+]
+
+--
+
+.pull-right[
+.box-inv-1.medium[Your possibilities]
+&lt;br&gt;
+]
+
+---
+
+class: title title-1
+
+# Does ice cream make us happy?
+
+.pull-left[
+.box-inv-1.medium[My possibilities]
+&lt;br&gt;
+.box-1.small[
+`\(Y_{me}\)`(🍦) = 😀, `\(Y_{me}\)`(no 🍦) = 😠
+]
+
+.box-1.small[
+`\(Y_{me}\)`(🍦) = 😀, `\(Y_{me}\)`(no 🍦) = 😀
+]
+
+.box-1.small[
+`\(Y_{me}\)`(🍦) = 😠, `\(Y_{me}\)`(no 🍦) = 😠
+]
+
+.box-1.small[
+`\(Y_{me}\)`(🍦) = 😠, `\(Y_{me}\)`(no 🍦) = 😀
+]
+]
+
+
+.pull-right[
+.box-inv-1.medium[Your possibilities]
+&lt;br&gt;
+.box-1.small[
+`\(Y_{you}\)`(🍦) = 😀, `\(Y_{you}\)`(no 🍦) = 😠
+]
+
+.box-1.small[
+`\(Y_{you}\)`(🍦) = 😀, `\(Y_{you}\)`(no 🍦) = 😀
+]
+
+.box-1.small[
+`\(Y_{you}\)`(🍦) = 😠, `\(Y_{you}\)`(no 🍦) = 😠
+]
+
+.box-1.small[
+`\(Y_{you}\)`(🍦) = 😠, `\(Y_{you}\)`(no 🍦) = 😀
+]
+]
+
+---
+
+class: title-1 title
+
+# Does ice cream make us happy?
+
+.box-inv-1.medium[Exposure possibilities]
+
+--
+
+.box-1.medium[We both eat ice cream]
+
+--
+
+.box-1.medium[We both do not eat ice cream]
+
+--
+
+.box-1.medium[I eat ice cream you do not]
+
+--
+
+.box-1.medium[I do not eat ice cream, you do]
+
+---
+
+class: title title-1
+
+# Potential Outcomes
+
+.box-1[
+`\(Y_{me}\)`(🍦, 🍦),
+`\(Y_{me}\)`(no 🍦, no🍦),
+`\(Y_{me}\)`(🍦, no 🍦),
+`\(Y_{me}\)`(no 🍦, 🍦)
+]
+
+--
+&lt;br&gt;
+
+.box-1[
+`\(Y_{you}\)`(🍦, 🍦),
+`\(Y_{you}\)`(no 🍦, no🍦),
+`\(Y_{you}\)`(🍦, no 🍦),
+`\(Y_{you}\)`(no 🍦, 🍦)
+]
+
+---
+
+class: title title-1
+
+## Stable Unit Treatment Value Assumption
+
+.box-inv-1[
+The potential outcomes for any unit do not vary with the exposures assigned to other units, and, for each unit, there are no different forms or versions of each exposure level, which lead to different potential outcomes.]
+
+.footer[
+Imbens and Rubin (2015) *Causal Inference*
+]
+
+---
+
+class: title title-1
+
+## Stable Unit Treatment Value Assumption
+
+.box-inv-1[
+**The potential outcomes for any unit do not vary with the exposures assigned to other units**, and, for each unit, there are no different forms or versions of each exposure level, which lead to different potential outcomes.]
+
+.footer[
+Imbens and Rubin (2015) *Causal Inference*
+]
+
+--
+
+.box-1.medium[No Interference]
+
+---
+
+class: title title-1
+
+# No interference
+
+.box-inv-1.medium[This is a strong assumption!]
+
+--
+
+.box-1[What if *you* eating ice cream made me happy?]
+
+--
+
+.box-1[What if *me* eating ice cream in front of you when you didn't have any made you angry?]
+
+--
+
+.box-inv-1.medium[These are examples of **interference**!]
+
+---
+
+class: title title-1
+
+# Vaccines: a classic interference example
+
+.box-inv-1.medium[If everyone else is immunized with a perfect vaccine, your immunization will have no effect]
+
+--
+
+.box-1.medium[In these cases, we can]
+
+--
+
+.box-inv-1[define the **unit** more broadly, for example a community, hospital, school, etc]
+
+--
+
+.box-inv-1[limit the number of units assigned to a particular exposure]
+
+---
+
+class: title title-1
+
+## Stable Unit Treatment Value Assumption
+
+.box-inv-1[
+The potential outcomes for any unit do not vary with the exposures assigned to other units, and, for each unit, there are no different forms or versions of each exposure level, which lead to different potential outcomes.]
+
+.footer[
+Imbens and Rubin (2015) *Causal Inference*
+]
+
+---
+
+class: title title-1
+
+## Stable Unit Treatment Value Assumption
+
+.box-inv-1[
+The potential outcomes for any unit do not vary with the exposures assigned to other units, and, for **each unit, there are no different forms or versions of each exposure level, which lead to different potential outcomes.**]
+
+.footer[
+Imbens and Rubin (2015) *Causal Inference*
+]
+
+---
+
+class: title title-1
+
+# Exposure assignment
+
+
+.box-1.medium[
+`\(Y_{me}^{obs}\)`(🍦) = 😀
+]
+
+--
+
+&lt;br&gt;
+
+.box-inv-1[I decided to eat ice cream because I was feeling quite grumpy and thought it might make me feel better! It did!]
+
+---
+class: title title-1
+
+# Exposure assignment
+
+.box-1.medium[
+`\(Y_{you}^{obs}\)`(no 🍦) = 😀
+]
+
+--
+
+&lt;br&gt;
+
+.box-inv-1[You decided not to eat ice cream because you were feeling fine. After you were happy!]
+
+---
+
+class: title title-1, center
+
+# &lt;svg style="height:0.8em;top:.04em;position:relative;" viewBox="0 0 640 512"&gt;&lt;path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/&gt;&lt;/svg&gt; Application Exercise
+&lt;br&gt;&lt;br&gt;
+
+.huge[
+[github.com/sta-679-s22](https://github.com/sta-679-s22)
+]
+---
+
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+--
+
+.box-1[Assignment probability must be **individualistic** (your covariates / potential outcomes can't influence my assignment)]
+
+--
+
+.box-1[All units must have **non-zero** probability for all exposures]
+
+--
+
+.box-1[Assignment **cannot** depend on the potential outcomes]
+
+---
+
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+
+.box-1[Assignment probability must be **individualistic** (your covariates / potential outcomes can't influence my assignment)]
+
+
+.box-2[All units must have **non-zero** probability for all exposures]
+
+
+.box-2[Assignment **cannot** depend on the potential outcomes]
+
+---
+
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+
+.box-2[Assignment probability must be **individualistic** (your covariates / potential outcomes can't influence my assignment)]
+
+
+.box-1[All units must have **non-zero** probability for all exposures]
+
+
+.box-2[Assignment **cannot** depend on the potential outcomes]
+
+---
+
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+
+.box-2[Assignment probability must be **individualistic** (your covariates / potential outcomes can't influence my assignment)]
+
+
+
+.box-2[All units must have **non-zero** probability for all exposures]
+
+
+
+.box-1[Assignment **cannot** depend on the potential outcomes]
+---
+
+class: title title-1
+
+# Notation
+
+.box-inv-1.medium[
+.huge[
+`\(\mathbf{Y}(0), \mathbf{Y}(1)\)`
+]
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+vectors of potential outcomes where the `\(i\)`th is equal to `\(Y_i(0)\)` / `\(Y_i(1)\)`
+]
+
+---
+
+class: title title-1
+
+# Notation
+
+.box-inv-1.medium[
+.huge[
+`\(\mathbf{X}\)`
+]
+]
+
+--
+
+.box-1[
+vector of exposure assignment
+]
+
+---
+
+class: section-title-1 title-1 middle
+
+# Causal inference is fundamentally a missing data problem
+
+.footer[Rubin (1974) Journal of Educational Psychology doi:10.1037/h0037350]
+
+---
+
+class: title title-1
+
+# Outcomes for an individual
+
+
+.box-inv-1[
+`\(Y_i^{obs}= Y_i(X_i)=\begin{cases}Y_i(0)&amp;\textrm{if }X_i=0\\Y_i(1)&amp;\textrm{if }X_i = 1\end{cases}\)`
+]
+
+--
+&lt;br&gt;
+
+.box-1[
+`\(Y_i^{mis}= Y_i(1-X_i)=\begin{cases}Y_i(1)&amp;\textrm{if }X_i=0\\Y_i(0)&amp;\textrm{if }X_i = 1\end{cases}\)`
+]
+
+---
+
+class: title title-1
+
+# Outcomes for an individual
+
+
+.box-inv-1[
+`\(Y_i(0)= \begin{cases}Y_i^{mis}&amp;\textrm{if }X_i=1\\Y_i^{obs}&amp;\textrm{if }X_i = 0\end{cases}\)`
+]
+
+
+&lt;br&gt;
+
+--
+
+.box-1[
+`\(Y_i(1)= \begin{cases}Y_i^{mis}&amp;\textrm{if }X_i=0\\Y_i^{obs}&amp;\textrm{if }X_i = 1\end{cases}\)`
+]
+---
+class: section-title-1 title-1 middle
+
+# Causal inference is fundamentally a missing data problem
+
+.footer[Rubin (1974) Journal of Educational Psychology doi:10.1037/h0037350]
+
+--
+
+.box-inv-1[If we impute the missing outcomes, we can know the value of any causal estimand]
+---
+
+class: title title-1
+
+# Assignment mechanism
+
+.box-inv-1.medium[
+
+`\(P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\)`
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+What is `\(\mathbf{Z}\)`
+]
+
+--
+
+&lt;br&gt;
+
+.box-inv-1[
+A matrix of **pre-exposure** covariates
+]
+
+---
+
+class: title title-1
+
+# Assignment mechanism
+
+.box-inv-1.medium[
+
+`\(P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\)`
+]
+
+--
+
+.box-1[such that]
+
+--
+
+.box-inv-1[
+`$$\sum_{X\in\{0,1\}^N}P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1)) =1$$`
+for all `\(\mathbf{Z}\)`, `\(\mathbf{Y}(0)\)`, and `\(\mathbf{Y}(1)\)`
+]
+
+---
+
+class: title title-1
+
+# Assignment mechanism
+
+.box-inv-1[
+In words: this is the probability that a particular value for the full assignment will occur -- like person 1 gets assigned to the exposure, 2 &amp; 3 to control, 4 to exposure, and so on. The probabilities across the full set of `\(2^N\)` possible assignment vectors must sum to 1.
+]
+
+--
+
+.box-1.medium[This is **not** the probability that a particular person will be assigned a particular exposure]
+
+---
+
+class: title title-1
+
+# Unit Assignment Probability
+
+.box-inv-1[
+
+`\(P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=\sum_{\mathbf{X}:X_i=1}P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0),\mathbf{Y}(1))\)`
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+You can get this by summing across all possible assignment vectors, `\(\mathbf{X}\)` where `\(X_i=1\)`
+]
+
+---
+
+class: section-title-1 title-1 middle
+
+# Propensity score: The average unit assignment probability for units where `\(X_i=x\)`
+
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+---
+
+class: title title-1
+
+# Propensity Score
+
+.box-inv-1.medium[
+
+`\(e_i(x)=\frac{1}{N(x)}\sum_{i: X_i=x}P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\)`
+]
+
+---
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
