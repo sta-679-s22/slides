@@ -378,6 +378,40 @@ $Y_i$(`r emo::ji("icecream")`), $Y_i$(no `r emo::ji("icecream")`)
 
 class: title title-1
 
+# Causal Effect
+
+.box-inv-1.medium[
+
+$\Huge Y(1) - Y(0)$
+]
+
+---
+
+class: title title-1
+
+# Causal Effect
+
+.box-inv-1.medium[
+
+$\Huge Y_i(1) - Y_i(0)$
+]
+
+---
+
+class: title title-1
+
+# Causal Estimand
+
+.box-inv-1.medium[
+
+$$\large \frac{1}{N}\sum_{i=1}^N(Y_i(1) - Y_i(0))$$
+]
+
+---
+
+
+class: title title-1
+
 # Potential Outcome
 
  <br> <br>
