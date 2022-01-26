@@ -1,0 +1,1076 @@
+---
+title: "Randomized Trials"
+author: "Lucy D'Agostino McGowan"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: "libs"
+    css: ["default", "css/style.css"]
+    seal: false
+    anchor_sections: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      navigation:
+        scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
+                      fig.retina = 3, fig.align = "center")
+```
+
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("tile_view"))
+```
+
+class: center middle main-title section-title-1
+
+# Randomized Trials
+
+.class-info[
+
+**Session 5**
+
+.light[STA 379/679: Causal Inference <br>
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+
+class: title title-1 center
+
+# Potential Outcome
+
+ <br> <br>
+.box-1[
+
+What *will* happen to you in the future given you have a particular exposure
+
+]  
+
+<br>
+
+--
+
+.box-inv-1.medium[
+
+**fixed** but **unknown**
+
+]
+---
+
+
+class: title title-1
+
+# What do we observe?
+
+.box-inv-1.medium[Recall: The causal effect is the comparison of the potential outcomes for the same unit **at the same moment** in time post-exposure]
+
+--
+
+.center[
+![](img/time-turner.gif)
+]
+
+---
+
+class: title title-1
+
+# Outcomes for an individual
+
+
+.box-inv-1[
+$Y_i^{obs}= Y_i(X_i)=\begin{cases}Y_i(0)&\textrm{if }X_i=0\\Y_i(1)&\textrm{if }X_i = 1\end{cases}$
+]
+
+--
+<br>
+
+.box-1[
+$Y_i^{mis}= Y_i(1-X_i)=\begin{cases}Y_i(1)&\textrm{if }X_i=0\\Y_i(0)&\textrm{if }X_i = 1\end{cases}$
+]
+
+---
+
+class: section-title-1 title-1 middle
+
+# Causal inference is fundamentally a missing data problem
+
+.footer[Rubin (1974) Journal of Educational Psychology doi:10.1037/h0037350]
+
+---
+
+class: title title-1
+
+## Stable Unit Treatment Value Assumption
+
+.box-inv-1[
+The potential outcomes for any unit do not vary with the exposures assigned to other units, and, for each unit, there are no different forms or versions of each exposure level, which lead to different potential outcomes.]
+
+.footer[
+Imbens and Rubin (2015) *Causal Inference*
+]
+
+---
+
+class: title title-1
+
+## Stable Unit Treatment Value Assumption
+
+.box-inv-1[
+**The potential outcomes for any unit do not vary with the exposures assigned to other units**, and, for each unit, there are no different forms or versions of each exposure level, which lead to different potential outcomes.]
+
+.footer[
+Imbens and Rubin (2015) *Causal Inference*
+]
+
+--
+
+.box-1.medium[No Interference]
+
+---
+
+class: title title-1
+
+## Stable Unit Treatment Value Assumption
+
+.box-inv-1[
+The potential outcomes for any unit do not vary with the exposures assigned to other units, and, for **each unit, there are no different forms or versions of each exposure level, which lead to different potential outcomes.**]
+
+.footer[
+Imbens and Rubin (2015) *Causal Inference*
+]
+
+---
+
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+--
+
+.box-1[Assignment probability must be **individualistic** (your covariates / potential outcomes can't influence my assignment)]
+
+--
+
+.box-1[All units must have **non-zero** probability for all exposures]
+
+--
+
+.box-1[Assignment **cannot** depend on the potential outcomes]
+
+---
+
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+
+.box-1[Assignment probability must be **individualistic** (your covariates / potential outcomes can't influence my assignment)]
+
+
+.box-2[All units must have **non-zero** probability for all exposures]
+
+
+.box-2[Assignment **cannot** depend on the potential outcomes]
+
+---
+
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+
+.box-2[Assignment probability must be **individualistic** (your covariates / potential outcomes can't influence my assignment)]
+
+
+.box-1[All units must have **non-zero** probability for all exposures]
+
+
+.box-2[Assignment **cannot** depend on the potential outcomes]
+
+---
+
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+
+.box-2[Assignment probability must be **individualistic** (your covariates / potential outcomes can't influence my assignment)]
+
+
+
+.box-2[All units must have **non-zero** probability for all exposures]
+
+
+
+.box-1[Assignment **cannot** depend on the potential outcomes]
+---
+
+class: title title-1
+
+# Randomized Trials!
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+library(tidyverse)
+set.seed(1)
+
+n <- 50
+meeple <- tibble(
+  happy = sample(rep(c(1, 0), each = n / 2)),
+  happiness = case_when(
+    happy == 1 ~ rbinom(n, 5, 0.7),
+    happy == 0 ~ rbinom(n, 3, 0.2)
+  ),
+  y0 = happiness,
+  y1 = happiness
+)
+```
+
+```{r}
+set.seed(5)
+
+d_random <- meeple %>%
+  mutate(x = sample(rep(c(1, 0), each = n / 2)),  # coin flip!
+         y_obs = ifelse(x == 1, y1, y0))
+
+```
+
+---
+
+class: title title-1
+
+# Randomized Trials!
+
+```{r}
+d_random %>%
+  summarise(average_noicecream = mean(y0),
+            average_icecream = mean(y1),
+            average_effect = mean(y1 - y0))
+```
+
+---
+
+class: title title-1
+
+# Randomized Trials!
+
+```{r}
+d_random %>%
+  summarise(
+    average_observed = 
+      mean(y_obs[x == 1]) - mean(y_obs[x == 0])
+    )
+```
+
+---
+
+class: title-1 title 
+
+# `r fontawesome::fa("pause")` Pipes
+
+.box-1.medium[Where does the name come from?]
+
+--
+
+The pipe operator is implemented in the package **magrittr**, it's pronounced "and then".
+
+.pull-left[
+![pipe](img/magritte.jpg)
+]
+.pull-right[
+![magrittr](img/magrittr.jpg)
+]
+
+.footer[Adapted from Data Science in a Box]
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("pause")` How does a pipe work?
+
+- You can think about the following sequence of actions - find key, 
+unlock car, start car, drive to school, park.
+- Expressed as a set of nested functions in R pseudocode this would look like:
+
+.small[
+
+```{r eval=FALSE}
+park(drive(start_car(find("keys")), to = "campus"))
+```
+
+]
+
+.footer[Adapted from Data Science in a Box]
+---
+
+class: title title-1
+
+# `r fontawesome::fa("pause")` How does a pipe work?
+
+.small[
+
+```{r eval = FALSE}
+park(drive(start_car(find("keys")), to = "campus"))
+```
+
+]
+
+- Writing it out using pipes give it a more natural (and easier to read) 
+structure:
+.small[
+
+```{r eval = FALSE}
+find("keys") %>%
+  start_car() %>%
+  drive(to = "campus") %>%
+  park()
+```
+
+]
+
+.footer[Adapted from Data Science in a Box]
+
+---
+
+class: title title-1
+# `r fontawesome::fa("pause")` What about other arguments?
+
+To send results to a function argument other than first one or to use the previous result for multiple arguments, use `.`
+
+```{r eval = FALSE}
+starwars %>%
+  filter(species == "Human") %>%
+  lm(mass ~ height, data = .)
+```
+
+.footer[Adapted from Data Science in a Box]
+
+---
+
+class: title title-1
+
+# Randomized trial
+
+* The easiest way to establish a causal effect is to run a controlled trial!
+
+--
+
+* Even very controlled experiments often have things that make them tricky to interpret: people drop out, non-compliance with treatment, interference
+
+---
+
+
+class: title title-1
+
+# Randomized trial
+
+.box-2[Assignment probability must be **individualistic** (your covariates / potential outcomes can't influence my assignment)]
+
+
+
+.box-1[All units must have **non-zero** probability for all exposures]
+
+
+
+.box-2[Assignment **cannot** depend on the potential outcomes]
+
+---
+
+class: title title-1
+
+# Randomized trial
+
+.box-1[Assignment probability must be **individualistic** (your covariates / potential outcomes can't influence my assignment)]
+
+
+
+.box-2[All units must have **non-zero** probability for all exposures]
+
+
+
+.box-1[Assignment **cannot** depend on the potential outcomes]
+
+---
+
+
+class: title title-1
+
+# Notation
+
+.box-inv-1.medium[
+.huge[
+$\mathbf{Y}(0), \mathbf{Y}(1)$
+]
+]
+
+--
+
+<br>
+
+.box-1[
+vectors of potential outcomes where the $i$th is equal to $Y_i(0)$ / $Y_i(1)$
+]
+
+---
+
+class: title title-1
+
+# Notation
+
+.box-inv-1.medium[
+.huge[
+$\mathbf{X}$
+]
+]
+
+--
+
+.box-1[
+vector of exposure assignment
+]
+
+---
+
+class: section-title-1 title-1 middle
+
+# Causal inference is fundamentally a missing data problem
+
+.footer[Rubin (1974) Journal of Educational Psychology doi:10.1037/h0037350]
+
+---
+
+class: title title-1
+
+# Outcomes for an individual
+
+
+.box-inv-1[
+$Y_i^{obs}= Y_i(X_i)=\begin{cases}Y_i(0)&\textrm{if }X_i=0\\Y_i(1)&\textrm{if }X_i = 1\end{cases}$
+]
+
+--
+<br>
+
+.box-1[
+$Y_i^{mis}= Y_i(1-X_i)=\begin{cases}Y_i(1)&\textrm{if }X_i=0\\Y_i(0)&\textrm{if }X_i = 1\end{cases}$
+]
+
+---
+
+class: title title-1
+
+# Outcomes for an individual
+
+
+.box-inv-1[
+$Y_i(0)= \begin{cases}Y_i^{mis}&\textrm{if }X_i=1\\Y_i^{obs}&\textrm{if }X_i = 0\end{cases}$
+]
+
+
+<br>
+
+--
+
+.box-1[
+$Y_i(1)= \begin{cases}Y_i^{mis}&\textrm{if }X_i=0\\Y_i^{obs}&\textrm{if }X_i = 1\end{cases}$
+]
+---
+class: section-title-1 title-1 middle
+
+# Causal inference is fundamentally a missing data problem
+
+.footer[Rubin (1974) Journal of Educational Psychology doi:10.1037/h0037350]
+
+--
+
+.box-inv-1[If we impute the missing outcomes, we can know the value of any causal estimand]
+---
+
+class: title-1 title
+
+# Average treatment effect estimand
+
+<br>
+
+.box-inv-1[
+
+$$\tau=\frac{1}{N}\sum_{i=1}^N(Y_i(1)-Y_i(0))=\bar{Y}(1)-\bar{Y}(0)$$
+
+]
+
+---
+
+class: title-1 title
+
+# Average treatment effect estimand
+
+<br>
+
+.box-inv-1[
+
+$$\bar{Y}(0)=\frac{1}{N}\sum_{i=1}^NY_i(0)\textrm{   and   }\bar{Y}(1) = \frac{1}{N}\sum_{i=1}^NY_i(1)$$
+]
+
+---
+
+class: title title-1
+
+# Randomized experiment
+
+.box-1[
+$$N_{e} = \sum_{i=1}^NX_i$$ 
+are assigned to the exposure
+]
+
+---
+class: title title-1
+
+# Randomized experiment
+
+.box-1[
+$$N_c = \sum_{i=1}^N(1-X_i)$$
+are assigned to the control group
+]
+
+---
+
+class: title title-1
+
+# Estimator for average treatment effect
+
+<br>
+
+.box-inv-1[
+.huge[
+$$\hat{\tau}=\bar{Y}_e^{obs}-\bar{Y}_c^{obs}$$
+]
+]
+
+---
+class: center
+
+<figure>
+<img src = "img/estimand.jpeg" width = "50%"></img>
+</figure>
+.footer[
+Simon Grund on [Twitter](https://twitter.com/simongrund89/status/1085929122860359680?lang=bg)
+]
+---
+
+class: title-1 title
+
+# Average treatment effect estimand
+
+<br>
+
+.box-inv-1[
+
+$$\tau=\frac{1}{N}\sum_{i=1}^N(Y_i(1)-Y_i(0))=\bar{Y}(1)-\bar{Y}(0)$$
+
+]
+
+---
+
+
+
+class: title title-1
+
+# Estimator for average treatment effect
+
+<br>
+
+.box-inv-1[
+.huge[
+$$\hat{\tau}=\bar{Y}_e^{obs}-\bar{Y}_c^{obs}$$
+]
+]
+
+---
+
+
+class: title title-1
+
+# Estimator for average treatment effect
+
+<br>
+
+.box-inv-1[
+.huge[
+$$Y_c^{obs}=\frac{1}{N_c}\sum_{i:X_i=0}Y_i^{obs}$$
+]
+]
+
+---
+
+class: title title-1
+
+# Estimator for average treatment effect
+
+<br>
+
+.box-inv-1[
+.huge[
+$$Y_e^{obs}=\frac{1}{N_e}\sum_{i:X_i=1}Y_i^{obs}$$
+]
+]
+---
+
+class: title title-1 
+
+# Estimator for average treatment effect
+
+```{r}
+d_random %>%
+  summarise(
+    average_observed = 
+      mean(y_obs[x == 1]) - mean(y_obs[x == 0]
+                                 )
+    )
+```
+
+
+---
+
+class: title title-1 
+
+# Estimator for average treatment effect
+
+.box-1.medium[Why does this work?]
+
+--
+
+.box-inv-1.medium[We know:]
+
+--
+
+.box-1[
+
+$Y_i^{obs}=Y_i(1)$ if $X_i=1$
+]
+
+--
+
+.box-1[
+
+$Y_i^{obs}=Y_i(0)$ if $X_i=0$
+]
+
+---
+
+class: title title-1 
+
+# We can rewrite the estimator
+
+<br>
+
+.box-inv-1[
+
+$$\hat\tau=\frac{1}{N}\sum_{i=1}^N\left(\frac{X_iY_i(1)}{N_e/N}-\frac{(1-X_i)Y_i(0)}{N_c/N}\right)$$
+
+]
+
+---
+class: title title-1 
+
+# We can rewrite the estimator
+
+.box-inv-1[
+
+
+$$\frac{1}{N_e}\sum_{i:X_i=1}Y_i^{obs}-\frac{1}{N_c}\sum_{i:X_i=0}Y_i^{obs}$$ 
+
+]
+
+---
+
+class: title title-1 
+
+# We can rewrite the estimator
+
+.box-inv-1[
+
+
+$$\frac{1}{N_e}\sum_{i:X_i=1}\color{purple}{Y_i^{obs}}-\frac{1}{N_c}\sum_{i:X_i=0}Y_i^{obs}$$ 
+
+]
+
+---
+
+class: title title-1 
+
+# We can rewrite the estimator
+
+.box-inv-1[
+
+
+$$\frac{1}{N_e}\sum_{i:X_i=1}\color{purple}{Y_i(1)X_i}-\frac{1}{N_c}\sum_{i:X_i=0}Y_i^{obs}$$ 
+
+]
+
+---
+
+class: title title-1 
+
+# We can rewrite the estimator
+
+.box-inv-1[
+
+
+$$\frac{1}{N_e}\sum_{i:X_i=1}{Y_i(1)X_i} -\frac{1}{N_c}\sum_{i:X_i=0}\color{purple}{Y_i^{obs}}$$ 
+
+]
+
+---
+
+class: title title-1 
+
+# We can rewrite the estimator
+
+.box-inv-1[
+
+
+$$\frac{1}{N_e}\sum_{i:X_i=1}{Y_i(1)X_i} -\frac{1}{N_c}\sum_{i:X_i=0}\color{purple}{Y_i(0)(1-X_i)}$$ 
+
+]
+
+---
+
+class: title title-1 
+
+# We can rewrite the estimator
+
+.box-inv-1[
+
+
+$$\sum_{i:X_i=1}\frac{Y_i(1)X_i}{\color{purple}{N_e} }-\sum_{i:X_i=0}\frac{Y_i(0)(1-X_i)}{\color{purple}{N_c}}$$ 
+
+]
+---
+
+
+class: title title-1 
+
+# We can rewrite the estimator
+
+.box-inv-1[
+
+
+$$\color{purple}{\frac{1}{N}}\left(\sum_{i:X_i=1}\frac{Y_i(1)X_i}{{N_e}/\color{purple}{N} }-\sum_{i:X_i=0}\frac{Y_i(0)(1-X_i)}{{N_c}/\color{purple}{N}}\right)$$ 
+
+]
+
+---
+
+
+
+class: title title-1 
+
+# We can rewrite the estimator
+
+.box-inv-1[
+
+
+$$\frac{1}{N}\color{purple}{\sum_{i=1}^N}\left(\frac{Y_i(1)X_i}{{N_e}/{N} }-\frac{Y_i(0)(1-X_i)}{{N_c}/{N}}\right)$$ 
+
+]
+---
+
+class: title title-1 
+
+# What is random?
+
+.box-inv-1[
+
+
+$$\frac{1}{N}\sum_{i=1}^N\left(\frac{Y_i(1)X_i}{{N_e}/{N} }-\frac{Y_i(0)(1-X_i)}{{N_c}/{N}}\right)$$ 
+
+]
+
+---
+
+class: title title-1 
+
+# What is random?
+
+.box-inv-1[
+
+
+$$\frac{1}{N}{\sum_{i=1}^N}\left(\frac{Y_i(1)\color{purple}{X_i}}{{N_e}/{N} }-\frac{Y_i(0)(1-\color{purple}{X_i})}{{N_c}/{N}}\right)$$ 
+
+]
+
+---
+
+class: title title-1
+
+# Randomized experiment
+
+<br>
+
+.box-inv-1[
+$$P_X(X_i = 1 | \mathbf{Y}(0), \mathbf{Y}(1)) = \mathbb{E}_X[X_i|Y(0), Y(1)] = N_e/N$$
+]
+
+---
+
+class: title title-1
+
+# Randomized experiment
+
+<br>
+
+.box-inv-1[
+$$P_X(X_i = 0 | \mathbf{Y}(0), \mathbf{Y}(1)) = \\\mathbb{E}_X[1 - X_i|Y(0), Y(1)] = N_c/N$$
+]
+
+---
+
+class: title title-1
+
+# Randomized exeriment: unbiased
+
+.box-inv-1[
+
+$$\mathbb{E}_X[\hat\tau|\mathbf{Y}(0)\mathbf{Y}(1)]=\\\frac{1}{N}\sum_{i=1}^N\left(\frac{\mathbb{E}_X[X_i]Y_i(1)}{N_e/N}-\frac{\mathbb{E}_X[1-X_i]Y_i(0)}{N_c/N}\right)$$
+]
+
+---
+
+class: title title-1
+
+# Randomized exeriment: unbiased
+
+.box-inv-1[
+
+$$\mathbb{E}_X[\hat\tau|\mathbf{Y}(0)\mathbf{Y}(1)]=\\\frac{1}{N}\sum_{i=1}^N\left(\frac{(N_e/N)Y_i(1)}{N_e/N}-\frac{(N_c/N)Y_i(0)}{N_c/N}\right)$$
+]
+
+---
+
+
+class: title title-1
+
+# Randomized exeriment: unbiased
+
+.box-inv-1[
+
+$$\mathbb{E}_X[\hat\tau|\mathbf{Y}(0)\mathbf{Y}(1)]=\\\frac{1}{N}\sum_{i=1}^N\left(Y_i(1)-Y_i(0)\right)=\tau$$
+]
+
+---
+class: title title-1, center
+
+# `r fontawesome::fa("laptop")` Application Exercise
+<br><br>
+
+.huge[[github.com/sta-679-s22](https://github.com/sta-679-s22)]
+
+---
+
+class: title title-1 center
+
+# Why not always conduct an experiment?
+
+
+`r emo::ji("medical_symbol")` ethics 
+--
+  `r emo::ji("money_with_wings")` money 
+--
+  `r emo::ji("clock")` time 
+
+--
+
+.box-inv-1.medium[Deferring a decision **is** a decision]
+
+---
+
+class: title title-1
+
+# Target Trial
+
+* What experiment would you design if you could?
+
+---
+
+class: title title-1
+
+# Algorithm for causal inference
+
+<br><br>
+1. **Ask** causal questions
+--
+
+2. **Answer** the causal question
+
+.footer[Miguel Hernàn, Target Trials]
+
+---
+
+class: title title-1
+
+# Algorithm for causal inference
+
+<br><br>
+1. **Ask** causal questions  
+  * Specify the protocal for a target trial
+--
+
+2. **Answer** the causal question  
+ * Conduct the target trial if possible, OR
+ * Use observational data to **emulate** the target trial
+
+.footer[Miguel Hernàn, Target Trials]
+---
+
+class: title title-1
+
+# Compontents of a target trial
+
+.pull-left[
+.box-inv-1.medium[eligibility criteria]
+
+.box-inv-1.medium[treatment strategy]
+
+.box-inv-1.medium[assignment procedures]
+
+]
+--
+.pull-right[
+.box-inv-1.medium[follow-up period]
+
+.box-inv-1.medium[outcome]
+
+.box-inv-1.medium[causal contrasts of interest]
+
+.box-inv-1.medium[analysis plan]
+
+]
+
+.footer[Hernán & Robins. (2016) American Journal of Epidemiology doi:10.1093/aje/kwv254]
+
+---
+
+class: title title-1
+
+# An example
+
+.pull-left[
+.box-inv-1.medium[observational data]
+
+* Women who used hormone replacement therapy had **lower risk** of heart disease compared to those who didn't
+]
+
+--
+
+.pull-right[
+.box-inv-1.medium[randomized trial]
+
+* Women who were randomized to use hormone replacement therapy had **higher risk** of heart disease compared to those who didn't
+]
+
+.footer[Miguel Hernàn, Target Trials]
+
+---
+class: title title-1
+
+# Why the difference?
+
+* The randomized trial compared people who *started* treatment compared to those who didn't
+* Observational trial compared *current* users; people who were susceptible to heart disease were already out of the cohort! So current use became a marker of not being susceptible. 
+
+.footer[Hernán et al. (2008) Epidemiology doi:10.1097/EDE.0b013e3181875e61]
+
+---
+
+class: title title-1
+
+# The solution?
+
+* Reanalyze the observational data like the randomized trial (new users vs non users)
+
+.footer[Hernán et al. (2008) Epidemiology doi:10.1097/EDE.0b013e3181875e61]
+
+---
+
+class: title title-1
+
+# The importance of time zero
+
+.box-inv-1.medium[In a randomized study]
+
+* Eligibility criteria are met
+* Treatment is assigned
+* Study outcomes begin to be recorded
+
+--
+
+.box-inv-1.medium[The same should be true for an observational study!]
+
+---
+
+class: title title-1
+
+# What can go wrong?
+
+
+.pull-left[![](img/time-zero.png) ]
+
+.pull-right[.small[ [1] This can bias the effect estimate because the analysis is restricted to those who remained under follow-up by time zero (like the example!)]
+]
+
+.footer[Hernán et al (2016) Journal of Clinical Epidemiology doi: 10.1016/j.jclinepi.2016.04.014]
+---
+
+class: title title-1
+
+# What can go wrong?
+
+
+.pull-left[![](img/time-zero.png)]
+
+.pull-right[.small[ [2] This increases the opportunity for selection biasbecause the analysis will only include individuals who remain under follow-up at the reset time zero and who meet these posttreatment criteria]]
+
+.footer[Hernán et al (2016) Journal of Clinical Epidemiology doi: 10.1016/j.jclinepi.2016.04.014]
+---
+
+class: title title-1
+
+# What can go wrong?
+
+
+.pull-left[![](img/time-zero.png)]
+
+.pull-right[.small[[3] Because treatment assignment predates eligibility, selection bias may arise (like 2). In addition, bias may also occur because by definition nobody would have an event between treatment assignment and the completion of the eligibility criteria. This is a period, often labeled as "immortal time", during which the risk is guaranteed to be exactly zero. ]]
+
+.footer[Hernán et al (2016) Journal of Clinical Epidemiology doi: 10.1016/j.jclinepi.2016.04.014]
+---
+
+class: title title-1
+
+# What can go wrong?
+
+
+.pull-left[![](img/time-zero.png)]
+.pull-right[.small[[4] This bias occurs when information on treatment after time zero is used to assign individuals to a treatment strategy. ]]
+
+.footer[Hernán et al (2016) Journal of Clinical Epidemiology doi: 10.1016/j.jclinepi.2016.04.014]
+
+
