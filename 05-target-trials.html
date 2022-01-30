@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Target Trials</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lucy D’Agostino McGowan" />
+    <meta name="date" content="2022-01-29" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+class: center middle main-title section-title-1
+
+# Target Trials
+
+.class-info[
+
+**Session 6**
+
+.light[STA 379/679: Causal Inference &lt;br&gt;
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+
+class: title title-1 center
+
+# Potential Outcome
+
+&lt;br&gt; &lt;br&gt;
+.box-1[
+
+What *will* happen to you in the future given you have a particular exposure
+
+]  
+
+&lt;br&gt;
+
+--
+
+.box-inv-1.medium[
+
+**fixed** but **unknown**
+
+]
+
+---
+
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+--
+
+.box-1[Assignment probability must be **individualistic** (your covariates / potential outcomes can't influence my assignment)]
+
+--
+
+.box-1[All units must have **non-zero** probability for all exposures]
+
+--
+
+.box-1[Assignment **cannot** depend on the potential outcomes]
+
+---
+
+class: title title-1 
+
+# What do we observe?
+
+
+--
+
+.box-1[
+
+`\(Y_i^{obs}=Y_i(1)\)` if `\(X_i=1\)`
+]
+
+&lt;br&gt;
+
+--
+
+.box-1[
+
+`\(Y_i^{obs}=Y_i(0)\)` if `\(X_i=0\)`
+]
+
+---
+
+class: title title-1 
+
+# What do we observe?
+
+.box-1[
+`\(Y_i^{obs}=Y_i(1)(X_i) + Y_i(0)(1-X_i)\)`
+]
+
+&lt;br&gt;
+
+--
+
+.box-inv-1[
+Is `\(Y_{obs}\)` independent of the exposure assignment, `\(X_i\)`?
+]
+
+---
+
+class: title title-1
+
+## Stable Unit Treatment Value Assumption
+
+.box-inv-1[
+The potential outcomes for any unit do not vary with the exposures assigned to other units, and, for each unit, there are no different forms or versions of each exposure level, which lead to different potential outcomes.]
+
+.footer[
+Imbens and Rubin (2015) *Causal Inference*
+]
+
+---
+
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[**Potential outcomes** for any unit do not vary with the exposure of other units]
+]
+
+--
+
+.pull-right[
+.box-inv-1[🗣 SUTVA [part 1]]
+]
+
+---
+
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[**Potential outcomes** for any unit do not vary with the exposure of other units]
+]
+
+.pull-right[
+.box-inv-1[🗣 SUTVA [part 1]]
+
+.box-inv-1[🗣 no interference]
+]
+
+---
+
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[**Potential outcomes** for any unit do not vary with the exposure of other units]
+]
+
+.pull-right[
+.box-inv-1[🗣 SUTVA [part 1]]
+
+.box-inv-1[🗣 no interference]
+
+.box-inv-1[👩‍🔬 requires subject matter expertise]
+]
+---
+
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[**Potential outcomes** for any unit do not vary with the exposure of other units]
+]
+
+.pull-right[
+.box-inv-1[🗣 SUTVA [part 1]]
+
+.box-inv-1[🗣 no interference]
+
+.box-inv-1[👩‍🔬 requires subject matter expertise]
+
+.box-inv-1[👷 can be resolved via study design]
+]
+---
+
+
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[there are no different forms or versions of each exposure level]
+]
+
+--
+
+.pull-right[
+
+.box-inv-1[🗣 SUTVA [part 2]]
+
+]
+
+---
+
+
+
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[there are no different forms or versions of each exposure level]
+]
+
+
+.pull-right[
+
+.box-inv-1[🗣 SUTVA [part 2]]
+
+.box-inv-1[🗣 consistency]
+
+]
+
+---
+
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[there are no different forms or versions of each exposure level]
+]
+
+
+.pull-right[
+
+.box-inv-1[🗣 SUTVA [part 2]]
+
+.box-inv-1[🗣 consistency]
+
+.box-inv-1[👩‍🔬 clear definition of exposure]
+
+
+]
+
+---
+
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[there are no different forms or versions of each exposure level]
+]
+
+
+.pull-right[
+
+.box-inv-1[🗣 SUTVA [part 2]]
+
+.box-inv-1[🗣 consistency]
+
+.box-inv-1[👩‍🔬 clear definition of exposure]
+
+.box-inv-1[👷 can be resolved via study design]
+
+]
+---
+
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[**Exposure assignment** probability for any unit does not depend on covariates / potential outcomes of other units]
+]
+
+--
+
+.pull-right[
+
+.box-inv-1[🗣 individualistic]
+
+]
+
+---
+
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[**Exposure assignment** probability for any unit does not depend on covariates / potential outcomes of other units]
+]
+
+
+.pull-right[
+
+.box-inv-1[🗣 individualistic]
+
+.box-inv-1[👩‍🔬 knowledge of assignment mechanism (violated in adaptive clinical trials)]
+
+]
+---
+
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[**Exposure assignment** probability for any unit does not depend on covariates / potential outcomes of other units]
+]
+
+
+.pull-right[
+
+.box-inv-1[🗣 individualistic]
+
+.box-inv-1[👩‍🔬 knowledge of assignment mechanism (violated in adaptive clinical trials)]
+
+.box-inv-1[👷 classic randomization, non-sequential trials]
+
+]
+
+---
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[All units must have **non-zero** probability for all exposures]
+]
+
+--
+.pull-right[
+
+.box-inv-1[🗣 probabilistic]
+
+.box-inv-1[🗣 positivity]
+
+
+
+
+]
+---
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[All units must have **non-zero** probability for all exposures]
+]
+
+
+.pull-right[
+
+.box-inv-1[🗣 probabilistic]
+
+.box-inv-1[🗣 positivity]
+
+.box-inv-1[👩‍🔬 subject matter knowledge (structural violations), parameteric models (random violations)]
+
+
+]
+---
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[All units must have **non-zero** probability for all exposures]
+]
+
+
+.pull-right[
+
+.box-inv-1[🗣 probabilistic]
+
+.box-inv-1[🗣 positivity]
+
+.box-inv-1[👩‍🔬 subject matter knowledge (structural violations), parameteric models (random violations)]
+
+.box-inv-1[👷 randomization]
+
+]
+---
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[All units must have **non-zero** probability for all exposures]
+]
+
+
+.pull-right[
+
+.box-inv-1[🗣 probabilistic]
+
+.box-inv-1[🗣 positivity]
+
+.box-inv-1[👩‍🔬 subject matter knowledge (structural violations), parameteric models (random violations)]
+
+.box-inv-1[👷 randomization]
+
+.box-inv-1[👷 exclusion criteria]
+]
+
+---
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[Exposure assignment **cannot** depend on the potential outcomes]
+]
+
+--
+
+.pull-right[
+
+.box-inv-1[🗣 no unmeasured confounding]
+
+
+]
+---
+
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[Exposure assignment **cannot** depend on the potential outcomes]
+]
+
+
+.pull-right[
+
+.box-inv-1[🗣 no unmeasured confounding]
+
+.box-inv-1[👩‍🔬 not testable :( (sensitivity analyses can help!)]
+
+
+]
+---
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[Exposure assignment **cannot** depend on the potential outcomes]
+]
+
+
+.pull-right[
+
+.box-inv-1[🗣 no unmeasured confounding]
+
+.box-inv-1[👩‍🔬 not testable :( (sensitivity analyses can help!)]
+
+.box-inv-1[👷 randomization]
+
+]
+---
+class: title title-1
+
+## Summary of assumptions
+
+.pull-left[
+.box-1[Exposure assignment **cannot** depend on the potential outcomes]
+]
+
+
+.pull-right[
+
+.box-inv-1[🗣 no unmeasured confounding]
+
+.box-inv-1[👩‍🔬 not testable :( (sensitivity analyses can help!)]
+
+.box-inv-1[👷 randomization]
+
+.box-inv-1[👷 condition on confounding factors to induce independence]
+
+]
+
+---
+
+class: title title-1
+
+# Summary of assumptions
+
+
+Assumption | Classic Randomized Trial| Randomized Trial
+------------|-----------------
+No Interference | 🤷 | 🤷 
+Consistency | 😄 | 😄 
+Individualistic | 😄| 🤷
+Probabilistic |😄| 😄
+Unconfounded |😄| 🤷
+
+---
+class: title title-1
+
+# Designing randomized trials
+.footer[Hernán &amp; Robins. (2016) American Journal of Epidemiology doi:10.1093/aje/kwv254]
+
+.pull-left[
+.box-inv-1.medium[eligibility criteria]
+
+.box-inv-1.medium[consistent exposure]
+
+.box-inv-1.medium[assignment procedures]
+
+]
+--
+.pull-right[
+.box-inv-1.medium[follow-up period]
+
+.box-inv-1.medium[outcome]
+
+.box-inv-1.medium[causal contrasts of interest]
+
+.box-inv-1.medium[analysis plan]
+
+]
+
+---
+
+class: title title-1
+
+# Designing randomized trials
+.footer[Hernán &amp; Robins. (2016) American Journal of Epidemiology doi:10.1093/aje/kwv254]
+
+.pull-left[
+.box-inv-1.medium[eligibility criteria]
+
+.box-inv-1.medium[consistent exposure]
+
+.box-inv-1.medium[assignment procedures]
+
+]
+
+.pull-right[
+.box-inv-1.medium[follow-up period]
+
+.box-inv-1.medium[outcome]
+
+.box-2.medium[causal contrasts of interest]
+
+.box-2.medium[analysis plan]
+
+]
+
+---
+
+class: title title-1 
+
+# Summary of assumptions
+
+
+Assumption | Eligibility Criteria | Consistent Exposure | Assignment Procedures | Follow-up Period | Outcome
+------------|-----------------
+No Interference | | ✔️|✔️ | | ✔️
+Consistency | |✔️|||
+Individualistic | ||✔️||
+Probabilistic |✔️||✔️||
+Unconfounded |✔️||✔️|✔️||
+
+---
+
+class: title title-1
+
+# Summary of assumptions
+
+
+Assumption | Classic Randomized Trial| Randomized Trial| Observational Study
+------------|-----------------|-------------------
+No Interference | 🤷 | 🤷 | 🤷
+Consistency | 😄 | 😄 | 🤷
+Individualistic | 😄| 🤷| 🤷
+Probabilistic |😄| 😄| 🤷
+Unconfounded |😄| 🤷| 🤷
+
+
+---
+
+class: title title-1 center
+
+# Why not always conduct an experiment?
+
+--
+.box-1.medium[⚕️ ethics ]
+
+---
+
+class: title title-1 center
+
+# Why not always conduct an experiment?
+
+
+.box-1.medium[⚕️ ethics   💸 money ]
+---
+
+class: title title-1 center
+
+# Why not always conduct an experiment?
+
+
+.box-1.medium[⚕️ ethics   💸 money  🕡 time ]
+
+
+--
+
+.box-inv-1.medium[Deferring a decision **is** a decision]
+
+---
+
+class: section-title-1 title-1 middle
+
+# Target Trial
+
+--
+
+.box-inv-1[What experiment would you design if you could?]
+
+---
+
+class: title title-1
+
+# Algorithm for causal inference
+
+.pull-left[
+.box-inv-1.medium[**Ask** good causal questions]
+]
+--
+
+.pull-right[
+.box-inv-1.medium[**Answer** the causal question]
+]
+
+.footer[Miguel Hernàn, Target Trials]
+
+---
+
+class: title title-1
+
+# Algorithm for causal inference
+
+.pull-left[
+.box-inv-1.medium[**Ask** good causal questions]
+
+.box-1[ Specify the protocol for a target trial]
+
+]
+
+
+.pull-right[
+.box-inv-1.medium[**Answer** the causal question]
+]
+
+
+---
+
+class: title title-1
+
+# Algorithm for causal inference
+
+.pull-left[
+.box-inv-1.medium[**Ask** good causal questions]
+
+.box-1[ Specify the protocol for a target trial]
+
+]
+
+.pull-right[
+.box-inv-1.medium[**Answer** the causal question]
+
+.box-1[Conduct the target trial if possible, OR]
+
+.box-1[Use observational data to **emulate** the target trial]
+]
+
+.footer[Miguel Hernàn, Target Trials]
+---
+
+class: title title-1
+
+# Compontents of a target trial
+
+.pull-left[
+.box-inv-1.medium[eligibility criteria]
+
+.box-inv-1.medium[consistent exposure]
+
+.box-inv-1.medium[assignment procedures]
+
+]
+--
+.pull-right[
+.box-inv-1.medium[follow-up period]
+
+.box-inv-1.medium[outcome]
+
+.box-inv-1.medium[causal contrasts of interest]
+
+.box-inv-1.medium[analysis plan]
+
+]
+
+.footer[Hernán &amp; Robins. (2016) American Journal of Epidemiology doi:10.1093/aje/kwv254]
+
+---
+
+
+class: title title-1
+
+# Compontents of a target trial
+
+.pull-left[
+.box-inv-1.medium[eligibility criteria]
+
+.box-inv-1.medium[consistent exposure]
+
+.box-inv-1.medium[assignment procedures]
+
+]
+
+.pull-right[
+.box-inv-1.medium[follow-up period]
+
+.box-inv-1.medium[outcome]
+
+.box-2.medium[causal contrasts of interest]
+
+.box-2.medium[analysis plan]
+
+]
+
+.footer[Hernán &amp; Robins. (2016) American Journal of Epidemiology doi:10.1093/aje/kwv254]
+
+---
+
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.001.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+
+---
+
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.002.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+---
+
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.003.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+
+---
+
+class: title title-1
+
+# Compontents of a target trial
+
+.pull-left[
+.box-2.medium[eligibility criteria]
+
+.box-inv-1.medium[consistent exposure]
+
+.box-inv-1.medium[assignment procedures]
+
+]
+
+.pull-right[
+.box-2.medium[follow-up period]
+
+.box-2.medium[outcome]
+
+.box-2.medium[causal contrasts of interest]
+
+.box-2.medium[analysis plan]
+
+]
+
+.footer[Hernán &amp; Robins. (2016) American Journal of Epidemiology doi:10.1093/aje/kwv254]
+
+---
+
+
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.004.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+
+---
+
+class: title title-1
+
+# Compontents of a target trial
+
+.pull-left[
+.box-2.medium[eligibility criteria]
+
+.box-2.medium[consistent exposure]
+
+.box-2.medium[assignment procedures]
+
+]
+
+.pull-right[
+.box-2.medium[follow-up period]
+
+.box-inv-1.medium[outcome]
+
+.box-2.medium[causal contrasts of interest]
+
+.box-2.medium[analysis plan]
+
+]
+
+.footer[Hernán &amp; Robins. (2016) American Journal of Epidemiology doi:10.1093/aje/kwv254]
+
+---
+
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.006.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+
+---
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.009.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+---
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.010.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+---
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.011.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+
+---
+
+
+class: title title-1
+
+# Compontents of a target trial
+
+.pull-left[
+.box-inv-1.medium[eligibility criteria]
+
+.box-2.medium[consistent exposure]
+
+.box-2.medium[assignment procedures]
+
+]
+
+.pull-right[
+.box-2.medium[follow-up period]
+
+.box-2.medium[outcome]
+
+.box-2.medium[causal contrasts of interest]
+
+.box-2.medium[analysis plan]
+
+]
+
+.footer[Hernán &amp; Robins. (2016) American Journal of Epidemiology doi:10.1093/aje/kwv254]
+
+---
+
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.012.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+
+---
+
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.013.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+---
+
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.014.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+
+---
+
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.015.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+
+---
+
+class: title title-1
+
+# Compontents of a target trial
+
+.pull-left[
+.box-2.medium[eligibility criteria]
+
+.box-2.medium[consistent exposure]
+
+.box-2.medium[assignment procedures]
+
+]
+
+.pull-right[
+.box-inv-1.medium[follow-up period]
+
+.box-2.medium[outcome]
+
+.box-2.medium[causal contrasts of interest]
+
+.box-2.medium[analysis plan]
+
+]
+
+.footer[Hernán &amp; Robins. (2016) American Journal of Epidemiology doi:10.1093/aje/kwv254]
+
+---
+
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.018.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+
+---
+
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.019.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+
+---
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.020.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+
+---
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.021.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+---
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.022.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+---
+class: center middle
+
+&lt;figure&gt;
+&lt;img src = "img/diagram/diagram/diagram.025.jpeg" width = "80%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+---
+
+class: title title-1
+
+# An example
+
+.pull-left[
+.box-inv-1.medium[observational data]
+
+* Women who used hormone replacement therapy had **lower risk** of heart disease compared to those who didn't
+]
+
+--
+
+.pull-right[
+.box-inv-1.medium[randomized trial]
+
+* Women who were randomized to use hormone replacement therapy had **higher risk** of heart disease compared to those who didn't
+]
+
+.footer[Miguel Hernàn, Target Trials]
+
+---
+class: title title-1
+
+# Why the difference?
+
+.box-1[The randomized trial compared people who *started* treatment compared to those who didn't]
+
+--
+
+.box-inv-1[The observational trial compared *current* users; people who were susceptible to heart disease were already out of the cohort! So current use became a marker of not being susceptible]
+
+.footer[Hernán et al. (2008) Epidemiology doi:10.1097/EDE.0b013e3181875e61]
+
+---
+
+class: title title-1
+
+# The solution?
+
+.box-inv-1[Reanalyze the observational data like the randomized trial (new users vs non users)]
+
+.footer[Hernán et al. (2008) Epidemiology doi:10.1097/EDE.0b013e3181875e61]
+
+---
+
+class: title title-1
+
+# The importance of time zero
+
+.box-inv-1.medium[In a randomized study]
+
+* Eligibility criteria are met
+* Treatment is assigned
+* Study outcomes begin to be recorded
+
+--
+
+.box-inv-1.medium[The same should be true for an observational study!]
+
+---
+
+class: title title-1
+
+# What can go wrong?
+
+
+.pull-left[![](img/time-zero.png) ]
+
+.pull-right[.small[ [1] This can bias the effect estimate because the analysis is restricted to those who remained under follow-up by time zero (like the example!)]
+]
+
+.footer[Hernán et al (2016) Journal of Clinical Epidemiology doi: 10.1016/j.jclinepi.2016.04.014]
+---
+
+class: title title-1
+
+# What can go wrong?
+
+
+.pull-left[![](img/time-zero.png)]
+
+.pull-right[.small[ [2] This increases the opportunity for selection biasbecause the analysis will only include individuals who remain under follow-up at the reset time zero and who meet these posttreatment criteria]]
+
+.footer[Hernán et al (2016) Journal of Clinical Epidemiology doi: 10.1016/j.jclinepi.2016.04.014]
+---
+
+class: title title-1
+
+# What can go wrong?
+
+
+.pull-left[![](img/time-zero.png)]
+
+.pull-right[.small[[3] Because treatment assignment predates eligibility, selection bias may arise (like 2). In addition, bias may also occur because by definition nobody would have an event between treatment assignment and the completion of the eligibility criteria. This is a period, often labeled as "immortal time", during which the risk is guaranteed to be exactly zero. ]]
+
+.footer[Hernán et al (2016) Journal of Clinical Epidemiology doi: 10.1016/j.jclinepi.2016.04.014]
+---
+
+class: title title-1
+
+# What can go wrong?
+
+
+.pull-left[![](img/time-zero.png)]
+.pull-right[.small[[4] This bias occurs when information on treatment after time zero is used to assign individuals to a consistent exposure. ]]
+
+.footer[Hernán et al (2016) Journal of Clinical Epidemiology doi: 10.1016/j.jclinepi.2016.04.014]
+
+---
+
+class: title-1 title
+
+# Observational Study Target Trial
+
+--
+
+.box-1.medium[eligibility criteria]
+
+--
+
+.box-1.medium[consistent exposure]
+
+--
+
+.box-1.medium[follow-up time]
+
+--
+
+.box-1.medium[outcome]
+
+--
+
+.box-inv-1.medium[What is left?]
+
+---
+
+class: section-title-1 title-1 middle
+
+# the only difference between an observational study and target randomized study should be the **exposure assignment procedures**
+
+---
+
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+--
+
+.box-1[Assignment probability must be **individualistic** (your covariates / potential outcomes can't influence my assignment)]
+
+--
+
+.box-1[All units must have **non-zero** probability for all exposures]
+
+--
+
+.box-1[Assignment **cannot** depend on the potential outcomes]
+
+---
+
+
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+
+
+.box-2[Assignment probability must be **individualistic** (your covariates / potential outcomes can't influence my assignment)]
+
+.box-2[All units must have **non-zero** probability for all exposures]
+
+.box-1[Assignment **cannot** depend on the potential outcomes]
+
+---
+
+class:  title-inv-1
+
+# Assignment **cannot** depend on the potential outcomes
+
+.box-1.medium[
+
+`\(\mathbf{Y}(1), \mathbf{Y}(0) \perp \mathbf{X}\)`
+]
+
+---
+class: section-title-1 title-1 middle
+
+# What if we could capture everything that causes this independence assumption to break?
+---
+class: section-title-1 title-1 middle
+
+# confounders
+---
+class: section-title-1 title-1 middle
+
+# confounders: all factors associated with both the potential outcomes and **X**
+---
+
+class:  title-inv-1
+
+# Assignment **cannot** depend on the potential outcomes
+
+.box-1.medium[
+
+`\(\mathbf{Y}(1), \mathbf{Y}(0) \perp \mathbf{X}|\mathbf{Z}\)`
+]
+
+---
+class: title title-1
+
+
+
+# Lucy Land Trial!
+
+.small[
+
+```r
+set.seed(1)
+
+n &lt;- 1000
+meeple &lt;- tibble(
+  happy = sample(rep(c(1, 0), each = n / 2)),
+  happiness = case_when(
+    happy == 1 ~ rbinom(n, 5, 0.7),
+    happy == 0 ~ rbinom(n, 3, 0.2)
+  ),
+  y0 = happiness,
+  y1 = happiness
+)
+```
+]
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+```r
+set.seed(5)
+
+d_lucy &lt;- meeple %&gt;%
+  mutate(x = case_when(
+    happy == 1 ~ rbinom(n, 1, 0.9), 
+    happy == 0 ~ rbinom(n, 1, 0.1) 
+  ), 
+  y_obs = ifelse(x == 1, y1, y0))
+```
+
+---
+
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+```r
+set.seed(5)
+
+d_lucy &lt;- meeple %&gt;%
+* mutate(x = case_when(
+*   happy == 1 ~ rbinom(n, 1, 0.9),
+*   happy == 0 ~ rbinom(n, 1, 0.1)
+* ),
+  y_obs = ifelse(x == 1, y1, y0))
+```
+
+.box-inv-1[What does this violate?]
+
+---
+class: section-title-1 title-1 middle
+
+# the baseline indicator `happy` is a confounder for the exposure (getting ice cream based on whether they `smile`) and the outcome (`happiness`)
+---
+
+class: title title-1
+
+# Confounding
+
+&lt;img src="05-target-trials_files/figure-html/unnamed-chunk-5-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+.small[
+
+```r
+d_lucy %&gt;%
+  summarise(true_causal_effect = mean(y1) - mean(y0))
+```
+
+```
+## # A tibble: 1 × 1
+##   true_causal_effect
+##                &lt;dbl&gt;
+## 1                  0
+```
+]
+--
+
+.box-inv-1[
+`\(\bar{Y}(1) - \bar{Y}(0)\)`
+]
+---
+class: title title-1
+
+# Lucy Land Trial!
+
+.small[
+
+```r
+d_lucy %&gt;%
+  summarise(observed_causal_effect = 
+              sum(y_obs * x) / sum(x) -
+              sum(y_obs * (1 - x)) / sum(1 - x))
+```
+
+```
+## # A tibble: 1 × 1
+##   observed_causal_effect
+##                    &lt;dbl&gt;
+## 1                   2.22
+```
+]
+---
+class: title title-1
+
+# Lucy Land Trial!
+
+.small[
+
+```r
+d_lucy %&gt;%
+  summarise(observed_causal_effect = 
+*             sum(y_obs * x) / sum(x) -
+              sum(y_obs * (1 - x)) / sum(1 - x))
+```
+
+```
+## # A tibble: 1 × 1
+##   observed_causal_effect
+##                    &lt;dbl&gt;
+## 1                   2.22
+```
+]
+
+.box-inv-1.medium[
+
+`\(\bar{Y}^{obs}_e\)`
+]
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+.small[
+
+```r
+d_lucy %&gt;%
+  summarise(observed_causal_effect = 
+              sum(y_obs * x) / sum(x) - 
+*             sum(y_obs * (1 - x)) / sum(1 - x))
+```
+
+```
+## # A tibble: 1 × 1
+##   observed_causal_effect
+##                    &lt;dbl&gt;
+## 1                   2.22
+```
+]
+
+.box-inv-1.medium[
+
+`\(\bar{Y}^{obs}_c\)`
+]
+
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+.small[
+
+```r
+d_lucy %&gt;%
+  group_by(happy) %&gt;%
+  summarise(observed_causal_effect = 
+              sum(y_obs * x) / sum(x) - 
+              sum(y_obs * (1 - x)) / sum(1 - x))
+```
+
+```
+## # A tibble: 2 × 2
+##   happy observed_causal_effect
+##   &lt;dbl&gt;                  &lt;dbl&gt;
+## 1     0                -0.0347
+## 2     1                 0.0194
+```
+]
+
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+.small[
+
+```r
+d_lucy %&gt;%
+* group_by(happy) %&gt;%
+  summarise(observed_causal_effect = 
+              sum(y_obs * x) / sum(x) - 
+              sum(y_obs * (1 - x)) / sum(1 - x))
+```
+
+```
+## # A tibble: 2 × 2
+##   happy observed_causal_effect
+##   &lt;dbl&gt;                  &lt;dbl&gt;
+## 1     0                -0.0347
+## 2     1                 0.0194
+```
+]
+
+
+.box-inv-1[Why did this work?]
+
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+.small[
+
+```r
+d_lucy %&gt;%
+* group_by(happy) %&gt;%
+  summarise(observed_causal_effect = 
+              sum(y_obs * x) / sum(x) - 
+              sum(y_obs * (1 - x)) / sum(1 - x))
+```
+
+```
+## # A tibble: 2 × 2
+##   happy observed_causal_effect
+##   &lt;dbl&gt;                  &lt;dbl&gt;
+## 1     0                -0.0347
+## 2     1                 0.0194
+```
+]
+
+
+.box-inv-1[After conditioning on `happy`, `x` is independent of the potential outcomes]
+---
+
+
+class: section-title-1 title-1 middle
+
+# the only difference between an observational study and target randomized study should be the **exposure assignment procedures**
+
+---
+
+class: section-title-1 title-1 middle
+
+# what if we have several confounders?
+
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+.small[
+
+```r
+d_lucy %&gt;%
+  group_by(happy) %&gt;%
+  summarise(observed_causal_effect = 
+              sum(y_obs * x) / sum(x) - 
+              sum(y_obs * (1 - x)) / sum(1 - x))
+```
+
+```
+## # A tibble: 2 × 2
+##   happy observed_causal_effect
+##   &lt;dbl&gt;                  &lt;dbl&gt;
+## 1     0                -0.0347
+## 2     1                 0.0194
+```
+]
+
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+```r
+p &lt;- glm(x ~ happy, data = d_lucy, family = binomial()) %&gt;%
+  predict(type = "response")
+
+d_lucy &lt;- d_lucy %&gt;%
+  mutate(prob_of_exposure = p)
+```
+
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+```r
+*p &lt;- glm(x ~ happy, data = d_lucy, family = binomial()) %&gt;%
+* predict(type = "response")
+
+d_lucy &lt;- d_lucy %&gt;%
+  mutate(prob_of_exposure = p)
+```
+
+
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+```r
+p &lt;- glm(x ~ happy, data = d_lucy, family = binomial()) %&gt;%
+  predict(type = "response")
+
+*d_lucy &lt;- d_lucy %&gt;%
+* mutate(prob_of_exposure = p)
+```
+
+--
+
+.box-inv-1[Estimate the probability of being "assigned" to the exposure]
+
+---
+class: title title-1
+
+# Lucy Land Trial!
+
+.small[
+
+```r
+d_lucy
+```
+
+```
+## # A tibble: 1,000 × 7
+##    happy happiness    y0    y1     x y_obs prob_of_exposure
+##    &lt;dbl&gt;     &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;            &lt;dbl&gt;
+##  1     0         1     1     1     0     1            0.130
+##  2     0         1     1     1     0     1            0.130
+##  3     1         4     4     4     0     4            0.886
+##  4     0         1     1     1     0     1            0.130
+##  5     0         0     0     0     0     0            0.130
+##  6     1         4     4     4     1     4            0.886
+##  7     1         4     4     4     1     4            0.886
+##  8     1         2     2     2     1     2            0.886
+##  9     0         0     0     0     0     0            0.130
+## 10     1         4     4     4     1     4            0.886
+## # … with 990 more rows
+```
+
+]
+
+---
+class: title title-1
+
+# Lucy Land Trial!
+
+
+```r
+d_lucy %&gt;%
+  mutate(wt = x / p + (1 - x) / (1 - p)) %&gt;%
+  summarise(observed_causal_effect = 
+              sum(y_obs * x * wt) / sum(x * wt) - 
+              sum(y_obs * (1 - x) * wt) / sum((1 - x) * wt))
+```
+
+```
+## # A tibble: 1 × 1
+##   observed_causal_effect
+##                    &lt;dbl&gt;
+## 1               -0.00761
+```
+---
+class: title title-1
+
+# Lucy Land Trial!
+
+
+```r
+d_lucy %&gt;%
+* mutate(wt = x / p + (1 - x) / (1 - p)) %&gt;%
+  summarise(observed_causal_effect = 
+              sum(y_obs * x * wt) / sum(x * wt) - 
+              sum(y_obs * (1 - x) * wt) / sum((1 - x) * wt)) 
+```
+
+```
+## # A tibble: 1 × 1
+##   observed_causal_effect
+##                    &lt;dbl&gt;
+## 1               -0.00761
+```
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+```r
+d_lucy %&gt;%
+  mutate(wt = x / p + (1 - x) / (1 - p)) %&gt;%
+  summarise(observed_causal_effect = 
+*             sum(y_obs * x * wt) / sum(x * wt) -
+*             sum(y_obs * (1 - x) * wt) / sum((1 - x) * wt))
+```
+
+```
+## # A tibble: 1 × 1
+##   observed_causal_effect
+##                    &lt;dbl&gt;
+## 1               -0.00761
+```
+
+---
+
+class: section-title-1 title-1 middle
+
+# If you can condition on all confounders, you can regain an exposure assignment independent of the potential outcomes 💪
+
+---
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

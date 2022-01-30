@@ -4,7 +4,7 @@
     <title>Randomized Trials</title>
     <meta charset="utf-8" />
     <meta name="author" content="Lucy D’Agostino McGowan" />
-    <meta name="date" content="2022-01-26" />
+    <meta name="date" content="2022-01-29" />
     <script src="libs/header-attrs-2.10/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
@@ -611,7 +611,7 @@ class: title title-1
 
 .box-inv-1[
 .huge[
-`$$Y_c^{obs}=\frac{1}{N_c}\sum_{i:X_i=0}Y_i^{obs}$$`
+`$$\bar{Y}_c^{obs}=\frac{1}{N_c}\sum_{i:X_i=0}Y_i^{obs}$$`
 ]
 ]
 
@@ -625,7 +625,7 @@ class: title title-1
 
 .box-inv-1[
 .huge[
-`$$Y_e^{obs}=\frac{1}{N_e}\sum_{i:X_i=1}Y_i^{obs}$$`
+`$$\bar{Y}_e^{obs}=\frac{1}{N_e}\sum_{i:X_i=1}Y_i^{obs}$$`
 ]
 ]
 ---
@@ -889,196 +889,6 @@ class: title title-1, center
 .huge[[github.com/sta-679-s22](https://github.com/sta-679-s22)]
 
 ---
-
-class: title title-1 center
-
-# Why not always conduct an experiment?
-
-
-⚕️ ethics 
---
-  💸 money 
---
-  🕚 time 
-
---
-
-.box-inv-1.medium[Deferring a decision **is** a decision]
-
----
-
-class: title title-1
-
-# Target Trial
-
-* What experiment would you design if you could?
-
----
-
-class: title title-1
-
-# Algorithm for causal inference
-
-&lt;br&gt;&lt;br&gt;
-1. **Ask** causal questions
---
-
-2. **Answer** the causal question
-
-.footer[Miguel Hernàn, Target Trials]
-
----
-
-class: title title-1
-
-# Algorithm for causal inference
-
-&lt;br&gt;&lt;br&gt;
-1. **Ask** causal questions  
-  * Specify the protocal for a target trial
---
-
-2. **Answer** the causal question  
- * Conduct the target trial if possible, OR
- * Use observational data to **emulate** the target trial
-
-.footer[Miguel Hernàn, Target Trials]
----
-
-class: title title-1
-
-# Compontents of a target trial
-
-.pull-left[
-.box-inv-1.medium[eligibility criteria]
-
-.box-inv-1.medium[treatment strategy]
-
-.box-inv-1.medium[assignment procedures]
-
-]
---
-.pull-right[
-.box-inv-1.medium[follow-up period]
-
-.box-inv-1.medium[outcome]
-
-.box-inv-1.medium[causal contrasts of interest]
-
-.box-inv-1.medium[analysis plan]
-
-]
-
-.footer[Hernán &amp; Robins. (2016) American Journal of Epidemiology doi:10.1093/aje/kwv254]
-
----
-
-class: title title-1
-
-# An example
-
-.pull-left[
-.box-inv-1.medium[observational data]
-
-* Women who used hormone replacement therapy had **lower risk** of heart disease compared to those who didn't
-]
-
---
-
-.pull-right[
-.box-inv-1.medium[randomized trial]
-
-* Women who were randomized to use hormone replacement therapy had **higher risk** of heart disease compared to those who didn't
-]
-
-.footer[Miguel Hernàn, Target Trials]
-
----
-class: title title-1
-
-# Why the difference?
-
-* The randomized trial compared people who *started* treatment compared to those who didn't
-* Observational trial compared *current* users; people who were susceptible to heart disease were already out of the cohort! So current use became a marker of not being susceptible. 
-
-.footer[Hernán et al. (2008) Epidemiology doi:10.1097/EDE.0b013e3181875e61]
-
----
-
-class: title title-1
-
-# The solution?
-
-* Reanalyze the observational data like the randomized trial (new users vs non users)
-
-.footer[Hernán et al. (2008) Epidemiology doi:10.1097/EDE.0b013e3181875e61]
-
----
-
-class: title title-1
-
-# The importance of time zero
-
-.box-inv-1.medium[In a randomized study]
-
-* Eligibility criteria are met
-* Treatment is assigned
-* Study outcomes begin to be recorded
-
---
-
-.box-inv-1.medium[The same should be true for an observational study!]
-
----
-
-class: title title-1
-
-# What can go wrong?
-
-
-.pull-left[![](img/time-zero.png) ]
-
-.pull-right[.small[ [1] This can bias the effect estimate because the analysis is restricted to those who remained under follow-up by time zero (like the example!)]
-]
-
-.footer[Hernán et al (2016) Journal of Clinical Epidemiology doi: 10.1016/j.jclinepi.2016.04.014]
----
-
-class: title title-1
-
-# What can go wrong?
-
-
-.pull-left[![](img/time-zero.png)]
-
-.pull-right[.small[ [2] This increases the opportunity for selection biasbecause the analysis will only include individuals who remain under follow-up at the reset time zero and who meet these posttreatment criteria]]
-
-.footer[Hernán et al (2016) Journal of Clinical Epidemiology doi: 10.1016/j.jclinepi.2016.04.014]
----
-
-class: title title-1
-
-# What can go wrong?
-
-
-.pull-left[![](img/time-zero.png)]
-
-.pull-right[.small[[3] Because treatment assignment predates eligibility, selection bias may arise (like 2). In addition, bias may also occur because by definition nobody would have an event between treatment assignment and the completion of the eligibility criteria. This is a period, often labeled as "immortal time", during which the risk is guaranteed to be exactly zero. ]]
-
-.footer[Hernán et al (2016) Journal of Clinical Epidemiology doi: 10.1016/j.jclinepi.2016.04.014]
----
-
-class: title title-1
-
-# What can go wrong?
-
-
-.pull-left[![](img/time-zero.png)]
-.pull-right[.small[[4] This bias occurs when information on treatment after time zero is used to assign individuals to a treatment strategy. ]]
-
-.footer[Hernán et al (2016) Journal of Clinical Epidemiology doi: 10.1016/j.jclinepi.2016.04.014]
-
-
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
