@@ -7,6 +7,9 @@ body, h1, h2, h3 {
   font-family: 'Fira Sans Condensed', sans;
 }
 
+body {
+  color: #86a293;;
+}
 h1, h2, h3 {
   font-weight: 600;
 }
@@ -646,3 +649,71 @@ figcaption {
     background: #A52C60;
       color: #FFFFFF;
   }
+
+
+ul {
+  font-size: 48px;
+  list-style-type: none;
+  text-align: left;
+  font-weight: 500;
+  padding-top: 40px;
+}
+
+ul li {
+  padding-bottom: 40px;
+}
+
+ol {
+  counter-reset: my-counter;
+  list-style: none;
+  padding-left: 40px;
+  font-size: 45px;
+  font-weight: bold;
+  text-align: left;
+}
+
+ol li {
+  counter-increment: my-counter;
+  padding-left: 40px;
+  position: relative;
+  font-size: 45px;
+  margin: 20px 0;
+  display: block;
+  margin-block-start: 0.83em;
+  margin-block-end: 0.83em;
+  margin-inline-start: 0;
+  margin-inline-end: 0;
+}
+
+ol li::before {
+  content: counter(my-counter);
+  color: #fff;
+  font-size: 40px;
+  font-weight: bold;
+  position: absolute;
+  left: -25px;
+  line-height: 50px;
+  width: 50px;
+  height: 50px;
+  top: 0;
+  background: #d29380;
+  border-radius: 50%;
+  text-align: center;
+}
+
+.num {
+  position: absolute;
+  color: #fff;
+  font-size: 40px;
+  font-weight: bold;
+  line-height: 50px;
+  width: 50px;
+  height: 50px;
+  background: #d29380;
+  border-radius: 50%;
+  text-align: center;
+}
+
+a{
+  color: #e2c1c0;
+}

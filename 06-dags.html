@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Causal Diagrams</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lucy D’Agostino McGowan" />
+    <meta name="date" content="2022-02-04" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+class: center middle main-title section-title-1
+
+# Causal Diagrams
+
+.class-info[
+
+**Session 7**
+
+.light[STA 379/679: Causal Inference &lt;br&gt;
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+
+class: title title-1
+
+# Causal Diagrams
+
+.box-1[Visual depiction of causal relationships]
+
+--
+
+.box-1[Shows variables (nodes) and relationships (edges)]
+
+--
+
+.box-1[Time goes left to right]
+
+--
+
+.box-1[An arrow from one variable to another indicates a direct causal effect]
+
+---
+class: title title-1
+
+# Causal Diagrams
+
+&lt;img src="06-dags_files/figure-html/unnamed-chunk-1-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: title title-1
+
+# Causal Diagrams: DAGs
+
+
+.pull-left-3[
+
+.box-inv-1.medium[directed]
+
+
+]
+
+--
+
+.pull-middle-3[
+
+.box-inv-1.medium[acyclic]
+
+
+]
+
+--
+
+.pull-right-3[
+
+.box-inv-1.medium[graph]
+
+
+]
+---
+
+class: title title-1
+
+# Causal Diagrams: DAGs
+
+
+.pull-left-3[
+
+.box-inv-1.medium[directed]
+
+.box-1[edges imply direction (arrows)]
+
+]
+
+
+
+.pull-middle-3[
+
+.box-inv-1.medium[acyclic]
+
+
+]
+
+
+
+.pull-right-3[
+
+.box-inv-1.medium[graph]
+
+
+]
+---
+
+class: title title-1
+
+# Causal Diagrams: DAGs
+
+
+.pull-left-3[
+
+.box-inv-1.medium[directed]
+
+.box-1[edges imply direction (arrows)]
+
+]
+
+
+
+.pull-middle-3[
+
+.box-inv-1.medium[acyclic]
+
+.box-1[no variables can "cause" themselves, thus there are no *cycles*]
+]
+
+
+
+.pull-right-3[
+
+.box-inv-1.medium[graph]
+
+
+]
+---
+
+
+class: title title-1
+
+# Causal Diagrams: DAGs
+
+
+.pull-left-3[
+
+.box-inv-1.medium[directed]
+
+.box-1[edges imply direction (arrows)]
+
+]
+
+
+
+.pull-middle-3[
+
+.box-inv-1.medium[acyclic]
+
+.box-1[no variables can "cause" themselves, thus there are no *cycles*]
+]
+
+
+
+.pull-right-3[
+
+.box-inv-1.medium[graph]
+
+.box-1[it's a graph!]
+]
+---
+
+class: section-title section-title-1 middle 
+
+# "Draw your assumptions before your conclusions" 
+## -- Miguel Hernán
+---
+class: title-1 title
+
+# Drawing causal diagrams
+
+1. Specify your causal question
+
+
+.footer[
+Barrett &amp; D'Agostino McGowan *Causal Inference Workshop* https://causal-inference-r-workshop.netlify.app
+]
+
+---
+
+class: title-1 title
+
+# Drawing causal diagrams
+
+1. Specify your causal question
+1. Use domain knowledge
+
+.footer[
+Barrett &amp; D'Agostino McGowan *Causal Inference Workshop* https://causal-inference-r-workshop.netlify.app
+]
+
+---
+
+class: title-1 title
+
+# Drawing causal diagrams
+
+1. Specify your causal question
+1. Use domain knowledge
+1. Write variables as nodes
+
+.footer[
+Barrett &amp; D'Agostino McGowan *Causal Inference Workshop* https://causal-inference-r-workshop.netlify.app
+]
+
+---
+
+class: title-1 title
+
+# Drawing causal diagrams
+
+1. Specify your causal question
+1. Use domain knowledge
+1. Write variables as nodes
+1. Write causal pathways as arrows (edges)
+
+.footer[
+Barrett &amp; D'Agostino McGowan *Causal Inference Workshop* https://causal-inference-r-workshop.netlify.app
+]
+
+---
+
+class: title title-1
+
+# Specify your causal question
+
+.box-inv-1.medium[Does listening to a comedy podcast the morning before an exam improve graduate students test scores?]
+
+---
+
+class: title title-1 center
+
+# Specify your causal question
+
+&lt;img src = "img/test-dag/test-dag.001.jpeg" height = "600"&gt;&lt;/img&gt;
+
+---
+
+
+class: title title-1 center
+
+# Specify your causal question
+
+&lt;img src = "img/test-dag/test-dag.002.jpeg" height = "600"&gt;&lt;/img&gt;
+
+---
+
+class: title title-1 
+
+# Use domain knowledge
+
+.pull-left[
+.box-1[What are all of the things that could "cause" you to listen to a comedy podcast]
+]
+--
+
+.pull-right[
+.box-1[What are all of the things that could "cause" you to do well on a test]
+]
+---
+
+class: title title-1 center
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+&lt;br&gt;&lt;br&gt;&lt;br&gt;
+
+## [bit.ly/sta-679-s22-ae6](https://bit.ly/sta-679-s22-ae6)
+
+---
+
+class: section-title section-title-1 middle
+
+# install.packages("ggdag")
+
+---
+
+class: title title-1
+
+# Specify your DAG
+
+
+```r
+library(ggdag)
+dagify(
+  podcast ~ mood + humor + prepared,
+  exam ~ mood + prepared,
+  exposure = "podcast",
+  outcome = "exam"
+) %&gt;%
+  ggdag() + 
+  theme_dag()
+```
+
+---
+class: title title-1
+
+# Specify your DAG
+
+
+```r
+library(ggdag)
+dagify(
+* podcast ~ mood + humor + prepared,
+  exam ~ mood + prepared,
+  exposure = "podcast",
+  outcome = "exam"
+) %&gt;%
+  ggdag() + 
+  theme_dag()
+```
+
+---
+class: title title-1
+
+
+# Specify your DAG
+
+
+```r
+library(ggdag)
+dagify(
+  podcast ~ mood + humor + prepared,
+* exam ~ mood + prepared,
+  exposure = "podcast",
+  outcome = "exam"
+) %&gt;%
+  ggdag() + 
+  theme_dag()
+```
+
+---
+class: title title-1
+
+# Specify your DAG
+
+
+```r
+library(ggdag)
+dagify(
+  podcast ~ mood + humor + prepared,
+  exam ~ mood + prepared,
+* exposure = "podcast",
+  outcome = "exam"
+) %&gt;%
+  ggdag() + 
+  theme_dag()
+```
+
+---
+class: title title-1
+
+# Specify your DAG
+
+
+```r
+library(ggdag)
+dagify(
+  podcast ~ mood + humor + prepared,
+  exam ~ mood + prepared,
+  exposure = "podcast",
+* outcome = "exam"
+) %&gt;%
+  ggdag() + 
+  theme_dag()
+```
+
+---
+
+class: title title-1
+
+# Specify your DAG
+
+
+```r
+library(ggdag)
+dagify(
+  podcast ~ mood + humor + prepared,
+  exam ~ mood + prepared,
+  exposure = "podcast",
+  outcome = "exam"
+) %&gt;%
+* ggdag() +
+  theme_dag()
+```
+
+--
+
+.box-1[Note, we haven't ordered this by time yet, we'll deal with that in a bit!]
+
+---
+
+class: title title-1
+
+# Specify your DAG
+
+&lt;img src="06-dags_files/figure-html/unnamed-chunk-8-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: title title-1
+
+# Spurious causal effect?
+
+.box-inv-1.medium[Backdoor paths]
+
+--
+
+.box-1[Causal paths that point into both the "exposure" node and "outcome" node]
+
+--
+
+.box-1[If the experiment is randomized, there are no backdoor paths from the exposure to outcome]
+
+--
+
+.box-1[Otherwise, we can *condition* on measured covariates in order to blog all backdoor paths]
+
+---
+
+class: title title-1
+
+# Eliminate backdoor paths
+
+
+```r
+dagify(
+  podcast ~ mood + humor + prepared,
+  exam ~ mood + prepared,
+  exposure = "podcast",
+  outcome = "exam"
+) %&gt;%
+  ggdag_paths()
+```
+
+---
+
+
+class: title title-1
+
+# Eliminate backdoor paths
+
+
+```r
+dagify(
+  podcast ~ mood + humor + prepared,
+  exam ~ mood + prepared,
+  exposure = "podcast",
+  outcome = "exam"
+) %&gt;%
+* ggdag_paths()
+```
+
+---
+
+
+class: title title-1
+
+# Eliminate backdoor paths
+
+.pull-left[
+&lt;img src="06-dags_files/figure-html/unnamed-chunk-11-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+--
+.pull-right[
+.box-1[What isn't here? Why?]
+]
+---
+
+class: title title-1
+
+# Identify adjustment sets
+
+
+```r
+dagify(
+  podcast ~ mood + humor + prepared,
+  exam ~ mood + prepared,
+  exposure = "podcast",
+  outcome = "exam"
+) %&gt;%
+  ggdag_adjustment_set()
+```
+
+---
+
+class: title title-1
+
+# Identify adjustment sets
+
+
+```r
+dagify(
+  podcast ~ mood + humor + prepared,
+  exam ~ mood + prepared,
+  exposure = "podcast",
+  outcome = "exam"
+) %&gt;%
+* ggdag_adjustment_set()
+```
+
+---
+
+class: title title-1
+
+# Identify adjustment sets
+
+&lt;img src="06-dags_files/figure-html/unnamed-chunk-14-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: title title-1
+
+# Time order
+
+
+```r
+coord_dag &lt;- list(
+  x = c(mood = 1, prepared = 1, podcast = 2, exam = 3),
+  y = c(mood = 0.5, prepared = 1.5, podcast = 1, exam = 1)
+)
+
+dagify(
+  podcast ~ prepared + mood ,
+  exam ~ prepared + mood,
+  coords = coord_dag
+) %&gt;%
+  ggdag() +
+  theme_dag()
+```
+
+---
+class: title title-1
+# Time order
+
+
+```r
+*coord_dag &lt;- list(
+  x = c(mood = 1, prepared = 1, podcast = 2, exam = 3), 
+  y = c(mood = 0.5, prepared = 1.5, podcast = 1, exam = 1) 
+*) 
+
+dagify(
+  podcast ~ prepared + mood ,
+  exam ~ prepared + mood,
+  coords = coord_dag
+) %&gt;%
+  ggdag() +
+  theme_dag()
+```
+
+---
+
+class: title title-1
+# Time order
+
+
+```r
+coord_dag &lt;- list( 
+* x = c(mood = 1, prepared = 1, podcast = 2, exam = 3),
+  y = c(mood = 0.5, prepared = 1.5, podcast = 1, exam = 1) 
+) 
+
+dagify(
+  podcast ~ prepared + mood ,
+  exam ~ prepared + mood,
+  coords = coord_dag
+) %&gt;%
+  ggdag() +
+  theme_dag()
+```
+
+---
+
+class: title title-1
+# Time order
+
+
+```r
+coord_dag &lt;- list( 
+  x = c(mood = 1, prepared = 1, podcast = 2, exam = 3), 
+* y = c(mood = 0.5, prepared = 1.5, podcast = 1, exam = 1)
+) 
+
+dagify(
+  podcast ~ prepared + mood ,
+  exam ~ prepared + mood,
+  coords = coord_dag
+) %&gt;%
+  ggdag() +
+  theme_dag()
+```
+
+---
+
+class: title title-1
+# Time order
+
+
+```r
+coord_dag &lt;- list( 
+  x = c(mood = 1, prepared = 1, podcast = 2, exam = 3), 
+  y = c(mood = 0.5, prepared = 1.5, podcast = 1, exam = 1) 
+) 
+
+dagify(
+  podcast ~ prepared + mood ,
+  exam ~ prepared + mood,
+* coords = coord_dag
+) %&gt;%
+  ggdag() +
+  theme_dag()
+```
+
+---
+
+class: title title-1
+# Time order
+
+&lt;img src="06-dags_files/figure-html/unnamed-chunk-20-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+
+
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
