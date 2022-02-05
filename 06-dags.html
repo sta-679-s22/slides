@@ -4,7 +4,7 @@
     <title>Causal Diagrams</title>
     <meta charset="utf-8" />
     <meta name="author" content="Lucy D’Agostino McGowan" />
-    <meta name="date" content="2022-02-04" />
+    <meta name="date" content="2022-02-05" />
     <script src="libs/header-attrs-2.11/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
@@ -35,6 +35,300 @@ Lucy D'Agostino McGowan
 ]
 
 ---
+class: center
+
+&lt;img src="img/twitter-correlation.png" height = "600"&gt;&lt;/img&gt;
+
+---
+
+class: title title-1
+
+# What causes spurious correlations?
+
+1. Random chance
+
+---
+
+
+class: title title-1
+
+# What causes spurious correlations?
+
+1. Random chance
+1. Confounders
+
+---
+
+class: title title-1
+
+# How do we correct for these?
+
+.pull-left[
+.box-inv-1[Random chance]
+]
+
+---
+class: title title-1
+
+# How do we correct for these?
+
+.pull-left[
+.box-inv-1[Random chance]
+
+.box-1[Classic statistics!]
+]
+---
+class: title title-1
+
+# How do we correct for these?
+
+.pull-left[
+.box-inv-1[Random chance]
+
+.box-1[Classic statistics!]
+
+.box-1[Measures of uncertainty (i.e.confidence intervals)]
+]
+
+---
+
+![](img/spurious-correlations-book.jpg)
+
+.footer[https://www.tylervigen.com/spurious-correlations]
+
+---
+
+![](img/nic-cage.png)
+
+---
+
+
+
+.small[
+
+```r
+d &lt;- tibble(
+  year = 1999:2009,
+  nic_cage = c(2, 2, 2, 3, 1, 1, 2, 3, 4, 1, 4),
+  drownings = c(109, 102, 102, 98, 85, 95, 96, 98, 123, 94, 102),
+)
+
+cor.test(~ nic_cage + drownings, data = d)
+```
+
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  nic_cage and drownings
+## t = 2.6785, df = 9, p-value = 0.02527
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  0.1101273 0.9045101
+## sample estimates:
+##       cor 
+## 0.6660043
+```
+]
+
+---
+
+.small[
+
+```r
+d &lt;- tibble(
+  year = 1999:2009,
+  nic_cage = c(2, 2, 2, 3, 1, 1, 2, 3, 4, 1, 4),
+  drownings = c(109, 102, 102, 98, 85, 95, 96, 98, 123, 94, 102),
+)
+
+cor.test(~ nic_cage + drownings, data = d)
+```
+
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  nic_cage and drownings
+## t = 2.6785, df = 9, p-value = 0.02527
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+*##  0.1101273 0.9045101
+## sample estimates:
+##       cor 
+## 0.6660043
+```
+]
+
+---
+
+class: title title-1
+
+# How do we correct for these?
+
+.pull-left[
+.box-inv-1[Random chance]
+
+.box-1[Classic statistics!]
+
+.box-1[Measures of uncertainty (i.e.confidence intervals)]
+]
+
+.pull-right[
+.box-inv-1[Confounders]
+]
+
+---
+
+class: title title-1
+
+# How do we correct for these?
+
+.pull-left[
+.box-inv-1[Random chance]
+
+.box-1[Classic statistics!]
+
+.box-1[Measures of uncertainty (i.e.confidence intervals)]
+]
+
+.pull-right[
+.box-inv-1[Confounders]
+
+.box-1[adjust for confounders!]
+]
+
+---
+
+![](img/cheese.png)
+---
+
+.small[
+
+```r
+d &lt;- tibble(
+  year = 2000:2009,
+  bedsheets = c(327, 456, 509, 497, 596, 573, 661, 741, 809, 717),
+  cheese = c(29.8, 30.1, 30.5, 30.6, 31.3, 31.7, 32.6, 33.1, 32.7, 32.8),
+)
+cor.test(~bedsheets + cheese, data = d)
+```
+
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  bedsheets and cheese
+## t = 8.346, df = 8, p-value = 3.216e-05
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  0.7864140 0.9877242
+## sample estimates:
+##       cor 
+## 0.9470911
+```
+]
+
+---
+
+.small[
+
+```r
+d &lt;- tibble(
+  year = 2000:2009,
+  bedsheets = c(327, 456, 509, 497, 596, 573, 661, 741, 809, 717),
+  cheese = c(29.8, 30.1, 30.5, 30.6, 31.3, 31.7, 32.6, 33.1, 32.7, 32.8),
+)
+cor.test(~bedsheets + cheese, data = d)
+```
+
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  bedsheets and cheese
+## t = 8.346, df = 8, p-value = 3.216e-05
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+*##  0.7864140 0.9877242
+## sample estimates:
+##       cor 
+## 0.9470911
+```
+]
+---
+
+class: title title-1
+
+# Confounder: time
+
+.pull-left[
+&lt;img src="06-dags_files/figure-html/unnamed-chunk-6-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right[
+&lt;img src="06-dags_files/figure-html/unnamed-chunk-7-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+---
+
+.small[
+
+```r
+d &lt;- tibble(
+  year = 2000:2009,
+  bedsheets = c(327, 456, 509, 497, 596, 573, 661, 741, 809, 717),
+  cheese = c(29.8, 30.1, 30.5, 30.6, 31.3, 31.7, 32.6, 33.1, 32.7, 32.8),
+* bedsheets_ind = bedsheets - lag(bedsheets),
+* cheese_ind = cheese - lag(cheese)
+)
+cor.test(~bedsheets_ind + cheese_ind, data = d)
+```
+
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  bedsheets_ind and cheese_ind
+## t = 0.93825, df = 7, p-value = 0.3794
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.4240088  0.8170022
+## sample estimates:
+##       cor 
+## 0.3342299
+```
+]
+---
+.small[
+
+```r
+d &lt;- tibble(
+  year = 2000:2009,
+  bedsheets = c(327, 456, 509, 497, 596, 573, 661, 741, 809, 717),
+  cheese = c(29.8, 30.1, 30.5, 30.6, 31.3, 31.7, 32.6, 33.1, 32.7, 32.8),
+  bedsheets_ind = bedsheets - lag(bedsheets),
+  cheese_ind = cheese - lag(cheese)
+)
+cor.test(~bedsheets_ind + cheese_ind, data = d)
+```
+
+```
+## 
+## 	Pearson's product-moment correlation
+## 
+## data:  bedsheets_ind and cheese_ind
+*## t = 0.93825, df = 7, p-value = 0.3794
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+*##  -0.4240088  0.8170022
+## sample estimates:
+##       cor 
+## 0.3342299
+```
+]
+---
 
 class: title title-1
 
@@ -59,7 +353,7 @@ class: title title-1
 
 # Causal Diagrams
 
-&lt;img src="06-dags_files/figure-html/unnamed-chunk-1-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="06-dags_files/figure-html/unnamed-chunk-10-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -425,7 +719,7 @@ class: title title-1
 
 # Specify your DAG
 
-&lt;img src="06-dags_files/figure-html/unnamed-chunk-8-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="06-dags_files/figure-html/unnamed-chunk-17-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -490,7 +784,7 @@ class: title title-1
 # Eliminate backdoor paths
 
 .pull-left[
-&lt;img src="06-dags_files/figure-html/unnamed-chunk-11-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="06-dags_files/figure-html/unnamed-chunk-20-1.png" width="504" style="display: block; margin: auto;" /&gt;
 ]
 --
 .pull-right[
@@ -536,7 +830,7 @@ class: title title-1
 
 # Identify adjustment sets
 
-&lt;img src="06-dags_files/figure-html/unnamed-chunk-14-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="06-dags_files/figure-html/unnamed-chunk-23-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -648,7 +942,7 @@ dagify(
 class: title title-1
 # Time order
 
-&lt;img src="06-dags_files/figure-html/unnamed-chunk-20-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="06-dags_files/figure-html/unnamed-chunk-29-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 
 

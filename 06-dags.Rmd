@@ -44,6 +44,220 @@ Lucy D'Agostino McGowan
 ]
 
 ---
+class: center
+
+<img src="img/twitter-correlation.png" height = "600"></img>
+
+---
+
+class: title title-1
+
+# What causes spurious correlations?
+
+1. Random chance
+
+---
+
+
+class: title title-1
+
+# What causes spurious correlations?
+
+1. Random chance
+1. Confounders
+
+---
+
+class: title title-1
+
+# How do we correct for these?
+
+.pull-left[
+.box-inv-1[Random chance]
+]
+
+---
+class: title title-1
+
+# How do we correct for these?
+
+.pull-left[
+.box-inv-1[Random chance]
+
+.box-1[Classic statistics!]
+]
+---
+class: title title-1
+
+# How do we correct for these?
+
+.pull-left[
+.box-inv-1[Random chance]
+
+.box-1[Classic statistics!]
+
+.box-1[Measures of uncertainty (i.e.confidence intervals)]
+]
+
+---
+
+![](img/spurious-correlations-book.jpg)
+
+.footer[https://www.tylervigen.com/spurious-correlations]
+
+---
+
+![](img/nic-cage.png)
+
+---
+
+```{r, include = FALSE}
+library(tidyverse)
+```
+
+.small[
+```{r}
+d <- tibble(
+  year = 1999:2009,
+  nic_cage = c(2, 2, 2, 3, 1, 1, 2, 3, 4, 1, 4),
+  drownings = c(109, 102, 102, 98, 85, 95, 96, 98, 123, 94, 102),
+)
+
+cor.test(~ nic_cage + drownings, data = d)
+```
+]
+
+---
+
+.small[
+```{r, highlight.output = 8}
+d <- tibble(
+  year = 1999:2009,
+  nic_cage = c(2, 2, 2, 3, 1, 1, 2, 3, 4, 1, 4),
+  drownings = c(109, 102, 102, 98, 85, 95, 96, 98, 123, 94, 102),
+)
+
+cor.test(~ nic_cage + drownings, data = d)
+```
+]
+
+---
+
+class: title title-1
+
+# How do we correct for these?
+
+.pull-left[
+.box-inv-1[Random chance]
+
+.box-1[Classic statistics!]
+
+.box-1[Measures of uncertainty (i.e.confidence intervals)]
+]
+
+.pull-right[
+.box-inv-1[Confounders]
+]
+
+---
+
+class: title title-1
+
+# How do we correct for these?
+
+.pull-left[
+.box-inv-1[Random chance]
+
+.box-1[Classic statistics!]
+
+.box-1[Measures of uncertainty (i.e.confidence intervals)]
+]
+
+.pull-right[
+.box-inv-1[Confounders]
+
+.box-1[adjust for confounders!]
+]
+
+---
+
+![](img/cheese.png)
+---
+
+.small[
+```{r}
+
+d <- tibble(
+  year = 2000:2009,
+  bedsheets = c(327, 456, 509, 497, 596, 573, 661, 741, 809, 717),
+  cheese = c(29.8, 30.1, 30.5, 30.6, 31.3, 31.7, 32.6, 33.1, 32.7, 32.8),
+)
+cor.test(~bedsheets + cheese, data = d)
+```
+]
+
+---
+
+.small[
+```{r, highlight.output = 8}
+
+d <- tibble(
+  year = 2000:2009,
+  bedsheets = c(327, 456, 509, 497, 596, 573, 661, 741, 809, 717),
+  cheese = c(29.8, 30.1, 30.5, 30.6, 31.3, 31.7, 32.6, 33.1, 32.7, 32.8),
+)
+cor.test(~bedsheets + cheese, data = d)
+```
+]
+---
+
+class: title title-1
+
+# Confounder: time
+
+.pull-left[
+```{r, echo = FALSE}
+acf(d$cheese, main = "Autocorrelation Cheese Consumption")
+```
+]
+
+--
+
+.pull-right[
+```{r, echo = FALSE}
+acf(d$bedsheets, main = "Autocorrelation Bedsheet Tangling")
+```
+]
+---
+
+.small[
+```{r}
+
+d <- tibble(
+  year = 2000:2009,
+  bedsheets = c(327, 456, 509, 497, 596, 573, 661, 741, 809, 717),
+  cheese = c(29.8, 30.1, 30.5, 30.6, 31.3, 31.7, 32.6, 33.1, 32.7, 32.8),
+  bedsheets_ind = bedsheets - lag(bedsheets), #<<
+  cheese_ind = cheese - lag(cheese) #<<
+)
+cor.test(~bedsheets_ind + cheese_ind, data = d)
+```
+]
+---
+.small[
+```{r, highlight.output = c(5, 8)}
+
+d <- tibble(
+  year = 2000:2009,
+  bedsheets = c(327, 456, 509, 497, 596, 573, 661, 741, 809, 717),
+  cheese = c(29.8, 30.1, 30.5, 30.6, 31.3, 31.7, 32.6, 33.1, 32.7, 32.8),
+  bedsheets_ind = bedsheets - lag(bedsheets),
+  cheese_ind = cheese - lag(cheese)
+)
+cor.test(~bedsheets_ind + cheese_ind, data = d)
+```
+]
+---
 
 class: title title-1
 
