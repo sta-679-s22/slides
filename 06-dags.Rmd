@@ -703,6 +703,13 @@ class: title title-1
 
 class: title title-1
 
+# Spurious associations 
+
+![](img/dags-cars/dags-cars.001.png)
+---
+
+class: title title-1
+
 # Eliminate backdoor paths
 
 ```{r, eval = FALSE}
@@ -922,7 +929,185 @@ dagify(
   theme_dag()
 ```
 
+---
 
+
+class: title title-1 center
+
+# Causal Diagram Practice
+
+.box-inv-1[What should we adjust for to close the open path(s)?]
+
+```{r, echo = FALSE, fig.height = 6}
+coord_dag <- list( 
+  x = c(a = 1, b = 1, x = 2, y = 3), 
+  y = c(a = 0.5, b = 1.5, x = 1, y = 1) 
+) 
+dagify(
+  x ~ a + b ,
+  y ~ a + b,
+  coords = coord_dag
+) %>%
+  ggdag(node_size = 20) +
+  theme_dag()
+```
+
+---
+
+class: title title-1 center
+
+# Causal Diagram Practice
+
+.box-inv-1[What should we adjust for to close the open path(s)?]
+
+```{r, echo = FALSE, fig.height = 6}
+coord_dag <- list( 
+  x = c(a = 1, b = 1, x = 2, y = 3), 
+  y = c(a = 0.5, b = 1.5, x = 1, y = 1) 
+) 
+dagify(
+  x ~ a + b ,
+  y ~ a + b,
+  exposure = "x",
+  outcome = "y",
+  coords = coord_dag
+) %>%
+  ggdag_adjustment_set(shadow = TRUE)
+```
+
+---
+
+class: title title-1 
+# Causal Diagram Practice
+
+.box-inv-1[What should we adjust for to close the open path(s)?]
+
+```{r, echo = FALSE, fig.height = 6}
+coord_dag <- list( 
+  x = c(a = 1, b = 1, c = 1.5, x = 2, y = 3), 
+  y = c(a = 0.5, c = 0, b = 1.5, x = 1, y = 1) 
+) 
+dagify(
+  x ~ a + b + c,
+  y ~ a + b,
+  c ~ a,
+  coords = coord_dag
+) %>%
+  ggdag(node_size = 20) +
+  theme_dag()
+```
+
+---
+
+
+class: title title-1 
+# Causal Diagram Practice
+
+.box-inv-1[What should we adjust for to close the open path(s)?]
+
+```{r, echo = FALSE, fig.height = 6}
+coord_dag <- list( 
+  x = c(a = 1, b = 1, c = 1.5, x = 2, y = 3), 
+  y = c(a = 0.5, c = 0, b = 1.5, x = 1, y = 1) 
+) 
+dagify(
+  x ~ a + b + c,
+  y ~ a + b,
+  c ~ a,
+  exposure = "x",
+  outcome = "y",
+  coords = coord_dag
+) %>%
+  ggdag_adjustment_set(shadow = TRUE)
+```
+
+---
+
+class: title title-1 
+# Causal Diagram Practice
+
+.box-inv-1[What should we adjust for to close the open path(s)?]
+
+```{r, echo = FALSE, fig.height = 6}
+coord_dag <- list( 
+  x = c(a = 1, b = 1, c = 1.5, x = 2, y = 3), 
+  y = c(a = 0.5, c = .8, b = 1.5, x = 1, y = 1) 
+) 
+dagify(
+  x ~ c,
+  y ~ c,
+  c ~ a + b,
+  coords = coord_dag
+) %>%
+  ggdag(node_size = 20) +
+  theme_dag()
+```
+
+---
+
+class: title title-1 
+# Causal Diagram Practice
+
+.box-inv-1[What should we adjust for to close the open path(s)?]
+
+```{r, echo = FALSE, fig.height = 6}
+coord_dag <- list( 
+  x = c(a = 1, b = 1, c = 1.5, x = 2, y = 3), 
+  y = c(a = 0.5, c = .8, b = 1.5, x = 1, y = 1) 
+) 
+dagify(
+  x ~ c,
+  y ~ c,
+  c ~ a + b,
+  exposure = "x",
+  outcome = "y",
+  coords = coord_dag
+) %>%
+  ggdag_adjustment_set(shadow = TRUE)
+```
+
+---
+
+class: title title-1 
+# Causal Diagram Practice
+
+.box-inv-1[What should we adjust for to close the open path(s)?]
+
+```{r, echo = FALSE, fig.height = 6}
+coord_dag <- list( 
+  x = c(a = 1, b = 1, c = 1.5, x = 2, y = 3), 
+  y = c(a = 0.5, c = 1, b = 1.5, x = 0.5, y = 1.5) 
+) 
+dagify(
+  x ~ a,
+  y ~ b,
+  c ~ a + b,
+  exposure = "x",
+  outcome = "y",
+  coords = coord_dag
+) %>%
+  ggdag(node_size = 20) +
+  theme_dag()
+```
+
+---
+
+class: title title-1 
+# Causal Diagram Practice
+
+.box-inv-1[What should we adjust for to close the open path(s)?]
+
+```{r, echo = FALSE, fig.height = 6}
+dagify(
+  x ~ a,
+  y ~ b,
+  c ~ a + b,
+  exposure = "x",
+  outcome = "y",
+  coords = coord_dag
+) %>%
+  ggdag_adjustment_set(shadow = TRUE)
+```
 
 
 
