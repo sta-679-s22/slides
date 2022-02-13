@@ -849,7 +849,7 @@ class: title title-1
 
 .box-inv-1[
 
-$$\mathbb{E}_X[\hat\tau|\mathbf{Y}(0)\mathbf{Y}(1)]=\\\frac{1}{N}\sum_{i=1}^N\left(\frac{\mathbb{E}_X[X_i]Y_i(1)}{N_e/N}-\frac{\mathbb{E}_X[1-X_i]Y_i(0)}{N_c/N}\right)$$
+$$\mathbb{E}_X[\hat\tau|\mathbf{Y}(0),\mathbf{Y}(1)]=\\\frac{1}{N}\sum_{i=1}^N\left(\frac{\mathbb{E}_X[X_i]Y_i(1)}{N_e/N}-\frac{\mathbb{E}_X[1-X_i]Y_i(0)}{N_c/N}\right)$$
 ]
 
 ---
@@ -860,7 +860,7 @@ class: title title-1
 
 .box-inv-1[
 
-$$\mathbb{E}_X[\hat\tau|\mathbf{Y}(0)\mathbf{Y}(1)]=\\\frac{1}{N}\sum_{i=1}^N\left(\frac{(N_e/N)Y_i(1)}{N_e/N}-\frac{(N_c/N)Y_i(0)}{N_c/N}\right)$$
+$$\mathbb{E}_X[\hat\tau|\mathbf{Y}(0),\mathbf{Y}(1)]=\\\frac{1}{N}\sum_{i=1}^N\left(\frac{(N_e/N)Y_i(1)}{N_e/N}-\frac{(N_c/N)Y_i(0)}{N_c/N}\right)$$
 ]
 
 ---
@@ -872,7 +872,7 @@ class: title title-1
 
 .box-inv-1[
 
-$$\mathbb{E}_X[\hat\tau|\mathbf{Y}(0)\mathbf{Y}(1)]=\\\frac{1}{N}\sum_{i=1}^N\left(Y_i(1)-Y_i(0)\right)=\tau$$
+$$\mathbb{E}_X[\hat\tau|\mathbf{Y}(0),\mathbf{Y}(1)]=\\\frac{1}{N}\sum_{i=1}^N\left(Y_i(1)-Y_i(0)\right)=\tau$$
 ]
 
 ---

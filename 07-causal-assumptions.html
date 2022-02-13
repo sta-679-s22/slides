@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Causal assumptions</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lucy D’Agostino McGowan" />
+    <meta name="date" content="2022-02-13" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+class: center middle main-title section-title-1
+
+# Causal assumptions
+
+.class-info[
+
+**Session 8**
+
+.light[STA 379/679: Causal Inference &lt;br&gt;
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+
+class: title title-1
+
+# Notation
+
+.box-inv-1.medium[
+.huge[
+`\(\mathbf{Y}(0), \mathbf{Y}(1)\)`
+]
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+vectors of potential outcomes where the `\(i\)`th is equal to `\(Y_i(0)\)` / `\(Y_i(1)\)`
+]
+
+---
+
+class: title title-1
+
+# Notation
+
+.box-inv-1.medium[
+.huge[
+`\(\mathbf{X}\)`
+]
+]
+
+--
+
+&lt;br&gt;&lt;br&gt;
+
+.box-1[
+vector of exposure assignment
+]
+
+---
+
+class: title title-1
+
+# Outcomes for an individual
+
+
+.box-inv-1[
+`\(Y_i^{obs}= Y_i(X_i)=\begin{cases}Y_i(0)&amp;\textrm{if }X_i=0\\Y_i(1)&amp;\textrm{if }X_i = 1\end{cases}\)`
+]
+
+--
+&lt;br&gt;
+
+.box-1[
+`\(Y_i^{mis}= Y_i(1-X_i)=\begin{cases}Y_i(1)&amp;\textrm{if }X_i=0\\Y_i(0)&amp;\textrm{if }X_i = 1\end{cases}\)`
+]
+
+---
+
+class: title title-1
+
+# Assignment mechanism
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-inv-1.medium[
+
+`\(P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\)`
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+What is `\(\mathbf{Z}\)`
+]
+
+--
+
+&lt;br&gt;
+
+.box-inv-1[
+A matrix of **pre-exposure** covariates
+]
+
+---
+class: section-title section-title-1 middle
+
+# Let's start with **no assumptions**
+
+---
+
+class: title title-1
+
+# Assignment mechanism
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-inv-1.medium[
+
+`\(P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\)`
+]
+
+--
+
+.box-1[such that]
+
+--
+
+.box-inv-1[
+`$$\sum_{X\in\{0,1\}^N}P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1)) =1$$`
+for all `\(\mathbf{Z}\)`, `\(\mathbf{Y}(0)\)`, and `\(\mathbf{Y}(1)\)`
+]
+
+---
+
+class: title title-1
+
+# Assignment mechanism
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-inv-1[
+In words: this is the probability that a particular value for the full assignment will occur -- like person 1 gets assigned to the exposure, 2 &amp; 3 to control, 4 to exposure, and so on. The probabilities across the full set of `\(2^N\)` possible assignment vectors must sum to 1.
+]
+
+--
+
+.box-1.medium[This is **not** the probability that a particular person will be assigned a particular exposure]
+
+---
+
+class: title title-1
+
+# Unit Assignment Probability
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-inv-1[
+
+`\(P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=\sum_{\mathbf{X}:X_i=1}P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0),\mathbf{Y}(1))\)`
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+You can get this by summing across all possible assignment vectors, `\(\mathbf{X}\)` where `\(X_i=1\)`
+]
+
+---
+
+class: title title-1
+
+# Unit Assignment Probability
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[By this definition so far, the probability that the `\(i\)`th unit is in the *exposed* group can be a function of:]
+
+--
+
+.box-inv-1[their covariates `\((Z)\)`]
+
+--
+
+.box-inv-1[their potential outcomes `\((Y_i(0), Y_i(1))\)`]
+
+--
+
+.box-inv-1[the covariate values, exposure assignment, and potential outcomes of all other units]
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+# Average unit-level assignment probabilities
+
+
+.box-1[What if we want the average unit-level assignment probabilities for units with the same covariate values `\((Z_i = z)\)`?]
+
+--
+
+.box-1[This is known as the *propensity score* at `\(z\)`]
+
+
+---
+
+
+class: section-title-1 title-1 middle
+
+# Propensity score: The average unit assignment probability for units where `\(Z_i=z\)`
+
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Propensity Score
+
+.box-inv-1.medium[
+
+`\(e_i(z)=\frac{1}{N(z)}\sum_{i: Z_i=z}P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\)`
+]
+
+--
+
+&lt;br&gt; &lt;br&gt;
+
+.box-1[
+
+`\(N(z)\)` is the number of units where `\(Z_i = z\)` 
+
+]
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Example
+
+.box-inv-1[
+We have 2 units, so there are `\(2^2=4\)` possible values for `\(\mathbf{X}\)`
+]
+
+--
+
+&lt;br&gt;&lt;br&gt;
+.box-1[
+
+`$$\mathbf{X}=\left\{\begin{pmatrix}0\\0\end{pmatrix}, \begin{pmatrix}0\\1\end{pmatrix}, \begin{pmatrix}1\\0\end{pmatrix}, \begin{pmatrix}1\\1\end{pmatrix}\right\}$$`
+]
+
+---
+
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Example
+
+.box-inv-1[
+We have 2 units, so there are `\(2^2=4\)` possible values for `\(\mathbf{X}\)`
+]
+
+
+&lt;br&gt;&lt;br&gt;
+.box-1[
+
+`$$\mathbf{X}=\left\{\color{orange}{\begin{pmatrix}0\\0\end{pmatrix}}, \begin{pmatrix}0\\1\end{pmatrix}, \begin{pmatrix}1\\0\end{pmatrix}, \begin{pmatrix}1\\1\end{pmatrix}\right\}$$`
+]
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Example
+
+.box-inv-1[
+We have 2 units, so there are `\(2^2=4\)` possible values for `\(\mathbf{X}\)`
+]
+
+
+&lt;br&gt;&lt;br&gt;
+.box-1[
+
+`$$\mathbf{X}=\left\{\begin{pmatrix}0\\0\end{pmatrix}, \color{orange}{\begin{pmatrix}0\\1\end{pmatrix}}, \begin{pmatrix}1\\0\end{pmatrix}, \begin{pmatrix}1\\1\end{pmatrix}\right\}$$`
+]
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Example
+
+.box-inv-1[
+We have 2 units, so there are `\(2^2=4\)` possible values for `\(\mathbf{X}\)`
+]
+
+
+&lt;br&gt;&lt;br&gt;
+.box-1[
+
+`$$\mathbf{X}=\left\{\begin{pmatrix}0\\0\end{pmatrix}, \begin{pmatrix}0\\1\end{pmatrix}, \color{orange}{\begin{pmatrix}1\\0\end{pmatrix}}, \begin{pmatrix}1\\1\end{pmatrix}\right\}$$`
+]
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Example
+
+.box-inv-1[
+We have 2 units, so there are `\(2^2=4\)` possible values for `\(\mathbf{X}\)`
+]
+
+
+&lt;br&gt;&lt;br&gt;
+.box-1[
+
+`$$\mathbf{X}=\left\{\begin{pmatrix}0\\0\end{pmatrix}, \begin{pmatrix}0\\1\end{pmatrix}, \begin{pmatrix}1\\0\end{pmatrix}, \color{orange}{\begin{pmatrix}1\\1\end{pmatrix}}\right\}$$`
+]
+
+---
+
+class: section-title section-title-1 middle
+
+# Let's do a randomized experiment, so all exposure assignment possibilities are equally likely
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Randomized Example
+
+.box-1[
+
+`$$\mathbf{X}=\left\{\begin{pmatrix}0\\0\end{pmatrix}, \begin{pmatrix}0\\1\end{pmatrix}, \begin{pmatrix}1\\0\end{pmatrix}, \begin{pmatrix}1\\1\end{pmatrix}\right\}$$`
+]
+
+--
+
+&lt;br&gt;
+
+.box-inv-1[
+
+`$$P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1)) = ?$$`
+]
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Randomized Example
+
+.box-1[
+
+`$$\mathbf{X}=\left\{\begin{pmatrix}0\\0\end{pmatrix}, \begin{pmatrix}0\\1\end{pmatrix}, \begin{pmatrix}1\\0\end{pmatrix}, \begin{pmatrix}1\\1\end{pmatrix}\right\}$$`
+]
+
+
+&lt;br&gt;
+
+.box-inv-1[
+
+`$$P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1)) = 1/4$$`
+]
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Randomized Example
+
+.box-inv-1[
+
+`$$P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1)) = 1/4$$`
+]
+
+.box-1[What is the unit-level assignment probability?]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+
+`\(P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=\sum_{\mathbf{X}:X_i=1}P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0),\mathbf{Y}(1))\)`
+]
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Randomized Example
+
+.box-inv-1[
+
+`$$P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1)) = 1/4$$`
+]
+
+.box-1[What is the unit-level assignment probability?]
+
+
+&lt;br&gt;
+
+.box-1[
+
+`\(P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=\color{orange}{\sum_{\mathbf{X}:X_i=1}}P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0),\mathbf{Y}(1))\)`
+]
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Unit `\(i=1\)` assignment probability
+
+.box-1[
+
+`$$\mathbf{X}=\left\{\begin{pmatrix}0\\0\end{pmatrix}, \begin{pmatrix}0\\1\end{pmatrix}, \begin{pmatrix}1\\0\end{pmatrix}, \begin{pmatrix}1\\1\end{pmatrix}\right\}$$`
+]
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Unit `\(i=1\)` assignment probability
+
+.box-1[
+
+`$$\mathbf{X}=\left\{\begin{pmatrix}0\\0\end{pmatrix},\begin{pmatrix}0\\1\end{pmatrix}, \color{orange}{\begin{pmatrix}1\\0\end{pmatrix}}, \color{orange}{\begin{pmatrix}1\\1\end{pmatrix}}\right\}$$`
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+`$$P_1(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=\sum_{\mathbf{X}:X_1=1}P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0),\mathbf{Y}(1))$$`
+
+]
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Unit `\(i=1\)` assignment probability
+
+.box-1[
+
+`$$\mathbf{X}=\left\{\begin{pmatrix}0\\0\end{pmatrix},\begin{pmatrix}0\\1\end{pmatrix}, \color{orange}{\begin{pmatrix}1\\0\end{pmatrix}}, \color{orange}{\begin{pmatrix}1\\1\end{pmatrix}}\right\}$$`
+]
+
+
+&lt;br&gt;
+.box-1[
+`$$P_1(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=1/4 + 1/4 = 1/2$$`
+
+]
+
+---
+
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Unit `\(i=2\)` assignment probability
+
+.box-1[
+
+`$$\mathbf{X}=\left\{\begin{pmatrix}0\\0\end{pmatrix}, \begin{pmatrix}0\\1\end{pmatrix}, \begin{pmatrix}1\\0\end{pmatrix}, \begin{pmatrix}1\\1\end{pmatrix}\right\}$$`
+]
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Unit `\(i=2\)` assignment probability
+
+.box-1[
+
+`$$\mathbf{X}=\left\{\begin{pmatrix}0\\0\end{pmatrix},\color{orange}{\begin{pmatrix}0\\1\end{pmatrix}}, \begin{pmatrix}1\\0\end{pmatrix}, \color{orange}{\begin{pmatrix}1\\1\end{pmatrix}}\right\}$$`
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+`$$P_2(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=\sum_{\mathbf{X}:X_2=1}P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0),\mathbf{Y}(1))$$`
+
+]
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Unit `\(i=2\)` assignment probability
+
+.box-1[
+
+`$$\mathbf{X}=\left\{\begin{pmatrix}0\\0\end{pmatrix},\color{orange}{\begin{pmatrix}0\\1\end{pmatrix}}, \begin{pmatrix}1\\0\end{pmatrix}, \color{orange}{\begin{pmatrix}1\\1\end{pmatrix}}\right\}$$`
+]
+
+&lt;br&gt;
+
+.box-1[
+`$$P_2(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=1/4 + 1/4 = 1/2$$`
+
+]
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Propensity Score
+
+.box-inv-1.medium[
+
+`\(e_i(z)=\frac{1}{N(z)}\sum_{i: Z_i=z}P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\)`
+]
+
+--
+
+.box-1[Because this experiment is randomized, the propensity score is equal to the unit assignment probabilities (1/2 for units 1 and 2)]
+
+---
+
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+
+.box-1[**individualistic**: your covariates / potential outcomes can't influence my assignment]
+
+
+
+.box-1[**probabilistic**: all units must have **non-zero** probability for all exposures]
+
+
+
+.box-1[**unconfounded**: assignment **cannot** depend on the potential outcomes]
+
+---
+
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+
+.box-1[**individualistic**: your covariates / potential outcomes can't influence my assignment]
+
+
+
+.box-2[**probabilistic**: all units must have **non-zero** probability for all exposures]
+
+
+
+.box-2[**unconfounded**: assignment **cannot** depend on the potential outcomes]
+
+---
+class: title title-1
+
+# Individualistic
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[✌️ properties make an assignment "individualistic"]
+
+--
+
+.box-1[
+An assignment mechanism `\(P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\)` is individualistic if, for some function `\(q( · )\in   [0, 1]\)`,
+
+`$$P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=q(Z_i, Y_i(0), Y_i(1))\\\textrm{ for all }i=1,\dots,N$$` 
+]
+
+---
+
+class: title title-1
+
+# Individualistic
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[✌️ properties make an assignment "individualistic"]
+
+.box-inv-1[
+1️⃣ in words: The unit-level assignment probability for unit `\(i\)` is equal to some function of *only that unit's* covariates and potential outcomes
+]
+---
+
+class: title title-1
+
+# Individualistic
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[✌️ properties make an assignment "individualistic"]
+
+
+.box-1[
+`$$P(\mathbf{X},\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=\\c\prod_{i=1}^Nq(Z_i, Y_i(0), Y_i(1))^{X_i}(1-q(Z_i, Y_i(0), Y_i(1))^{1-X_i}\\\textrm{for }(\mathbf{X}, \mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\in \mathbb{A}\\\textrm{ for some set }\mathbb{A}\textrm{ and 0 elsewhere}$$` 
+]
+
+---
+
+class: title title-1
+
+# Individualistic
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[✌️ properties make an assignment "individualistic"]
+
+.box-inv-1[
+2️⃣ in words: Probability of assignment is proportional to the product of the individual probability assignments. Since we are taking the product of the probabilities, this requires independence among probability of assignment for individual observations
+]
+
+---
+
+class: title title-1
+
+# Propensity score under individualistic
+
+.box-1[Given individualistic assignment, the propensity score simplifies to]
+
+.box-1[
+`$$e(z) = \frac{1}{N_z}\sum_{i:Z_i=z}q(Z_i, Y_i(0), Y_i(1))$$`
+
+]
+
+---
+
+
+class: title title-1
+
+# Propensity Score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-inv-1.medium[
+
+`$$e_i(z)=\frac{1}{N(z)}\sum_{i: Z_i=z}P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))$$`
+]
+
+.box-1[Without individualistic assumption]
+
+---
+
+
+class: title title-1
+
+# Propensity Score
+
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+
+.box-inv-1.medium[
+
+`$$e(z) = \frac{1}{N_z}\sum_{i:Z_i=z}q(Z_i, Y_i(0), Y_i(1))$$`
+]
+
+.box-1[With individualistic assumption]
+
+--
+
+.box-1[What is different?]
+
+---
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+
+.box-2[**individualistic**: your covariates / potential outcomes can't influence my assignment]
+
+
+
+.box-1[**probabilistic**: all units must have **non-zero** probability for all exposures]
+
+
+
+.box-2[**unconfounded**: assignment **cannot** depend on the potential outcomes]
+
+---
+
+class: title title-1
+
+# Probabilistic
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+An assignment mechanism `\(P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\)` is probabilistic if the probability of assignment to treatment for unit `\(i\)` is strictly between zero and one
+]
+
+--
+&lt;br&gt;
+.box-1[
+
+`$$0 &lt; P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1)) &lt; 1,\\ \textrm{for all possible }\mathbf{Z},\mathbf{Y}(0), \mathbf{Y}(1)\\ \textrm{for all }i=1,\dots,N$$` 
+
+]
+
+---
+
+class: title title-1
+
+# Exposure assignment
+
+.box-inv-1[Understanding the **assignment mechanism** is crucial for understanding the causal effect]
+
+
+.box-2[**individualistic**: your covariates / potential outcomes can't influence my assignment]
+
+
+
+.box-2[**probabilistic**: all units must have **non-zero** probability for all exposures]
+
+
+
+.box-1[**unconfounded**: assignment **cannot** depend on the potential outcomes]
+
+---
+class: title title-1
+
+# Unconfounded
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[An assignment mechanism is unconfounded if it does not depend on the potential outcomes]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+`$$P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}'(0), \mathbf{Y}'(1))\\\textrm{for all }\mathbf{X},\mathbf{Z},\mathbf{Y}(0),\mathbf{Y}(1),\mathbf{Y}'(0), \mathbf{Y}'(1)$$`
+]
+
+
+---
+
+class: title title-1
+
+# Unconfounded
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[If the assignment mechanism is unconfounded, we can drop the potential outcomes from the assignment probability]
+
+--
+&lt;br&gt;
+
+.box-1[
+`$$P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1)) = P(\mathbf{X}|\mathbf{Z})$$`
+]
+
+---
+
+class: title title-1
+
+# Under individualistic + unconfounded
+
+.box-1[
+
+`$$P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1)) = c\prod_{i=1}^N q(Z_i)^{X_i}(1-q(Z_i))^{1-X_i}$$`
+]
+
+--
+&lt;br&gt;
+
+.box-1[
+`\(e(z)=q(z)\)`
+]
+
+---
+
+class: title title-1
+
+# Under individualistic + unconfounded
+
+.box-1[
+
+`$$P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1)) = c\prod_{i=1}^N e(Z_i)^{X_i}(1-e(Z_i))^{1-X_i}$$`
+]
+
+&lt;br&gt;
+
+.box-1[
+The assignment mechanism is the product of the propensity scores
+]
+
+---
+class: title title-1
+
+# Propensity Score
+
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+
+.box-inv-1.medium[
+`$$e(z) = P(X = 1 | Z = z)$$`
+]
+
+--
+
+.box-1[
+The propensity score is a *balancing score*. Conditional on the propensity score, the distribution of `\(\mathbf{Z}\)` is similar between the exposed `\((X=1)\)` and unexposed `\((X=0)\)` units.
+]
+
+
+---
+
+
+class: center
+
+&lt;figure&gt;
+&lt;img src = "img/estimand.jpeg" width = "50%"&gt;&lt;/img&gt;
+&lt;/figure&gt;
+.footer[
+Simon Grund on [Twitter](https://twitter.com/simongrund89/status/1085929122860359680?lang=bg)
+]
+---
+
+class: title-1 title
+
+# Average treatment effect estimand
+
+&lt;br&gt;
+
+.box-inv-1[
+
+`$$\tau=\frac{1}{N}\sum_{i=1}^N(Y_i(1)-Y_i(0))=\bar{Y}(1)-\bar{Y}(0)$$`
+
+]
+
+---
+
+
+
+class: title title-1
+
+# Estimator for average treatment effect
+
+&lt;br&gt;
+
+.box-inv-1[
+.huge[
+`$$\hat{\tau}=\bar{Y}_e^{obs}-\bar{Y}_c^{obs}$$`
+]
+]
+
+---
+
+class: title title-1
+
+# Unbiased?
+
+.box-1[
+What must be true for `\(\hat\tau\)` to be an unbiased estimate of `\(\tau\)`?
+]
+
+.box-inv-1[
+.huge[
+`$$\hat{\tau}=\bar{Y}_e^{obs}-\bar{Y}_c^{obs}$$`
+]
+]
+
+---
+
+
+class: title title-1 
+
+# We can rewrite the estimator
+
+.box-inv-1[
+
+
+`$$\frac{1}{N}\sum_{i=1}^N\left(\frac{Y_i(1)X_i}{N_e/{N} }-\frac{Y_i(0)(1-X_i)}{N_c/{N}}\right)$$` 
+
+]
+---
+
+class: title title-1 
+
+# What is random?
+
+.box-inv-1[
+
+
+`$$\frac{1}{N}\sum_{i=1}^N\left(\frac{Y_i(1)X_i}{N_e/N }-\frac{Y_i(0)(1-X_i)}{N_c/N}\right)$$` 
+
+]
+
+---
+
+class: title title-1 
+
+# What is random?
+
+.box-inv-1[
+
+
+`$$\frac{1}{N}{\sum_{i=1}^N}\left(\frac{Y_i(1)\color{purple}{X_i}}{N_e/N}-\frac{Y_i(0)(1-\color{purple}{X_i})}{N_c/N}\right)$$` 
+
+]
+
+---
+
+class: title title-1
+
+# Randomized experiment
+
+&lt;br&gt;
+
+.box-inv-1[
+`$$P_X(X_i = 1 | \mathbf{Y}(0), \mathbf{Y}(1)) = \mathbb{E}_X[X_i|Y(0), Y(1)] = N_e/N$$`
+]
+
+---
+
+class: title title-1
+
+# Randomized experiment
+
+&lt;br&gt;
+
+.box-inv-1[
+`$$P_X(X_i = 0 | \mathbf{Y}(0), \mathbf{Y}(1)) = \\\mathbb{E}_X[1 - X_i|Y(0), Y(1)] = N_c/N$$`
+]
+
+---
+
+class: title title-1
+
+# Randomized exeriment: unbiased
+
+.box-inv-1[
+
+`$$\mathbb{E}_X[\hat\tau|\mathbf{Y}(0),\mathbf{Y}(1)]=\\\frac{1}{N}\sum_{i=1}^N\left(\frac{\mathbb{E}_X[X_i]Y_i(1)}{N_e/N}-\frac{\mathbb{E}_X[1-X_i]Y_i(0)}{N_c/N}\right)$$`
+]
+
+---
+
+class: title title-1
+
+# Randomized exeriment: unbiased
+
+.box-inv-1[
+
+`$$\mathbb{E}_X[\hat\tau|\mathbf{Y}(0),\mathbf{Y}(1)]=\\\frac{1}{N}\sum_{i=1}^N\left(\frac{(N_e/N)Y_i(1)}{N_e/N}-\frac{(N_c/N)Y_i(0)}{N_c/N}\right)$$`
+]
+
+---
+
+
+class: title title-1
+
+# Randomized exeriment: unbiased
+
+.box-inv-1[
+
+`$$\mathbb{E}_X[\hat\tau|\mathbf{Y}(0),\mathbf{Y}(1)]=\\\frac{1}{N}\sum_{i=1}^N\left(Y_i(1)-Y_i(0)\right)=\tau$$`
+]
+
+---
+
+class: section-title section-title-1 middle
+
+# Observational Study, one binary confounder
+---
+class: title title-1 
+
+# We can rewrite the estimand
+
+
+.box-inv-1[
+
+`$$\tau_{Z=1}=\frac{1}{N_{Z=1}}\sum_{i:Z_i = 1}(Y_i(1)-Y_i(0))$$`
+
+]
+
+
+.box-inv-1[
+`$$\tau_{Z=0}=\frac{1}{N_{Z=0}}\sum_{i:Z_i = 0}(Y_i(1)-Y_i(0))$$`
+]
+
+--
+
+.box-1[Unbiased?]
+
+---
+class: title title-1 
+
+# We can rewrite the estimand
+
+.box-inv-1[
+
+`$$\tau = \frac{N_{Z=1}}{N}\tau_{Z=1} + \frac{N_{Z=0}}{N}\tau_{Z=0}$$`
+
+]
+
+--
+
+&lt;br&gt;
+
+
+.box-inv-1[
+
+`$$\tau = \frac{1}{N}\left[\sum_{i:Z=1}((Y_i(1)-Y_i(0)) + \sum_{i:Z=0}((Y_i(1)-Y_i(0))\right]$$`
+
+]
+
+---
+class: title title-1
+
+
+
+# Lucy Land Trial!
+
+.small[
+
+```r
+set.seed(1)
+
+n &lt;- 1000
+meeple &lt;- tibble(
+  happy = sample(rep(c(1, 0), each = n / 2)),
+  happiness = case_when(
+    happy == 1 ~ rbinom(n, 5, 0.7),
+    happy == 0 ~ rbinom(n, 3, 0.2)
+  ),
+  y0 = happiness,
+  y1 = happiness
+)
+```
+]
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+```r
+set.seed(5)
+
+d_lucy &lt;- meeple %&gt;%
+  mutate(x = case_when(
+    happy == 1 ~ rbinom(n, 1, 0.9), 
+    happy == 0 ~ rbinom(n, 1, 0.1) 
+  ), 
+  y_obs = ifelse(x == 1, y1, y0))
+```
+
+---
+
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+```r
+set.seed(5)
+
+d_lucy &lt;- meeple %&gt;%
+* mutate(x = case_when(
+*   happy == 1 ~ rbinom(n, 1, 0.9),
+*   happy == 0 ~ rbinom(n, 1, 0.1)
+* ),
+  y_obs = ifelse(x == 1, y1, y0))
+```
+
+.box-inv-1[What does this violate?]
+
+---
+class: section-title-1 title-1 middle
+
+# the baseline indicator `happy` is a confounder for the exposure and the outcome
+---
+
+class: title title-1
+
+# Confounding
+
+&lt;img src="07-causal-assumptions_files/figure-html/unnamed-chunk-5-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+.small[
+
+```r
+d_lucy %&gt;%
+  summarise(true_causal_effect = mean(y1) - mean(y0))
+```
+
+```
+## # A tibble: 1 × 1
+##   true_causal_effect
+##                &lt;dbl&gt;
+## 1                  0
+```
+]
+--
+
+.box-inv-1[
+`\(\bar{Y}(1) - \bar{Y}(0)\)`
+]
+---
+class: title title-1
+
+# Lucy Land Trial!
+
+.small[
+
+```r
+d_lucy %&gt;%
+  summarise(observed_causal_effect = 
+              sum(y_obs * x) / sum(x) -
+              sum(y_obs * (1 - x)) / sum(1 - x))
+```
+
+```
+## # A tibble: 1 × 1
+##   observed_causal_effect
+##                    &lt;dbl&gt;
+## 1                   2.22
+```
+]
+---
+class: title title-1
+
+# Lucy Land Trial!
+
+.small[
+
+```r
+d_lucy %&gt;%
+  summarise(observed_causal_effect = 
+*             sum(y_obs * x) / sum(x) -
+              sum(y_obs * (1 - x)) / sum(1 - x))
+```
+
+```
+## # A tibble: 1 × 1
+##   observed_causal_effect
+##                    &lt;dbl&gt;
+## 1                   2.22
+```
+]
+
+.box-inv-1.medium[
+
+`\(\bar{Y}^{obs}_e\)`
+]
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+.small[
+
+```r
+d_lucy %&gt;%
+  summarise(observed_causal_effect = 
+              sum(y_obs * x) / sum(x) - 
+*             sum(y_obs * (1 - x)) / sum(1 - x))
+```
+
+```
+## # A tibble: 1 × 1
+##   observed_causal_effect
+##                    &lt;dbl&gt;
+## 1                   2.22
+```
+]
+
+.box-inv-1.medium[
+
+`\(\bar{Y}^{obs}_c\)`
+]
+
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+.small[
+
+```r
+d_lucy %&gt;%
+  group_by(happy) %&gt;%
+  summarise(observed_causal_effect = 
+              sum(y_obs * x) / sum(x) - 
+              sum(y_obs * (1 - x)) / sum(1 - x))
+```
+
+```
+## # A tibble: 2 × 2
+##   happy observed_causal_effect
+##   &lt;dbl&gt;                  &lt;dbl&gt;
+## 1     0                -0.0347
+## 2     1                 0.0194
+```
+]
+
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+.small[
+
+```r
+d_lucy %&gt;%
+* group_by(happy) %&gt;%
+  summarise(observed_causal_effect = 
+              sum(y_obs * x) / sum(x) - 
+              sum(y_obs * (1 - x)) / sum(1 - x))
+```
+
+```
+## # A tibble: 2 × 2
+##   happy observed_causal_effect
+##   &lt;dbl&gt;                  &lt;dbl&gt;
+## 1     0                -0.0347
+## 2     1                 0.0194
+```
+]
+
+
+.box-inv-1[Why did this work?]
+
+---
+
+class: title title-1
+
+# Lucy Land Trial!
+
+
+.small[
+
+```r
+d_lucy %&gt;%
+* group_by(happy) %&gt;%
+  summarise(observed_causal_effect = 
+              sum(y_obs * x) / sum(x) - 
+              sum(y_obs * (1 - x)) / sum(1 - x))
+```
+
+```
+## # A tibble: 2 × 2
+##   happy observed_causal_effect
+##   &lt;dbl&gt;                  &lt;dbl&gt;
+## 1     0                -0.0347
+## 2     1                 0.0194
+```
+]
+
+
+.box-inv-1[After conditioning on `happy`, `x` is independent of the potential outcomes]
+
+---
+
+class: section-title section-title-1 middle
+
+# We can extend this to any number of confounders, but it gets harder to estimate
+
+---
+
+class: section-title section-title-1 middle
+
+# What if instead we could condition on some balancing score?
+
+---
+
+class: title title-1
+
+# Balancing score
+
+
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[A balancing score `\(b(z)\)` is a function of the covariates such that]
+
+.box-1[
+
+`$$X_i \perp Z_i | b(Z_i)$$`
+]
+
+--
+
+.box-1[a balancing score is a function of the covariates such that the probability of receiving the exposure given the covariates is free of dependence on the covariates given the balancing score]
+
+---
+
+class: title title-1
+
+# propensity score = balancing score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+
+.box-1[
+
+`$$X_i \perp Z_i | b(Z_i)$$`
+]
+
+--
+
+equivalently
+
+.box-1[
+`$$P(X_i=1|Z_i, e(Z_i)) = P(X_i = 1|e(Z_i))$$`
+]
+
+--
+
+.box-1[
+
+`\(X_i\)` is independent of `\(Z_i\)` given the propensity score
+]
+
+---
+
+
+class: title title-1
+
+# propensity score = balancing score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+
+.box-1[
+
+`$$X_i \perp Z_i | b(Z_i)$$`
+]
+
+
+
+equivalently
+
+.box-1[
+`$$\color{orange}{P(X_i=1|Z_i, e(Z_i))} = P(X_i = 1|e(Z_i))$$`
+]
+
+
+
+.box-1[
+
+`\(X_i\)` is independent of `\(Z_i\)` given the propensity score
+]
+
+---
+class: title title-1
+
+# propensity score = balancing score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$P(X_i = 1 | Z_i, e(Z_i)) = P(X_i = 1 | Z_i)$$`
+]
+
+--
+
+.box-inv-1.medium[Why?]
+
+--
+
+.box-1[
+The propensity score is a function of `\(Z_i\)`
+]
+
+---
+
+class: title title-1
+
+# propensity score = balancing score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$P(X_i = 1 | Z_i, e(Z_i)) = P(X_i = 1 | Z_i) = e(Z_i)$$`
+]
+
+--
+
+.box-inv-1.medium[Why?]
+
+--
+
+.box-1[
+That is the definition of the propensity score
+]
+
+---
+
+
+class: title title-1
+
+# propensity score = balancing score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+
+.box-1[
+
+`$$X_i \perp Z_i | b(Z_i)$$`
+]
+
+
+
+equivalently
+
+.box-1[
+`$$\color{orange}{P(X_i=1|Z_i, e(Z_i))} = P(X_i = 1|e(Z_i))$$`
+]
+
+
+
+.box-1[
+
+`\(X_i\)` is independent of `\(Z_i\)` given the propensity score
+]
+
+---
+
+
+class: title title-1
+
+# propensity score = balancing score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+
+.box-1[
+
+`$$X_i \perp Z_i | b(Z_i)$$`
+]
+
+
+
+equivalently
+
+.box-1[
+`$$e(Z_i) = P(X_i = 1|e(Z_i))$$`
+]
+
+
+
+.box-1[
+
+`\(X_i\)` is independent of `\(Z_i\)` given the propensity score
+]
+
+---
+
+
+class: title title-1
+
+# propensity score = balancing score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+
+.box-1[
+
+`$$X_i \perp Z_i | b(Z_i)$$`
+]
+
+
+
+equivalently
+
+.box-1[
+`$$P(X_i=1|Z_i, e(Z_i)) = \color{orange}{P(X_i = 1|e(Z_i))}$$`
+]
+
+
+
+.box-1[
+
+`\(X_i\)` is independent of `\(Z_i\)` given the propensity score
+]
+
+---
+
+class: title title-1
+
+# propensity score = balancing score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+
+.box-1[
+`$$P(X_i = 1 | e(Z_i)) = E[X_i |e(Z_i)] \\=E[E[X_i|Z_i, e(Z_i)]|e(Z_i)]$$`
+]
+
+--
+
+.box-inv-1.medium[Why?]
+
+--
+
+.box-1[Definition of probability &amp; iterated expectation]
+
+---
+
+class: title title-1
+
+# propensity score = balancing score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+
+.box-1[
+`$$P(X_i = 1 | e(Z_i)) = E[X_i |e(Z_i)] \\=E[E[X_i|Z_i, e(Z_i)]|e(Z_i)]\\=E[e(Z_i)|e(Z_i)]\\=e(Z_i)$$`
+]
+
+
+
+.box-inv-1.medium[Why?]
+
+
+
+.box-1[Definition of probability &amp; iterated expectation]
+
+---
+
+class: title title-1
+
+# propensity score = balancing score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+
+.box-1[
+`$$P(X_i = 1 | e(Z_i)) = E[X_i |e(Z_i)] \\=E[\color{orange}{E[X_i|Z_i, e(Z_i)]}|e(Z_i)]\\=E[e(Z_i)|e(Z_i)]\\=e(Z_i)$$`
+]
+
+
+
+.box-inv-1.medium[Why?]
+
+
+
+.box-1[Definition of probability &amp; iterated expectation]
+
+---
+
+class: title title-1
+
+# propensity score = balancing score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+
+.box-1[
+`$$P(X_i = 1 | e(Z_i)) = E[X_i |e(Z_i)] \\=E[\color{orange}{E[X_i|Z_i, e(Z_i)]}|e(Z_i)]\\=E[\color{orange}{e(Z_i)}|e(Z_i)]\\=e(Z_i)$$`
+]
+
+
+
+.box-inv-1.medium[Why?]
+
+
+
+.box-1[Definition of probability &amp; iterated expectation]
+
+---
+
+class: middle
+
+## if assignment to treatment is unconfounded given the full set of covariates, then assignment is also unconfounded conditioning only on a balancing score
+
+---
+
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[We can show that]
+
+.box-inv-1[
+
+`$$E\left[\frac{Y_i^{obs}X_i}{e(Z_i)}\right] = E[Y_i(1)]$$`
+
+]
+
+--
+&lt;br&gt;
+
+.box-inv-1[
+
+`$$E\left[\frac{Y_i^{obs}(1 - X_i)}{1 - e(Z_i)}\right] = E[Y_i(0)]$$`
+
+]
+
+---
+
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$E\left[\frac{Y_i^{obs}X_i}{e(Z_i)}\right]=E\left[E\left[\frac{Y_i^{obs}X_i}{e(Z_i)}\Big|Z_i\right]\right]$$`
+]
+
+--
+
+.box-inv-1.medium[Why?]
+
+--
+
+.box-1[Law of iterated expectations]
+
+---
+
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$E\left[E\left[\frac{Y_i^{obs}X_i}{e(Z_i)}\Big|Z_i\right]\right] = E\left[E\left[\frac{Y_i(1)X_i}{e(Z_i)}\Big|Z_i\right]\right]$$`
+]
+
+---
+
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$E\left[E\left[\frac{\color{orange}{Y_i^{obs}}X_i}{e(Z_i)}\Big|Z_i\right]\right] = E\left[E\left[\frac{\color{orange}{Y_i(1)}X_i}{e(Z_i)}\Big|Z_i\right]\right]$$`
+]
+
+--
+
+.box-inv-1.medium[Why?]
+
+--
+
+.box-1[We're only looking at the observations where `\(X_i = 1\)`]
+
+---
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$=E\left[E\left[\frac{Y_i(1)X_i}{e(Z_i)}\Big|Z_i\right]\right]=E\left[\frac{E[Y_i(1)|Z_i]E_X[X_i|Z_i]}{e(Z_i)}\right]$$`
+]
+
+---
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$=E\left[E\left[\frac{\color{orange}{Y_i(1)X_i}}{e(Z_i)}\Big|\color{orange}{Z_i}\right]\right]=E\left[\frac{\color{orange}{E[Y_i(1)|Z_i]E_X[X_i|Z_i]}}{e(Z_i)}\right]$$`
+]
+
+--
+
+.box-inv-1.medium[Why?]
+
+--
+
+.box-1[
+Unconfoundedness (we can split `\(E[Y(1)X]=E[Y(1)]E[X]\)`)
+]
+
+---
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$E\left[\frac{E[Y_i(1)|Z_i]E_X[X_i|Z_i]}{e(Z_i)}\right]=E[E[Y_i(1)|Z_i]]$$`
+]
+---
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$E\left[\frac{E[Y_i(1)|Z_i]\color{orange}{E_X[X_i|Z_i]}}{\color{orange}{e(Z_i)}}\right]=E[E[Y_i(1)|Z_i]]$$`
+]
+
+--
+
+.box-inv-1.medium[Why?]
+
+--
+
+.box-1[
+propensity score definition: `\(e(Z_i)=E_X[X_i|Z_i]\)`
+]
+
+---
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$E[E[Y_i(1)|Z_i]]=E[Y_i(1)]$$`
+]
+
+--
+
+.box-inv-1.medium[Why?]
+
+--
+
+.box-1[
+Law of iterated expectation
+]
+
+---
+
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-inv-1[
+`$$\hat\tau=\frac{1}{N}\sum_{i=1}^N\frac{X_iY_i^{obs}}{e(Z_i)}-\frac{1}{N}\sum_{i=1}^{N}\frac{(1-X_i)Y_{i}^{obs}}{1-e(Z_i)}$$`
+]
+
+---
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

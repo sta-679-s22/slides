@@ -1289,7 +1289,8 @@ d_lucy <- meeple %>%
 ---
 class: section-title-1 title-1 middle
 
-# the baseline indicator `happy` is a confounder for the exposure (getting ice cream based on whether they `smile`) and the outcome (`happiness`)
+# the baseline indicator `happy` is a confounder for the exposure and the outcome
+
 ---
 
 class: title title-1
