@@ -638,7 +638,7 @@ class: title title-1
 
 
 .box-1[
-$$P(\mathbf{X},\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=\\c\prod_{i=1}^Nq(Z_i, Y_i(0), Y_i(1))^{X_i}(1-q(Z_i, Y_i(0), Y_i(1))^{1-X_i}\\\textrm{for }(\mathbf{X}, \mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\in \mathbb{A}\\\textrm{ for some set }\mathbb{A}\textrm{ and 0 elsewhere}$$ 
+$$P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=\\c\prod_{i=1}^Nq(Z_i, Y_i(0), Y_i(1))^{X_i}(1-q(Z_i, Y_i(0), Y_i(1))^{1-X_i}\\\textrm{for }(\mathbf{X}, \mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\in \mathbb{A}\\\textrm{ for some set }\mathbb{A}\textrm{ and 0 elsewhere}$$ 
 ]
 
 ---
