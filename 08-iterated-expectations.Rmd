@@ -47,6 +47,144 @@ Lucy D'Agostino McGowan
 
 class: title title-1
 
+
+# What is expectation?
+
+.box-1.medium[
+.huge[
+$$E[X]$$
+]
+]
+
+---
+
+class: title title-1
+
+# What is expectation
+
+.box-1[In the discrete case, an expected value is just a weighted average of all possible values of the discrete random variable]
+
+--
+<br>
+.box-1[
+
+$$E[X] = \sum_xxP(X=x)$$
+
+]
+---
+
+class: title title-1
+
+# What is expectation
+
+.box-1[How do we define expectation for continuous random variables?]
+
+--
+
+.box-1[
+
+$$E[X] = \int_{-\infty}^\infty xf(x)dx$$
+
+]
+
+--
+<br>
+.box-inv-1[
+What is $f(x)$?]
+
+---
+
+
+class: title title-1
+
+# What is a conditional expectation?
+
+
+.box-1[
+
+$$E[X|Y] = \sum_xxP(X=x|Y=y)$$
+
+]
+
+---
+
+class: title title-1
+
+# What is a conditional expectation?
+
+
+.box-1[
+
+$$E[X|Y] = \sum_{\color{orange}x}xP(X=x|Y=y)$$
+
+]
+
+---
+
+class: title title-1
+
+# What is a conditional expectation?
+
+
+.box-1[
+
+$$E[X|Y] = \sum_{\color{orange}x}\color{orange}xP(X=x|Y=y)$$
+
+]
+
+---
+
+
+class: title title-1
+
+# What is a conditional expectation?
+
+
+.box-1[
+
+$$E[X|Y] = \sum_{\color{orange}x}\color{orange}x\color{orange}{P(X=x|Y=y)}$$
+
+]
+---
+
+class: title title-1
+
+# What is a conditional expectation?
+
+
+.box-1[
+
+$$E[X|Y] = \sum_{x}xP(X=x|Y=y)$$
+]
+
+<br>
+
+.box-1[
+$$E[X|Y] = \int_{-\infty}^\infty x f(x|y)dx$$
+]
+
+---
+
+
+class: title title-1
+
+# What is a conditional expectation?
+
+
+.box-1[
+
+$$E[X|Y] = \sum_{x}xP(X=x|Y=y)$$
+]
+
+<br>
+
+.box-1[
+$$E[X|Y] = \int_{-\infty}^\infty x \color{orange}{f(x|y)}dx$$
+]
+---
+
+class: title title-1
+
 # Law of Iterated Expectations
 
 .box-1.medium[
@@ -85,7 +223,7 @@ class: title title-1
 
 .box-1.medium[
 
-$$ E[X]=E[\color{orange}{E[X|Y]}]$$
+$$E[X]=E[\color{orange}{E[X|Y]}]$$
 ]
 
 
@@ -124,7 +262,7 @@ class: title title-1
 
 .box-1[
 
-$$ E[X]=\color{orange}{\sum_y}\sum_x xP(X=x|Y=y)\color{orange}{P(Y=y)}$$
+$$E[X]=\color{orange}{\sum_y}\sum_x xP(X=x|Y=y)\color{orange}{P(Y=y)}$$
 ]
 
 --
@@ -139,7 +277,7 @@ class: title title-1
 
 .box-1[
 
-$$ E[X]=\sum_y\sum_x x\color{orange}{P(X=x|Y=y)P(Y=y)}$$
+$$E[X]=\sum_y\sum_x x\color{orange}{P(X=x|Y=y)P(Y=y)}$$
 ]
 
 --
@@ -159,7 +297,7 @@ class: title title-1
 
 .box-1[
 
-$$ E[X]=\sum_y\sum_x x\color{orange}{P(X=x, Y=y)}$$
+$$E[X]=\sum_y\sum_x x\color{orange}{P(X=x, Y=y)}$$
 ]
 
 ---
@@ -170,7 +308,7 @@ class: title title-1
 
 .box-1[
 
-$$ E[X]=\color{orange}{\sum_x \sum_y}xP(X=x, Y=y)$$
+$$E[X]=\color{orange}{\sum_x \sum_y}xP(X=x, Y=y)$$
 ]
 
 ---
@@ -182,7 +320,7 @@ class: title title-1
 
 .box-1[
 
-$$ E[X]=\sum_x x \sum_yP(X=x, Y=y)$$
+$$E[X]=\sum_x x \sum_yP(X=x, Y=y)$$
 ]
 
 
@@ -194,7 +332,7 @@ class: title title-1
 
 .box-1[
 
-$$ E[X]=\sum_x x \color{orange}{\sum_yP(X=x, Y=y)}$$
+$$E[X]=\sum_x x \color{orange}{\sum_yP(X=x, Y=y)}$$
 ]
 
 --
@@ -211,7 +349,7 @@ class: title title-1
 
 .box-1.medium[
 
-$$ E[X]=\sum_x x \color{orange}{P(X = x)}$$
+$$E[X]=\sum_x x \color{orange}{P(X = x)}$$
 ]
 
 --
@@ -227,8 +365,89 @@ class: title title-1
 
 .box-1.medium[
 
-$$ E[X]=E[X]$$
+$$E[X]=E[X]$$
 ]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+.box-1[Suppose $X$ and $Y$ are jointly continuous with a joint density function $f(x, y)$ and marginal densities $f_x(x), f_y(y)$]
+
+<br>
+
+.box-1.medium[
+
+$$E[X]=\int_{-\infty}^\infty \int_{-\infty}^\infty xf(x,y)dxdy$$
+]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+
+.box-1.medium[
+
+$$E[X]=\int_{-\infty}^\infty \int_{-\infty}^\infty xf(x,y)dxdy$$
+]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+
+.box-1[
+
+$$\begin{align}E[X]&=\int_{-\infty}^\infty \int_{-\infty}^\infty xf(x,y)dxdy\\&=\int_{-\infty}^\infty \int_{-\infty}^\infty xf(x|y)f_y(y)dxdy\end{align}$$
+]
+
+--
+
+.box-1[Why?]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+
+.box-1[
+
+$$\begin{align}E[X]&=\int_{-\infty}^\infty \int_{-\infty}^\infty xf(x,y)dxdy\\&=\int_{-\infty}^\infty \int_{-\infty}^\infty xf(x|y)f_y(y)dxdy\\&=\int_{-\infty}^\infty \left\{\int_{-\infty}^\infty xf(x|y)dx\right\}f_y(y)dy\end{align}$$
+]
+
+--
+
+.box-1[What is in the brackets?]
+
+---
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+
+.box-1.small[
+
+$$\begin{align}E[X]&=\int_{-\infty}^\infty \int_{-\infty}^\infty xf(x,y)dxdy\\&=\int_{-\infty}^\infty \int_{-\infty}^\infty xf(x|y)f_y(y)dxdy\\&=\int_{-\infty}^\infty \left\{\int_{-\infty}^\infty xf(x|y)dx\right\}f_y(y)dy\\&=\int_{-\infty}^\infty E[X|Y]f_y(y)dy\end{align}$$
+]
+---
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+
+.box-1.small[
+
+$$\begin{align}E[X]&=\int_{-\infty}^\infty \int_{-\infty}^\infty xf(x,y)dxdy\\&=\int_{-\infty}^\infty \int_{-\infty}^\infty xf(x|y)f_y(y)dxdy\\&=\int_{-\infty}^\infty \left\{\int_{-\infty}^\infty xf(x|y)dx\right\}f_y(y)dy\\&=\int_{-\infty}^\infty E[X|Y]f_y(y)dy\\&=E[E[X|Y]]\end{align}$$
+]
+
 
 ---
 
