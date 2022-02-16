@@ -26,7 +26,7 @@ class: center middle main-title section-title-1
 
 .class-info[
 
-**Session 8**
+**Session 9**
 
 .light[STA 379/679: Causal Inference &lt;br&gt;
 Lucy D'Agostino McGowan
@@ -60,38 +60,78 @@ class: title title-1
 
 # Notation
 
-.box-inv-1.medium[
+.pull-left[.box-inv-1.medium[
 .huge[
 `\(\mathbf{X}\)`
 ]
 ]
 
---
 
-&lt;br&gt;&lt;br&gt;
+
+&lt;br&gt;
 
 .box-1[
 vector of exposure assignment
+]
+]
+
+--
+
+.pull-right[
+
+```
+## # A tibble: 8 × 3
+##   unit_1 unit_2 unit_3
+##    &lt;int&gt;  &lt;int&gt;  &lt;int&gt;
+## 1      0      0      0
+## 2      0      0      1
+## 3      0      1      0
+## 4      0      1      1
+## 5      1      0      0
+## 6      1      0      1
+## 7      1      1      0
+## 8      1      1      1
+```
 ]
 
 ---
 
 class: title title-1
 
-# Outcomes for an individual
+# Notation
 
-
-.box-inv-1[
-`\(Y_i^{obs}= Y_i(X_i)=\begin{cases}Y_i(0)&amp;\textrm{if }X_i=0\\Y_i(1)&amp;\textrm{if }X_i = 1\end{cases}\)`
+.pull-left[.box-inv-1.medium[
+.huge[
+`\(\mathbf{X}\)`
+]
 ]
 
---
+
+
 &lt;br&gt;
 
 .box-1[
-`\(Y_i^{mis}= Y_i(1-X_i)=\begin{cases}Y_i(1)&amp;\textrm{if }X_i=0\\Y_i(0)&amp;\textrm{if }X_i = 1\end{cases}\)`
+vector of exposure assignment
+]
 ]
 
+
+.pull-right[
+
+```
+## # A tibble: 8 × 3
+##   unit_1 unit_2 unit_3
+##    &lt;int&gt;  &lt;int&gt;  &lt;int&gt;
+## 1      0      0      0
+## 2      0      0      1
+*## 3      0      1      0
+## 4      0      1      1
+## 5      1      0      0
+## 6      1      0      1
+## 7      1      1      0
+## 8      1      1      1
+```
+]
 ---
 
 class: title title-1
@@ -150,6 +190,165 @@ for all `\(\mathbf{Z}\)`, `\(\mathbf{Y}(0)\)`, and `\(\mathbf{Y}(1)\)`
 
 ---
 
+
+class: title title-1
+
+# Assignment mechanism
+
+
+```
+## # A tibble: 8 × 4
+##   unit_1 unit_2 unit_3 assignment_probability
+##    &lt;int&gt;  &lt;int&gt;  &lt;int&gt;                  &lt;dbl&gt;
+## 1      0      0      0                  0.125
+## 2      0      0      1                  0.125
+## 3      0      1      0                  0.125
+## 4      0      1      1                  0.125
+## 5      1      0      0                  0.125
+## 6      1      0      1                  0.125
+## 7      1      1      0                  0.125
+## 8      1      1      1                  0.125
+```
+
+---
+
+class: title title-1
+
+# Assignment mechanism
+
+
+```r
+d %&gt;%
+  summarise(sum(assignment_probability))
+```
+
+```
+## # A tibble: 1 × 1
+##   `sum(assignment_probability)`
+##                           &lt;dbl&gt;
+## 1                             1
+```
+
+---
+
+class: title title-1
+
+# Assignment mechanism
+
+
+```
+## # A tibble: 8 × 4
+##   unit_1 unit_2 unit_3 assignment_probability
+##    &lt;int&gt;  &lt;int&gt;  &lt;int&gt;                  &lt;dbl&gt;
+## 1      0      0      0                      0
+## 2      0      0      1                      0
+## 3      0      1      0                      1
+## 4      0      1      1                      0
+## 5      1      0      0                      0
+## 6      1      0      1                      0
+## 7      1      1      0                      0
+## 8      1      1      1                      0
+```
+---
+
+class: title title-1
+
+# Assignment mechanism
+
+
+```
+## # A tibble: 8 × 4
+##   unit_1 unit_2 unit_3 assignment_probability
+##    &lt;int&gt;  &lt;int&gt;  &lt;int&gt;                  &lt;dbl&gt;
+## 1      0      0      0                      0
+## 2      0      0      1                      0
+*## 3      0      1      0                      1
+## 4      0      1      1                      0
+## 5      1      0      0                      0
+## 6      1      0      1                      0
+## 7      1      1      0                      0
+## 8      1      1      1                      0
+```
+---
+
+class: title title-1
+
+# Assignment mechanism
+
+
+```r
+d %&gt;%
+  summarise(sum(assignment_probability))
+```
+
+```
+## # A tibble: 1 × 1
+##   `sum(assignment_probability)`
+##                           &lt;dbl&gt;
+## 1                             1
+```
+
+---
+
+class: title title-1
+
+# Assignment mechanism
+
+
+```
+## # A tibble: 8 × 4
+##   unit_1 unit_2 unit_3 assignment_probability
+##    &lt;int&gt;  &lt;int&gt;  &lt;int&gt;                  &lt;dbl&gt;
+## 1      0      0      0                   0   
+## 2      0      0      1                   0   
+## 3      0      1      0                   0.25
+## 4      0      1      1                   0.25
+## 5      1      0      0                   0   
+## 6      1      0      1                   0   
+## 7      1      1      0                   0.25
+## 8      1      1      1                   0.25
+```
+---
+
+class: title title-1
+
+# Assignment mechanism
+
+
+```
+## # A tibble: 8 × 4
+##   unit_1 unit_2 unit_3 assignment_probability
+##    &lt;int&gt;  &lt;int&gt;  &lt;int&gt;                  &lt;dbl&gt;
+## 1      0      0      0                   0   
+## 2      0      0      1                   0   
+*## 3      0      1      0                   0.25
+*## 4      0      1      1                   0.25
+## 5      1      0      0                   0   
+## 6      1      0      1                   0   
+*## 7      1      1      0                   0.25
+*## 8      1      1      1                   0.25
+```
+
+---
+
+class: title title-1
+
+# Assignment mechanism
+
+
+```r
+d %&gt;%
+  summarise(sum(assignment_probability))
+```
+
+```
+## # A tibble: 1 × 1
+##   `sum(assignment_probability)`
+##                           &lt;dbl&gt;
+## 1                             1
+```
+
+---
 class: title title-1
 
 # Assignment mechanism
@@ -182,6 +381,121 @@ class: title title-1
 .box-1[
 You can get this by summing across all possible assignment vectors, `\(\mathbf{X}\)` where `\(X_i=1\)`
 ]
+
+---
+
+class: title title-1
+
+# Unit Assignment Probability
+
+
+```r
+d %&gt;%
+  filter(unit_1 == 1) %&gt;%
+  summarise(p1 = sum(assignment_probability))
+```
+
+```
+## # A tibble: 1 × 1
+##      p1
+##   &lt;dbl&gt;
+## 1   0.5
+```
+
+---
+
+
+class: title title-1
+
+# Unit Assignment Probability
+
+
+```r
+d %&gt;%
+* filter(unit_1 == 1) %&gt;%
+  summarise(p1 = sum(assignment_probability))
+```
+
+```
+## # A tibble: 1 × 1
+##      p1
+##   &lt;dbl&gt;
+## 1   0.5
+```
+
+--
+
+.box-1[
+
+`\(P_1(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=\sum_{\color{orange}{\mathbf{X}:X_1=1}}P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0),\mathbf{Y}(1))\)`
+]
+
+---
+
+class: title title-1
+
+# Unit Assignment Probability
+
+
+```r
+d %&gt;%
+  filter(unit_1 == 1) %&gt;% 
+* summarise(p1 = sum(assignment_probability))
+```
+
+```
+## # A tibble: 1 × 1
+##      p1
+##   &lt;dbl&gt;
+## 1   0.5
+```
+
+
+.box-1[
+
+`\(P_1(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))=\color{orange}{\sum_{\mathbf{X}:X_1=1}P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0),\mathbf{Y}(1))}\)`
+]
+
+---
+
+class: title title-1
+
+# Unit Assignment Probability
+
+
+```r
+d %&gt;%
+  filter(unit_2 == 1) %&gt;% 
+  summarise(p2 = sum(assignment_probability))
+```
+
+```
+## # A tibble: 1 × 1
+##      p2
+##   &lt;dbl&gt;
+## 1     1
+```
+
+---
+
+
+class: title title-1
+
+# Unit Assignment Probability
+
+
+```r
+d %&gt;%
+  filter(unit_3 == 1) %&gt;% 
+  summarise(p3 = sum(assignment_probability))
+```
+
+```
+## # A tibble: 1 × 1
+##      p3
+##   &lt;dbl&gt;
+## 1   0.5
+```
 
 ---
 
@@ -253,6 +567,148 @@ class: title title-1
 `\(N(z)\)` is the number of units where `\(Z_i = z\)` 
 
 ]
+---
+
+class: title title-1
+
+# Propensity score
+
+.box-1.small[Units 1 &amp; 3 are in category `1`, 2 in category `0`]
+
+.small[
+
+```r
+# Z = 1
+d %&gt;%
+  filter(unit_1 == 1 | unit_3 == 1) %&gt;% 
+  summarise(e1 = sum(assignment_probability) / n())
+```
+
+```
+## # A tibble: 1 × 1
+##      e1
+##   &lt;dbl&gt;
+## 1 0.125
+```
+
+]
+---
+
+class: title title-1
+
+# Propensity score
+
+
+
+.small[
+
+```r
+# Z = 1
+d %&gt;%
+* filter(unit_1 == 1 | unit_3 == 1) %&gt;%
+  summarise(e1 = sum(assignment_probability) / n())
+```
+
+```
+## # A tibble: 1 × 1
+##      e1
+##   &lt;dbl&gt;
+## 1 0.125
+```
+]
+
+--
+.box-1[
+
+`\(e_i(z)=\frac{1}{N(z)}\sum_{\color{orange}{i: Z_i=z}}P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\)`
+]
+
+---
+class: title title-1
+
+# Propensity score
+
+
+.small[
+
+```r
+# Z = 1
+d %&gt;%
+  filter(unit_1 == 1 | unit_3 == 1) %&gt;%  
+* summarise(e1 = sum(assignment_probability) / n())
+```
+
+```
+## # A tibble: 1 × 1
+##      e1
+##   &lt;dbl&gt;
+## 1 0.125
+```
+]
+
+.box-1[
+
+`\(e_i(z)=\frac{1}{N(z)}\sum_{i: Z_i=z}P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\)`
+]
+
+---
+
+class: title title-1
+
+# Propensity score
+
+
+.small[
+
+```r
+# Z = 1
+d %&gt;%
+  filter(unit_1 == 1 | unit_3 == 1) %&gt;%  
+* summarise(e1 = sum(assignment_probability) / n())
+```
+
+```
+## # A tibble: 1 × 1
+##      e1
+##   &lt;dbl&gt;
+## 1 0.125
+```
+]
+
+.box-1[
+
+`\(e_i(z)=\frac{1}{N(z)}\sum_{i: Z_i=z}P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\)`
+]
+
+---
+
+class: title title-1
+
+# Propensity score
+
+
+.small[
+
+```r
+# Z = 1
+d %&gt;%
+  filter(unit_2 == 1) %&gt;%  
+* summarise(e1 = sum(assignment_probability) / n())
+```
+
+```
+## # A tibble: 1 × 1
+##      e1
+##   &lt;dbl&gt;
+## 1  0.25
+```
+]
+
+.box-1[
+
+`\(e_i(z)=\frac{1}{N(z)}\sum_{i: Z_i=z}P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))\)`
+]
+
 ---
 
 class: title title-1
@@ -654,6 +1110,100 @@ class: title title-1
 
 class: title title-1
 
+# Individualistic
+
+.small[
+
+```r
+p1 = 0.25
+p2 = 0.5
+p3 = 0.75
+d &lt;- d %&gt;%
+  mutate(assignment_probability = 
+           p1 ^ unit_1 * (1 - p1)^(1 - unit_1) * 
+           p2 ^ unit_2 * (1 - p2)^(1 - unit_2) * 
+           p3 ^ unit_3 * (1 - p3)^(1 - unit_3)
+  )
+d
+```
+
+```
+## # A tibble: 8 × 4
+##   unit_1 unit_2 unit_3 assignment_probability
+##    &lt;int&gt;  &lt;int&gt;  &lt;int&gt;                  &lt;dbl&gt;
+## 1      0      0      0                 0.0938
+## 2      0      0      1                 0.281 
+## 3      0      1      0                 0.0938
+## 4      0      1      1                 0.281 
+## 5      1      0      0                 0.0312
+## 6      1      0      1                 0.0938
+## 7      1      1      0                 0.0312
+## 8      1      1      1                 0.0938
+```
+]
+---
+
+class: title title-1
+
+# Individualistic
+
+
+```r
+d %&gt;%
+  filter(unit_1 == 1) %&gt;%
+  summarise(p1 = sum(assignment_probability))
+```
+
+```
+## # A tibble: 1 × 1
+##      p1
+##   &lt;dbl&gt;
+## 1  0.25
+```
+
+---
+class: title title-1
+
+# Individualistic
+
+
+```r
+d %&gt;%
+  filter(unit_2 == 1) %&gt;%
+  summarise(p2 = sum(assignment_probability))
+```
+
+```
+## # A tibble: 1 × 1
+##      p2
+##   &lt;dbl&gt;
+## 1   0.5
+```
+
+---
+
+class: title title-1
+
+# Individualistic
+
+
+```r
+d %&gt;%
+  filter(unit_3 == 1) %&gt;%
+  summarise(p3 = sum(assignment_probability))
+```
+
+```
+## # A tibble: 1 × 1
+##      p3
+##   &lt;dbl&gt;
+## 1  0.75
+```
+
+---
+
+class: title title-1
+
 # Propensity score under individualistic
 
 .box-1[Given individualistic assignment, the propensity score simplifies to]
@@ -789,7 +1339,47 @@ class: title title-1
 ]
 
 ---
+class: title title-1
 
+# Unconfounded
+
+.small[
+
+```r
+y_0 &lt;- c(1, 1, 1)
+y_1 &lt;- c(2, 1, 2)
+p &lt;- (0.25 + 0.5 * (y_1 - y_0))
+p
+```
+
+```
+## [1] 0.75 0.25 0.75
+```
+]
+--
+
+.box-1[Confounded!]
+
+---
+
+class: title title-1
+
+# Unconfounded
+
+.small[
+
+```r
+y_0 &lt;- c(1, 1, 1)
+y_1 &lt;- c(2, 1, 2)
+z &lt;- c(1, 0, 1) #&lt;
+p &lt;- (0.25 + 0.5 * z)
+```
+]
+--
+
+.box-1[Unconfounded!]
+
+---
 class: title title-1
 
 # Under individualistic + unconfounded
@@ -1018,9 +1608,6 @@ class: title title-1
 `$$\tau_{Z=0}=\frac{1}{N_{Z=0}}\sum_{i:Z_i = 0}(Y_i(1)-Y_i(0))$$`
 ]
 
---
-
-.box-1[Unbiased?]
 
 ---
 class: title title-1 
@@ -1117,7 +1704,7 @@ class: title title-1
 
 # Confounding
 
-&lt;img src="07-causal-assumptions_files/figure-html/unnamed-chunk-5-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="08-causal-assumptions_files/figure-html/unnamed-chunk-31-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -1778,6 +2365,10 @@ class: title title-1
 .box-inv-1[
 `$$\hat\tau=\frac{1}{N}\sum_{i=1}^N\frac{X_iY_i^{obs}}{e(Z_i)}-\frac{1}{N}\sum_{i=1}^{N}\frac{(1-X_i)Y_{i}^{obs}}{1-e(Z_i)}$$`
 ]
+
+--
+
+.box-1[Unbiased?]
 
 ---
 

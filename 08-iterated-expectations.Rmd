@@ -1,0 +1,313 @@
+---
+title: "Law of Iterated Expectations"
+author: "Lucy D'Agostino McGowan"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: "libs"
+    css: ["default", "css/style.css"]
+    seal: false
+    anchor_sections: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      navigation:
+        scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
+                      fig.retina = 3, fig.align = "center")
+```
+
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("tile_view"))
+```
+
+class: center middle main-title section-title-1
+
+# Law of Iterated Expectations
+
+.class-info[
+
+**Session 9**
+
+.light[STA 379/679: Causal Inference <br>
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations
+
+.box-1.medium[
+
+$$\Large E[X]=E[E[X|Y]]$$
+]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations
+
+.box-1.medium[
+
+$$\Large E_\color{orange}X[X]=E_\color{orange}Y[E[X|Y]]$$
+]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+.box-1.medium[
+
+$$\Large E[X]=E[E[X|Y]]$$
+]
+
+---
+
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+.box-1.medium[
+
+$$ E[X]=E[\color{orange}{E[X|Y]}]$$
+]
+
+
+---
+
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+.box-1.medium[
+
+$$E[X]=E\left[\color{orange}{\sum_x xP(X=x|Y=y)}\right]$$
+]
+
+--
+
+.box-inv-1[Definition of expectation]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+.box-1.medium[
+
+$$E[X]=\color{orange}E\left[\sum_x xP(X=x|Y=y)\right]$$
+]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+.box-1[
+
+$$ E[X]=\color{orange}{\sum_y}\sum_x xP(X=x|Y=y)\color{orange}{P(Y=y)}$$
+]
+
+--
+<br>
+.box-inv-1[Definition of expectation]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+.box-1[
+
+$$ E[X]=\sum_y\sum_x x\color{orange}{P(X=x|Y=y)P(Y=y)}$$
+]
+
+--
+<br>
+
+.box-1[
+
+Per Bayes! $$P(X|Y)P(Y) = P(X,Y)$$
+
+]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+.box-1[
+
+$$ E[X]=\sum_y\sum_x x\color{orange}{P(X=x, Y=y)}$$
+]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+.box-1[
+
+$$ E[X]=\color{orange}{\sum_x \sum_y}xP(X=x, Y=y)$$
+]
+
+---
+
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+.box-1[
+
+$$ E[X]=\sum_x x \sum_yP(X=x, Y=y)$$
+]
+
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+.box-1[
+
+$$ E[X]=\sum_x x \color{orange}{\sum_yP(X=x, Y=y)}$$
+]
+
+--
+<br>
+.box-1[
+Probability! $\sum_yP(X, Y)=P(X)$
+]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+.box-1.medium[
+
+$$ E[X]=\sum_x x \color{orange}{P(X = x)}$$
+]
+
+--
+<br>
+
+.box-1[Definition of expectations]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations Proof
+
+.box-1.medium[
+
+$$ E[X]=E[X]$$
+]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations
+
+.box-1.medium[
+Practical use: if you know something about the conditional distribution $X|Y$, and you know something about $Y$, you can learn about $X$
+]
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations
+
+.box-1.medium[Practical Example]
+
+.box-inv-1.medium[We want to know the average exam grade for the class. We know:]
+
+--
+1. The average conditional on whether the student studied
+2. The proportion of students who studied
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations
+
+.box-1.medium[Practical Example]
+
+.box-inv-1.medium[We want to know the average exam grade for the class]
+
+
+
+$$E[\textrm{exam grade}] = E[E[\textrm{exam grade | study status}]]$$
+---
+
+class: title title-1
+
+# Law of Iterated Expectations
+
+.box-1.medium[Practical Example]
+
+.box-inv-1.medium[We want to know the average exam grade for the class]
+
+
+
+$$E[\textrm{exam grade}] = \\\sum_{\textrm{study status}}E[\textrm{exam grade | study status}]P(\textrm{study status})$$
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations
+
+.box-1.medium[Practical Example]
+
+.box-inv-1.medium[We want to know the average exam grade for the class]
+
+
+$$E[\textrm{exam grade}] = \\E[\textrm{exam grade | studied}]P(\textrm{studied})+\\E[\textrm{exam grade | didn't study}]P(\textrm{didn't study})$$
+
+
+---
+
+class: title title-1
+
+# Law of Iterated Expectations
+
+.box-1.medium[Practical Example]
+
+.box-inv-1.medium[We want to know the average exam grade for the class]
+<br>
+.box-1[
+$E[\textrm{exam grade}] = 95 \times 0.8 + 70\times 0.2 = 90$
+]
+
+
+
