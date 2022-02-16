@@ -528,5 +528,169 @@ class: title title-1
 $E[\textrm{exam grade}] = 95 \times 0.8 + 70\times 0.2 = 90$
 ]
 
+---
+
+class: title title-1
+
+# Example
+
+Let's flip a coin twice, heads is 1, tails is 0. Let $X$ be the sum of the two flips, and $Y$ be the maximum. We can draw a table of the joint and marginal distributions:
+
+$p_{X,Y}(x,y)$ | | |
+----------------|--|-|
+ | y = 0 | y = 1 | $p_X(x)$
+x = 0 | 0.25 | 0 | 0.25
+x = 1 | 0 | 0.5 | 0.5
+x = 2 | 0 | 0.25 | 0.25
+$p_Y(y)$|0.25 | 0.75
+
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+
+
+1. Using the table on the previous slide, calculate $E[Y]$
+2. Calculate $E[Y|X = 0]$
+3. Calculate $E[Y|X = x]$ for each possible value $x$ of $X$
+4. Calculate $E[E[Y|X=x]]$ 
+
+<br><br>
+## https://bit.ly/sta-679-s22-ae7
+
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+$p_{X,Y}(x,y)$ | | |
+----------------|--|-|
+ | y = 0 | y = 1 | $p_X(x)$
+x = 0 | 0.25 | 0 | 0.25
+x = 1 | 0 | 0.5 | 0.5
+x = 2 | 0 | 0.25 | 0.25
+$p_Y(y)$|0.25 | 0.75
+
+
+.box-1[
+$$E[Y] = \sum_y y P(Y = y)$$
+]
+
+---
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+$p_{X,Y}(x,y)$ | | |
+----------------|--|-|
+ | y = 0 | y = 1 | $p_X(x)$
+x = 0 | 0.25 | 0 | 0.25
+x = 1 | 0 | 0.5 | 0.5
+x = 2 | 0 | 0.25 | 0.25
+$p_Y(y)$|0.25 | 0.75
+
+
+.box-1[
+$$E[Y] = 0 \times 0.25 + 1 \times 0.75 = 0.75$$
+
+
+]
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+$p_{X,Y}(x,y)$ | | |
+----------------|--|-|
+ | y = 0 | y = 1 | $p_X(x)$
+x = 0 | 0.25 | 0 | 0.25
+x = 1 | 0 | 0.5 | 0.5
+x = 2 | 0 | 0.25 | 0.25
+$p_Y(y)$|0.25 | 0.75
+
+.box-1[
+$$E[Y|X = 0] = 0 \times 1 + 0 \times 0 = 0$$
+]
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.pull-left[
+$p_{X,Y}(x,y)$ | | |
+----------------|--|-|
+ | y = 0 | y = 1 | $p_X(x)$
+x = 0 | 0.25 | 0 | 0.25
+x = 1 | 0 | 0.5 | 0.5
+x = 2 | 0 | 0.25 | 0.25
+$p_Y(y)$|0.25 | 0.75
+]
+
+.pull-right[
+x | E[Y &#124; X = x]
+---|--------
+0 | $0\times 1 + 1\times 0 = 0$
+1 | $0 \times 0 + 1 \times 1 = 1$
+2 | $0 \times 0 + 1 \times 1 = 1$
+
+]
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.pull-left[
+$p_{X,Y}(x,y)$ | | |
+----------------|--|-|
+ | y = 0 | y = 1 | $p_X(x)$
+x = 0 | 0.25 | 0 | 0.25
+x = 1 | 0 | 0.5 | 0.5
+x = 2 | 0 | 0.25 | 0.25
+$p_Y(y)$|0.25 | 0.75
+]
+
+.pull-right[
+x | E[Y &#124; X = x]
+---|--------
+0 | $0\times 1 + 1\times 0 = 0$
+1 | $0 \times 0 + 1 \times 1 = 1$
+2 | $0 \times 0 + 1 \times 1 = 1$
+
+]
+
+.box-1[
+$$E[E[Y|X=x]] = 0 \times 0.25 + 1 \times 0.5 + 1 \times 0.25 = 0.75$$
+]
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+
+```{r, eval = FALSE}
+flip2 <- rbinom(100000, 1, 0.5)
+flip1 <- rbinom(100000, 1, 0.5)
+x <- flip2 + flip1
+y = pmax(flip2, flip1)
+mean(y)
+mean(x)
+mean(y[x == 0])
+mean(y[x == 1])
+mean(y[x == 2])
+mean(y[x == 0]) * mean(x == 0) + 
+  mean(y[x == 1]) * mean(x == 1) + 
+  mean(y[x == 2]) * mean(x == 2)
+```
 
 
