@@ -1,0 +1,629 @@
+---
+title: "Estimating the propensity score"
+author: "Lucy D'Agostino McGowan"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: "libs"
+    css: ["default", "css/style.css"]
+    seal: false
+    anchor_sections: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      navigation:
+        scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
+                      fig.retina = 3, fig.align = "center")
+```
+
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("tile_view"))
+```
+
+class: center middle main-title section-title-1
+
+# Estimating the propensity score
+
+.class-info[
+
+**Session 10**
+
+.light[STA 379/679: Causal Inference <br>
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+
+class: section-title-1 title-1 middle
+
+# Propensity score: The average unit assignment probability for units where $Z_i=z$
+
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+---
+
+class: title title-1
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+# Propensity Score
+
+.box-inv-1.medium[
+
+$e_i(z)=\frac{1}{N(z)}\sum_{i: Z_i=z}P_i(\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1))$
+]
+
+--
+
+<br> <br>
+
+.box-1[
+
+$N(z)$ is the number of units where $Z_i = z$ 
+
+]
+---
+
+
+class: title title-1
+
+# Under individualistic + unconfounded
+
+.box-inv-1.medium[
+
+$e_i(z)=P(X=1 | Z=z))$
+]
+
+---
+class: title title-1
+
+# Under individualistic + unconfounded
+
+.box-1[
+
+$$P(\mathbf{X}|\mathbf{Z}, \mathbf{Y}(0), \mathbf{Y}(1)) = c\prod_{i=1}^N e(Z_i)^{X_i}(1-e(Z_i))^{1-X_i}$$
+]
+
+<br>
+
+.box-1[
+The assignment mechanism is the product of the propensity scores
+]
+
+---
+
+class: title title-1
+
+# Propensity Score
+
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+
+.box-inv-1.medium[
+$$e(z) = P(X = 1 | Z = z)$$
+]
+
+--
+
+.box-1[
+The propensity score is a *balancing score*. Conditional on the propensity score, the distribution of $\mathbf{Z}$ is similar between the exposed $(X=1)$ and unexposed $(X=0)$ units.
+]
+---
+
+class: title title-1
+
+# Estimating the propensity score
+
+.box-1[
+Can estimate it with any function `q()` that will give you an estimate of the probability that $X = 1$ given $Z=z$
+]
+
+--
+
+<br>
+
+.box-1[Most often, we use logistic regression!]
+
+---
+
+class: title title-1
+
+# Estimating the propensity score
+
+
+.box-1[
+
+$$\hat{e} = \frac{1}{1+\exp\{-\mathbf{Z}\boldsymbol\beta\}}$$
+]
+
+---
+
+class: title title-1
+
+# Estimating the propensity score
+
+```{r, eval = FALSE}
+glm(x ~ z1 + z2 + z3 + ..., 
+    data = data, 
+    family = binomial())
+```
+
+---
+
+class: title title-1
+
+# Estimating the propensity score
+
+```{r, eval = FALSE}
+glm(x ~ z1 + z2 + z3 + ..., #<<
+    data = data, 
+    family = binomial())
+```
+
+--
+
+.box-1[Exposure is the outcome, all confounders on the righthand side]
+---
+
+
+class: title title-1
+
+# Estimating the propensity score
+
+```{r, eval = FALSE}
+glm(x ~ z1 + z2 + z3 + ..., 
+    data = data, 
+    family = binomial()) #<<
+```
+
+---
+
+class: title title-1
+
+# Estimating the propensity score
+
+```{r, eval = FALSE}
+glm(x ~ z1 + z2 + z3 + ..., 
+    data = data, 
+    family = binomial()) %>%
+  predict(type = "response")
+```
+
+---
+
+class: title title-1
+
+# Estimating the propensity score
+
+```{r, eval = FALSE}
+glm(x ~ z1 + z2 + z3 + ..., 
+    data = data, 
+    family = binomial()) %>%
+  predict(type = "response") #<<
+```
+
+--
+
+.box-1[
+These are the propensity scores!
+]
+
+---
+
+class: title title-1
+
+# Estimating the propensity score
+
+```{r, eval = FALSE}
+glm(x ~ z1 + z2 + z3 + ..., 
+    data = data, 
+    family = binomial()) %>%
+  predict(type = "response") #<<
+```
+
+---
+
+class: title title-1
+
+# Example
+.footer[https://wwwn.cdc.gov/nchs/nhanes/nhefs/default.aspx/]
+![](img/nhane.png)
+
+--
+
+.box-1[
+The NHANES - Epidemiologic Follow-up Study (NHEFS) is a national longitudinal study
+]
+
+--
+<br>
+.box-1[
+It was designed to investigate the relationships between clinical, nutritional, & behavioral factors and morbidity, mortality, and hospital utilization
+]
+---
+
+class: title title-1
+
+# Example
+
+.small[
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+library(causaldata)
+library(tidyverse)
+nhefs_complete_uc <- nhefs_complete %>% 
+  filter(censored == 0)
+nhefs_complete_uc %>%
+  select(qsmk, wt82, everything())
+```
+]
+
+---
+
+class: title title-1
+
+# Example
+
+.box-1.medium[Causal Question]
+
+--
+
+.box-inv-1[Do people in the US who quit smoking between 1972 and 1982 weight more in 1982 compared to those who did not quite smoking?]
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-inv-1[Do people in the US who quit smoking between 1972 and 1982 weight more in 1982 compared to those who did not quite smoking?]
+
+1. Using the `ggdag` package draw a DAG for the causal question
+2. Determine the ideal "adjustment set(s)"
+2. Knit commit & push to GitHub
+
+`r countdown::countdown(8, font_size = "2em")`
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+
+1. `install.packages("causaldata")`
+2. Examine the variables included in the data by looking at the `nhefs_codebook`
+3. Mark any variables in your DAG that **aren't** in this dataset as latent and examine the adjustment sets
+4. Knit commit & push to GitHub
+
+`r countdown::countdown(8, font_size = "2em")`
+
+---
+
+class: title title-1
+
+# Example
+
+.small[
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+nhefs_complete_uc <- nhefs_complete %>% 
+  filter(censored == 0)
+
+glm(qsmk ~ wt71 + age + marital + race + sex, 
+    data = nhefs_complete_uc,
+    family = binomial()) %>%
+  predict(type = "response")
+```
+]
+
+---
+
+class: title title-1
+
+# Example
+
+.small[
+```{r, echo = TRUE, eval = FALSE, warning = FALSE}
+library(broom) #<<
+
+glm(qsmk ~ wt71 + age + marital + race + sex, 
+    data = nhefs_complete_uc,
+    family = binomial()) %>%
+  augment(type.predict = "response",
+          data = nhefs_complete_uc)
+```
+]
+
+---
+
+class: title title-1
+
+# Example
+
+.small[
+```{r, echo = TRUE, eval = FALSE, warning = FALSE}
+library(broom) #<<
+
+glm(qsmk ~ wt71 + age + marital + race + sex, 
+    data = nhefs_complete_uc,
+    family = binomial()) %>%
+  augment(type.predict = "response", #<<
+          data = nhefs_complete_uc)
+```
+]
+
+---
+
+class: title title-1
+
+# Example
+
+.small[
+```{r, echo = TRUE, eval = FALSE, warning = FALSE}
+library(broom) #<<
+
+glm(qsmk ~ wt71 + age + marital + race + sex, 
+    data = nhefs_complete_uc,
+    family = binomial()) %>%
+  augment(type.predict = "response", 
+          data = nhefs_complete_uc) #<<
+```
+]
+
+---
+class: title title-1
+
+# Example
+
+.small[
+```{r, echo = TRUE, eval = FALSE, warning = FALSE}
+nhefs_complete_uc <-  #<<
+  glm(qsmk ~ wt71 + age + marital + race + sex, 
+      data = nhefs_complete_uc,
+      family = binomial()) %>%
+  augment(type.predict = "response",
+          data = nhefs_complete_uc) 
+
+nhefs_complete_uc %>% 
+  select(qsmk, .fitted)
+```
+]
+
+---
+class: title title-1
+
+# Example
+
+.pull-left[
+.small[
+```{r, echo = TRUE, eval = FALSE}
+nhefs_complete_uc <-
+  glm(qsmk ~ wt71 + age + marital + race + sex, 
+      data = nhefs_complete_uc,
+      family = binomial()) %>%
+  augment(type.predict = "response",
+          data = nhefs_complete_uc) 
+
+nhefs_complete_uc %>%  #<<
+  select(qsmk, .fitted) #<<
+```
+]
+]
+
+.pull-right[
+```{r, echo = FALSE}
+library(broom) #<<
+nhefs_complete_uc <-
+  glm(qsmk ~ wt71 + age + marital + race + sex, 
+      data = nhefs_complete_uc,
+      family = binomial()) %>%
+  augment(type.predict = "response",
+          data = nhefs_complete_uc) 
+
+nhefs_complete_uc %>%  #<<
+  select(qsmk, .fitted) #<<
+```
+]
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+```{r, eval = FALSE}
+nhefs_complete_uc <- nhefs_complete %>% 
+  filter(censored == 0)
+```
+
+1. `install.packages("broom")`
+2. Fit a propensity score model using the confounders you identified that are in the NHEFS data
+3. Knit commit & push to GitHub
+
+`r countdown::countdown(8, font_size = "2em")`
+
+---
+
+class: title title-1
+
+# Propensity Score
+
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+
+.box-inv-1.medium[
+$$e(z) = P(X = 1 | Z = z)$$
+]
+
+
+.box-1[
+The propensity score is a *balancing score*. Conditional on the propensity score, the distribution of $\mathbf{Z}$ is similar between the exposed $(X=1)$ and unexposed $(X=0)$ units.
+]
+
+---
+
+class: title title-1
+
+# Histogram
+
+.left-code[
+```{r hist3, eval = FALSE}
+library(ggplot2)
+
+ggplot(nhefs_complete_uc, 
+       aes(x = .fitted, 
+           fill = as.factor(qsmk))) +
+  geom_histogram(bins = 30)
+```
+]
+
+.right-plot[
+```{r, ref.label="hist3", echo=FALSE}
+```
+]
+---
+
+class: title title-1
+
+# Histogram
+
+.left-code[
+```{r hist, eval = FALSE}
+library(ggplot2)
+
+ggplot(nhefs_complete_uc, 
+       aes(x = .fitted, 
+           fill = as.factor(qsmk))) +
+  geom_histogram(bins = 30) + 
+  labs(
+    fill = "Quit Smoking\n(1 = Yes, 0 = No)") #<<
+```
+]
+
+.right-plot[
+```{r hist-out, ref.label="hist", echo=FALSE}
+```
+]
+---
+
+class: title title-1
+
+# Histogram
+.left-code[
+```{r hist2, eval = FALSE}
+library(ggplot2)
+
+ggplot(nhefs_complete_uc, 
+       aes(x = .fitted, 
+           fill = as.factor(qsmk))) +
+  geom_histogram(bins = 30) + 
+  labs(
+    fill = "Quit Smoking\n(1 = Yes, 0 = No)",
+    x = "propensity score") #<<
+```
+]
+
+.right-plot[
+```{r, ref.label="hist2", echo=FALSE}
+```
+]
+---
+class: title title-1
+
+# Mirrored Histogram
+
+.small[
+```{r}
+df_plot_ps <- nhefs_complete_uc %>%
+  tidyr::pivot_wider(names_from = qsmk, 
+                     values_from = .fitted, 
+                     names_prefix = "qsmk_p")
+```
+]
+
+---
+
+class: title title-1
+
+# Mirrored Histogram
+
+.left-code[
+.small[
+```{r mirror, eval = FALSE}
+ggplot(df_plot_ps) +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p1), 
+                 fill = "cornflower blue") + 
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p0, 
+                     y = - stat(count)), 
+                 fill = "orange") + 
+  scale_y_continuous("count", label = abs) + 
+  scale_x_continuous("propensity score")
+```
+]
+]
+
+.right-plot[
+```{r, ref.label="mirror", echo=FALSE}
+```
+]
+
+
+---
+class: title title-1
+
+# Mirrored Histogram
+
+.left-code[
+.small[
+```{r mirror2, eval = FALSE}
+ggplot(df_plot_ps) +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p1), 
+                 fill = "cornflower blue") + 
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p0, 
+                     y = - stat(count)), 
+                 fill = "orange") + 
+  scale_y_continuous("count", label = abs) + 
+  scale_x_continuous("propensity score") +
+  geom_label(
+    label = "Quit smoking", 
+    x = 0.25,
+    y = 3,
+  ) + 
+  geom_label(
+    label = "Didn't quit smoking",
+    x = 0.25, 
+    y = -3
+  ) + 
+  theme_minimal()
+```
+]
+]
+
+.right-plot[
+```{r, ref.label="mirror2", echo=FALSE}
+```
+]
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+1. Create a mirrored histogram of your propensity scores
+2. Update the theme of and colors of your plot
+
+`r countdown::countdown(8, font_size = "2em")`
+
