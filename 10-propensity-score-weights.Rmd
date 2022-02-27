@@ -887,13 +887,6 @@ $$e_i\approx 1$$
 $w_{ATC}$
 ]
 
---
-
-<br>
-.box-inv-1[
-When the conditional probability of receiving the exposure is large, what does this approximate?
-]
-
 ---
 class: title title-1
 
