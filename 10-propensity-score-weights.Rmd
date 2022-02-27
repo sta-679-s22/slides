@@ -1,0 +1,955 @@
+---
+title: "Propensity score weighting"
+author: "Lucy D'Agostino McGowan"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: "libs"
+    css: ["default", "css/style.css"]
+    seal: false
+    anchor_sections: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      navigation:
+        scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
+                      fig.retina = 3, fig.align = "center")
+```
+
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("tile_view"))
+```
+
+class: center middle main-title section-title-1
+
+# Propensity score weighting
+
+.class-info[
+
+**Session 11**
+
+.light[STA 379/679: Causal Inference <br>
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+
+class: title title-1
+# Average treatment effect
+
+.box-1[
+$$ATE = E[Y(1) - Y(0)]$$
+]
+
+--
+
+<br>
+
+
+.box-inv-1[
+$$w_{ATE} = \frac{X_i}{e_i}+\frac{1-X_i}{1-e_i}$$
+]
+
+---
+
+class: title title-1
+# Average treatment effect
+
+```{r, include = FALSE}
+library(broom)
+library(tidyverse)
+library(causaldata)
+nhefs_complete_uc <- nhefs_complete %>% 
+  filter(censored == 0)
+```
+
+```{r}
+nhefs_complete_uc <-
+  glm(qsmk ~ wt71 + age + marital + race + sex, 
+      data = nhefs_complete_uc,
+      family = binomial()) %>%
+  augment(type.predict = "response",
+          data = nhefs_complete_uc) 
+```
+
+---
+class: title title-1
+# Average treatment effect
+
+```{r}
+nhefs_complete_uc <- nhefs_complete_uc %>%
+  mutate( 
+    w_ate = qsmk / .fitted + 
+      (1 - qsmk) / (1 - .fitted)
+  )
+```
+---
+
+class: title title-1
+# Average treatment effect
+
+```{r}
+nhefs_complete_uc <- nhefs_complete_uc %>%
+  mutate( #<<
+    w_ate = qsmk / .fitted + 
+      (1 - qsmk) / (1 - .fitted)
+  )
+```
+---
+class: title title-1
+# Average treatment effect
+
+```{r}
+nhefs_complete_uc <- nhefs_complete_uc %>%
+  mutate( 
+    w_ate = qsmk / .fitted + #<<
+      (1 - qsmk) / (1 - .fitted)
+  )
+```
+
+---
+
+class: title title-1
+# Average treatment effect
+
+```{r}
+nhefs_complete_uc <- nhefs_complete_uc %>%
+  mutate( 
+    w_ate = qsmk / .fitted + 
+      (1 - qsmk) / (1 - .fitted)#<<
+  )
+```
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-1[Open `appex-09` from last week]
+
+.box-1[Calculate the ATE weights using the propensity score model you fit]
+
+.box-1[What is the range of these weights? Theoretically, how small can they be? How large?]
+
+.box-1[Knit, commit, push to GitHub]
+
+`r countdown::countdown(5)`
+---
+
+class: title title-1
+
+# Mirrored Histogram
+
+.small[
+```{r}
+df_plot_ps <- nhefs_complete_uc %>%
+  tidyr::pivot_wider(names_from = qsmk, 
+                     values_from = .fitted, 
+                     names_prefix = "qsmk_p")
+```
+]
+
+---
+class: title title-1
+# Mirrored Histogram
+
+.left-code[
+.small[
+```{r mirror2, eval = FALSE}
+ggplot(df_plot_ps) +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p1), 
+                 fill = "cornflower blue") + 
+  geom_histogram(bins = 50, 
+                 alpha = 0.5,
+                 aes(x = qsmk_p1, 
+                     weight = w_ate), 
+                 fill = "cornflower blue") +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p0, 
+                     y = - stat(count))) + 
+  geom_histogram(bins = 50, 
+                 alpha = 0.5,
+                 aes(x = qsmk_p0, 
+                     weight = w_ate,
+                     y = - stat(count)), 
+                 fill = "orange") + 
+  scale_y_continuous("count", label = abs) + 
+  scale_x_continuous("propensity score") +
+  geom_label(
+    label = "Quit smoking", 
+    x = 0.25,
+    y = 3,
+  ) + 
+  geom_label(
+    label = "Didn't quit smoking",
+    x = 0.25, 
+    y = -3
+  ) + 
+  theme_minimal()
+```
+]
+]
+
+.right-plot[
+```{r, ref.label="mirror2", echo=FALSE}
+```
+]
+---
+class: title title-1
+# Mirrored Histogram
+
+.left-code[
+.small[
+```{r, eval = FALSE}
+ggplot(df_plot_ps) +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p1), 
+                 fill = "cornflower blue") + 
+  geom_histogram(bins = 50,  #<<
+                 alpha = 0.5, #<<
+                 aes(x = qsmk_p1, #<< 
+                     weight = w_ate),  #<<
+                 fill = "cornflower blue") +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p0, 
+                     y = - stat(count))) + 
+  geom_histogram(bins = 50, 
+                 alpha = 0.5,
+                 aes(x = qsmk_p0, 
+                     weight = w_ate,
+                     y = - stat(count)), 
+                 fill = "orange") + 
+  scale_y_continuous("count", label = abs) + 
+  scale_x_continuous("propensity score") +
+  geom_label(
+    label = "Quit smoking", 
+    x = 0.25,
+    y = 3,
+  ) + 
+  geom_label(
+    label = "Didn't quit smoking",
+    x = 0.25, 
+    y = -3
+  ) + 
+  theme_minimal()
+```
+]
+]
+
+.right-plot[
+```{r, ref.label="mirror2", echo=FALSE}
+```
+]
+
+---
+
+class: title title-1
+# Mirrored Histogram
+
+.left-code[
+.small[
+```{r, eval = FALSE}
+ggplot(df_plot_ps) +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p1), 
+                 fill = "cornflower blue") + 
+  geom_histogram(bins = 50,  
+                 alpha = 0.5, 
+                 aes(x = qsmk_p1, 
+                     weight = w_ate),  
+                 fill = "cornflower blue") +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p0, 
+                     y = - stat(count))) + 
+  geom_histogram(bins = 50, #<<
+                 alpha = 0.5, #<<
+                 aes(x = qsmk_p0, #<<
+                     weight = w_ate,#<<
+                     y = - stat(count)), #<<
+                 fill = "orange") + 
+  scale_y_continuous("count", label = abs) + 
+  scale_x_continuous("propensity score") +
+  geom_label(
+    label = "Quit smoking", 
+    x = 0.25,
+    y = 3,
+  ) + 
+  geom_label(
+    label = "Didn't quit smoking",
+    x = 0.25, 
+    y = -3
+  ) + 
+  theme_minimal()
+```
+]
+]
+
+.right-plot[
+```{r, ref.label="mirror2", echo=FALSE}
+```
+]
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-1[Create a mirrored histogram with your ATE pseudo-population overlaid]
+
+.box-1[Knit, commit, push to GitHub]
+
+`r countdown::countdown(5)`
+
+---
+
+class: title title-1
+
+# Table 1!
+
+.left-code[
+.small[
+```{r, eval = FALSE}
+library(gtsummary)
+nhefs_complete_uc %>%
+  tbl_summary(
+    by = qsmk, 
+    include = c(
+      "wt71", 
+      "age", 
+      "marital",
+      "race",
+      "sex")) %>%
+  add_overall()
+```
+
+]]
+
+.right-plot[
+.small[
+```{r, echo = FALSE}
+library(gtsummary)
+nhefs_complete_uc %>%
+  tbl_summary(
+    by = qsmk, 
+    include = c("wt71", "age", "marital", "race", "sex")) %>%
+  add_overall()
+```
+]
+]
+---
+
+class: title title-1
+
+# Table 1!
+
+```{r, echo = FALSE}
+nhefs_complete_uc %>%
+  tbl_summary(
+    by = qsmk, 
+    include = c("wt71", "age", "marital", "race", "sex")) %>%
+  add_overall()
+```
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-1[`install.packages("gtsummary")`]
+
+.box-1[Create Table 1 split by `qsmk`, including an `overall` column and using all variables in your propensity score model]
+
+.box-1[Knit, commit, push to GitHub]
+
+`r countdown::countdown(5)`
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+```{r, eval = FALSE}
+library(survey)
+svy_des <- svydesign(
+  ids = ~ 1,
+  data = nhefs_complete_uc,
+  weights = ~ w_ate
+)
+```
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+```{r, eval = FALSE}
+library(survey) #<<
+svy_des <- svydesign(
+  ids = ~ 1,
+  data = nhefs_complete_uc,
+  weights = ~ w_ate
+)
+```
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+```{r, eval = FALSE}
+library(survey)
+svy_des <- svydesign( #<<
+  ids = ~ 1,
+  data = nhefs_complete_uc,
+  weights = ~ w_ate
+)
+```
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+```{r, eval = FALSE}
+library(survey)
+svy_des <- svydesign(
+  ids = ~ 1, #<<
+  data = nhefs_complete_uc,
+  weights = ~ w_ate
+)
+```
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+```{r, eval = FALSE}
+library(survey)
+svy_des <- svydesign(
+  ids = ~ 1,
+  data = nhefs_complete_uc, #<<
+  weights = ~ w_ate
+)
+```
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+```{r}
+library(survey)
+svy_des <- svydesign(
+  ids = ~ 1,
+  data = nhefs_complete_uc,
+  weights = ~ w_ate #<<
+)
+```
+
+---
+
+
+class: title title-1
+
+# Weighted Table 1
+
+```{r, eval = FALSE}
+svy_des %>%
+  tbl_svysummary(by = qsmk,
+              include = c("wt71",
+                          "age",
+                          "marital",
+                          "race",
+                          "sex")) %>%
+  add_overall()
+```
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+```{r, eval = FALSE}
+svy_des %>% #<<
+  tbl_svysummary(by = qsmk, 
+              include = c("wt71",
+                          "age",
+                          "marital",
+                          "race",
+                          "sex")) %>%
+  add_overall()
+```
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+```{r, eval = FALSE}
+svy_des %>%
+  tbl_svysummary(by = qsmk, #<<
+              include = c("wt71",
+                          "age",
+                          "marital",
+                          "race",
+                          "sex")) %>%
+  add_overall()
+```
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+```{r, echo = FALSE}
+svy_des %>%
+  tbl_svysummary(by = qsmk,
+              include = c("wt71",
+                          "age",
+                          "marital",
+                          "race",
+                          "sex")) %>%
+  add_overall()
+```
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-1[`install.packages("survey")`]
+
+.box-1[Create weighted Table 1. Compare this to your Table 1 from the previous exercise - which column does it resemble the most?]
+
+.box-1[Knit, commit, push to GitHub]
+
+`r countdown::countdown(5)`
+
+---
+
+class: title title-1
+
+.small[
+# Average treatment effect among the treated
+]
+
+.box-1[
+$$ATT = E[Y(1) - Y(0) | X = 1]$$
+
+]
+
+--
+
+<br>
+
+.box-1[
+
+$$w_{ATT} = \frac{e_i X_i}{e_i} + \frac{e_i(1-X_i)}{1-e_i}$$
+]
+
+--
+<br>
+.box-inv-1[What is this when X=1?]
+---
+class: title title-1
+
+# ATT
+
+```{r, echo = FALSE}
+df_plot_ps <- nhefs_complete_uc %>%
+  mutate(w_att = qsmk + .fitted * (1 - qsmk) / (1 - .fitted) ) %>%
+  tidyr::pivot_wider(names_from = qsmk, 
+                     values_from = .fitted, 
+                     names_prefix = "qsmk_p")
+ggplot(df_plot_ps) +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p1), 
+                 fill = "cornflower blue") + 
+  geom_histogram(bins = 50,  
+                 alpha = 0.5, 
+                 aes(x = qsmk_p1, 
+                     weight = w_att),  
+                 fill = "cornflower blue") +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p0, 
+                     y = - stat(count))) + 
+  geom_histogram(bins = 50, #<<
+                 alpha = 0.5, #<<
+                 aes(x = qsmk_p0, #<<
+                     weight = w_att,#<<
+                     y = - stat(count)), #<<
+                 fill = "orange") + 
+  scale_y_continuous("count", label = abs) + 
+  scale_x_continuous("propensity score") +
+  geom_label(
+    label = "Quit smoking", 
+    x = 0.25,
+    y = 3,
+  ) + 
+  geom_label(
+    label = "Didn't quit smoking",
+    x = 0.25, 
+    y = -3
+  ) + 
+  theme_minimal()
+```
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-1[Calculate the `w_att`. What is the range of possible weights?]
+
+.box-1[Plot a mirrored histogram of this pseudo-population. What do you notice?]
+
+.box-1[Create weighted Table 1. Compare this to your unweighted Table 1 - which column does it resemble the most?]
+
+.box-1[Knit, commit, push to GitHub]
+
+`r countdown::countdown(10)`
+
+---
+class: title title-1
+.small[
+# Average treatment effect among the controls
+]
+
+.box-1[
+$$ATC = E[Y(1) - Y(0) | X = 0]$$
+]
+
+
+--
+<br>
+
+.box-1[
+
+$$w_{ATC} = \frac{(1 - e_i) X_i}{e_i} + \frac{(1 - e_i)(1-X_i)}{1-e_i}$$
+]
+
+--
+
+<br>
+.box-inv-1[What is this when X=0?]
+
+---
+
+class: title title-1
+
+# ATC
+
+```{r, echo = FALSE}
+df_plot_ps <- nhefs_complete_uc %>%
+  mutate(w_atc = (1 - .fitted) * qsmk / .fitted + (1 - qsmk)) %>%
+  tidyr::pivot_wider(names_from = qsmk, 
+                     values_from = .fitted, 
+                     names_prefix = "qsmk_p")
+ggplot(df_plot_ps) +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p1), 
+                 fill = "cornflower blue") + 
+  geom_histogram(bins = 50,  
+                 alpha = 0.5, 
+                 aes(x = qsmk_p1, 
+                     weight = w_atc),  
+                 fill = "cornflower blue") +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p0, 
+                     y = - stat(count))) + 
+  geom_histogram(bins = 50, #<<
+                 alpha = 0.5, #<<
+                 aes(x = qsmk_p0, #<<
+                     weight = w_atc,#<<
+                     y = - stat(count)), #<<
+                 fill = "orange") + 
+  scale_y_continuous("count", label = abs) + 
+  scale_x_continuous("propensity score") +
+  geom_label(
+    label = "Quit smoking", 
+    x = 0.25,
+    y = 3,
+  ) + 
+  geom_label(
+    label = "Didn't quit smoking",
+    x = 0.25, 
+    y = -3
+  ) + 
+  theme_minimal()
+```
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-1[Calculate the `w_atc`. What is the range of possible weights?]
+
+.box-1[Plot a mirrored histogram of this pseudo-population. What do you notice?]
+
+.box-1[Create weighted Table 1. Compare this to your unweighted Table 1 - which column does it resemble the most?]
+
+.box-1[Knit, commit, push to GitHub]
+
+`r countdown::countdown(10)`
+
+---
+class: title title-1
+
+.small[
+# Average treatment effect among matchable
+]
+
+.box-1[
+$$ATM_d = E[Y(1) - Y(0) | M_d = 1]$$
+]
+
+--
+<br>
+
+.box-inv-1[
+
+$$w_{ATM} = \frac{\textrm{min}\{e_i, 1-e_i\}}{X_i e_i + (1 - X_i)(1 - e_i)}$$
+]
+
+---
+
+class: title title-1
+.small[
+# Average treatment effect among matchable
+]
+
+```{r}
+nhefs_complete_uc <- nhefs_complete_uc %>%
+  mutate( 
+    w_atm = pmin(.fitted, 1 - .fitted) / #<<
+      (qsmk * .fitted + (1 - qsmk) * (1 - .fitted)) #<<
+  )
+```
+
+---
+
+class: title title-1
+
+# ATM
+
+```{r, echo = FALSE}
+df_plot_ps <- nhefs_complete_uc %>%
+  tidyr::pivot_wider(names_from = qsmk, 
+                     values_from = .fitted, 
+                     names_prefix = "qsmk_p")
+ggplot(df_plot_ps) +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p1), 
+                 fill = "cornflower blue") + 
+  geom_histogram(bins = 50,  
+                 alpha = 0.5, 
+                 aes(x = qsmk_p1, 
+                     weight = w_atm),  
+                 fill = "cornflower blue") +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p0, 
+                     y = - stat(count))) + 
+  geom_histogram(bins = 50, #<<
+                 alpha = 0.5, #<<
+                 aes(x = qsmk_p0, #<<
+                     weight = w_atm,#<<
+                     y = - stat(count)), #<<
+                 fill = "orange") + 
+  scale_y_continuous("count", label = abs) + 
+  scale_x_continuous("propensity score") +
+  geom_label(
+    label = "Quit smoking", 
+    x = 0.25,
+    y = 3,
+  ) + 
+  geom_label(
+    label = "Didn't quit smoking",
+    x = 0.25, 
+    y = -3
+  ) + 
+  theme_minimal()
+```
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-1[Calculate the `w_atm`. What is the range of possible weights?]
+
+.box-1[Plot a mirrored histogram of this pseudo-population. What do you notice?]
+
+.box-1[Create weighted Table 1. Compare this to your unweighted Table 1 - which column does it resemble the most (if any)?]
+
+.box-1[Knit, commit, push to GitHub]
+
+`r countdown::countdown(10)`
+
+---
+class: title title-1
+
+.small[
+# Average treatment effect among the overlap
+]
+
+.box-inv-1[
+Target population: overlap population
+]
+
+--
+
+.box-1[Similar to the "evenly matchable"]
+
+--
+
+.box-1[Creates a "pseudo-population" that has excellent variance properties]
+
+--
+
+.box-1[
+$$w_{ATO} = (1-e_i)X_i + e_i (1-X_i)$$
+]
+---
+
+class: title title-1
+
+.small[
+# Average treatment effect among the overlap
+]
+
+
+.box-1[
+$$w_{ATO} = (1-e_i)X_i + e_i (1-X_i)$$
+]
+
+--
+<br>
+.box-inv-1[
+When the conditional probability of receiving the exposure is small, what does this approximate?
+]
+
+--
+<br>
+.box-1[
+
+$$e_i\approx 0$$
+
+$w_{ATT}$
+]
+
+---
+
+class: title title-1
+
+.small[
+# Average treatment effect among the overlap
+]
+
+
+.box-1[
+$$w_{ATO} = (1-e_i)X_i + e_i (1-X_i)$$
+]
+
+--
+<br>
+.box-1[
+
+$$e_i\approx 1$$
+
+$w_{ATC}$
+]
+
+--
+
+<br>
+.box-inv-1[
+When the conditional probability of receiving the exposure is large, what does this approximate?
+]
+
+---
+class: title title-1
+
+# ATO
+
+```{r, echo = FALSE}
+df_plot_ps <- nhefs_complete_uc %>%
+  mutate(w_ato = (1 - .fitted) * qsmk + .fitted * (1 - qsmk)) %>%
+  tidyr::pivot_wider(names_from = qsmk, 
+                     values_from = .fitted, 
+                     names_prefix = "qsmk_p")
+ggplot(df_plot_ps) +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p1), 
+                 fill = "cornflower blue") + 
+  geom_histogram(bins = 50,  
+                 alpha = 0.5, 
+                 aes(x = qsmk_p1, 
+                     weight = w_ato),  
+                 fill = "cornflower blue") +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p0, 
+                     y = - stat(count))) + 
+  geom_histogram(bins = 50, #<<
+                 alpha = 0.5, #<<
+                 aes(x = qsmk_p0, #<<
+                     weight = w_ato,#<<
+                     y = - stat(count)), #<<
+                 fill = "orange") + 
+  scale_y_continuous("count", label = abs) + 
+  scale_x_continuous("propensity score") +
+  geom_label(
+    label = "Quit smoking", 
+    x = 0.25,
+    y = 3,
+  ) + 
+  geom_label(
+    label = "Didn't quit smoking",
+    x = 0.25, 
+    y = -3
+  ) + 
+  theme_minimal()
+```
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-1[Calculate the `w_ato`. What is the range of possible weights?]
+
+.box-1[Plot a mirrored histogram of this pseudo-population. What do you notice?]
+
+.box-1[Create weighted Table 1. Compare this to your unweighted Table 1 - which column does it resemble the most (if any)?]
+
+.box-1[Knit, commit, push to GitHub]
+
+`r countdown::countdown(10)`

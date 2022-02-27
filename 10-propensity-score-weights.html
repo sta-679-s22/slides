@@ -1,0 +1,2379 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Propensity score weighting</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lucy D’Agostino McGowan" />
+    <meta name="date" content="2022-02-27" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+class: center middle main-title section-title-1
+
+# Propensity score weighting
+
+.class-info[
+
+**Session 11**
+
+.light[STA 379/679: Causal Inference &lt;br&gt;
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+
+class: title title-1
+# Average treatment effect
+
+.box-1[
+`$$ATE = E[Y(1) - Y(0)]$$`
+]
+
+--
+
+&lt;br&gt;
+
+
+.box-inv-1[
+`$$w_{ATE} = \frac{X_i}{e_i}+\frac{1-X_i}{1-e_i}$$`
+]
+
+---
+
+class: title title-1
+# Average treatment effect
+
+
+
+
+```r
+nhefs_complete_uc &lt;-
+  glm(qsmk ~ wt71 + age + marital + race + sex, 
+      data = nhefs_complete_uc,
+      family = binomial()) %&gt;%
+  augment(type.predict = "response",
+          data = nhefs_complete_uc) 
+```
+
+---
+class: title title-1
+# Average treatment effect
+
+
+```r
+nhefs_complete_uc &lt;- nhefs_complete_uc %&gt;%
+  mutate( 
+    w_ate = qsmk / .fitted + 
+      (1 - qsmk) / (1 - .fitted)
+  )
+```
+---
+
+class: title title-1
+# Average treatment effect
+
+
+```r
+nhefs_complete_uc &lt;- nhefs_complete_uc %&gt;%
+* mutate(
+    w_ate = qsmk / .fitted + 
+      (1 - qsmk) / (1 - .fitted)
+  )
+```
+---
+class: title title-1
+# Average treatment effect
+
+
+```r
+nhefs_complete_uc &lt;- nhefs_complete_uc %&gt;%
+  mutate( 
+*   w_ate = qsmk / .fitted +
+      (1 - qsmk) / (1 - .fitted)
+  )
+```
+
+---
+
+class: title title-1
+# Average treatment effect
+
+
+```r
+nhefs_complete_uc &lt;- nhefs_complete_uc %&gt;%
+  mutate( 
+    w_ate = qsmk / .fitted + 
+*     (1 - qsmk) / (1 - .fitted)
+  )
+```
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+.box-1[Open `appex-09` from last week]
+
+.box-1[Calculate the ATE weights using the propensity score model you fit]
+
+.box-1[What is the range of these weights? Theoretically, how small can they be? How large?]
+
+.box-1[Knit, commit, push to GitHub]
+
+<div class="countdown" id="timer_621bfa5e" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+---
+
+class: title title-1
+
+# Mirrored Histogram
+
+.small[
+
+```r
+df_plot_ps &lt;- nhefs_complete_uc %&gt;%
+  tidyr::pivot_wider(names_from = qsmk, 
+                     values_from = .fitted, 
+                     names_prefix = "qsmk_p")
+```
+]
+
+---
+class: title title-1
+# Mirrored Histogram
+
+.left-code[
+.small[
+
+```r
+ggplot(df_plot_ps) +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p1), 
+                 fill = "cornflower blue") + 
+  geom_histogram(bins = 50, 
+                 alpha = 0.5,
+                 aes(x = qsmk_p1, 
+                     weight = w_ate), 
+                 fill = "cornflower blue") +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p0, 
+                     y = - stat(count))) + 
+  geom_histogram(bins = 50, 
+                 alpha = 0.5,
+                 aes(x = qsmk_p0, 
+                     weight = w_ate,
+                     y = - stat(count)), 
+                 fill = "orange") + 
+  scale_y_continuous("count", label = abs) + 
+  scale_x_continuous("propensity score") +
+  geom_label(
+    label = "Quit smoking", 
+    x = 0.25,
+    y = 3,
+  ) + 
+  geom_label(
+    label = "Didn't quit smoking",
+    x = 0.25, 
+    y = -3
+  ) + 
+  theme_minimal()
+```
+]
+]
+
+.right-plot[
+&lt;img src="10-propensity-score-weights_files/figure-html/unnamed-chunk-8-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+---
+class: title title-1
+# Mirrored Histogram
+
+.left-code[
+.small[
+
+```r
+ggplot(df_plot_ps) +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p1), 
+                 fill = "cornflower blue") + 
+* geom_histogram(bins = 50,
+*                alpha = 0.5,
+*                aes(x = qsmk_p1,
+*                    weight = w_ate),
+                 fill = "cornflower blue") +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p0, 
+                     y = - stat(count))) + 
+  geom_histogram(bins = 50, 
+                 alpha = 0.5,
+                 aes(x = qsmk_p0, 
+                     weight = w_ate,
+                     y = - stat(count)), 
+                 fill = "orange") + 
+  scale_y_continuous("count", label = abs) + 
+  scale_x_continuous("propensity score") +
+  geom_label(
+    label = "Quit smoking", 
+    x = 0.25,
+    y = 3,
+  ) + 
+  geom_label(
+    label = "Didn't quit smoking",
+    x = 0.25, 
+    y = -3
+  ) + 
+  theme_minimal()
+```
+]
+]
+
+.right-plot[
+&lt;img src="10-propensity-score-weights_files/figure-html/unnamed-chunk-10-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+class: title title-1
+# Mirrored Histogram
+
+.left-code[
+.small[
+
+```r
+ggplot(df_plot_ps) +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p1), 
+                 fill = "cornflower blue") + 
+  geom_histogram(bins = 50,  
+                 alpha = 0.5, 
+                 aes(x = qsmk_p1, 
+                     weight = w_ate),  
+                 fill = "cornflower blue") +
+  geom_histogram(bins = 50, 
+                 aes(x = qsmk_p0, 
+                     y = - stat(count))) + 
+* geom_histogram(bins = 50,
+*                alpha = 0.5,
+*                aes(x = qsmk_p0,
+*                    weight = w_ate,
+*                    y = - stat(count)),
+                 fill = "orange") + 
+  scale_y_continuous("count", label = abs) + 
+  scale_x_continuous("propensity score") +
+  geom_label(
+    label = "Quit smoking", 
+    x = 0.25,
+    y = 3,
+  ) + 
+  geom_label(
+    label = "Didn't quit smoking",
+    x = 0.25, 
+    y = -3
+  ) + 
+  theme_minimal()
+```
+]
+]
+
+.right-plot[
+&lt;img src="10-propensity-score-weights_files/figure-html/unnamed-chunk-12-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+.box-1[Create a mirrored histogram with your ATE pseudo-population overlaid]
+
+.box-1[Knit, commit, push to GitHub]
+
+<div class="countdown" id="timer_621bfce9" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# Table 1!
+
+.left-code[
+.small[
+
+```r
+library(gtsummary)
+nhefs_complete_uc %&gt;%
+  tbl_summary(
+    by = qsmk, 
+    include = c(
+      "wt71", 
+      "age", 
+      "marital",
+      "race",
+      "sex")) %&gt;%
+  add_overall()
+```
+
+]]
+
+.right-plot[
+.small[
+<div id="kouscmcllv" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#kouscmcllv .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#kouscmcllv .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kouscmcllv .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#kouscmcllv .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#kouscmcllv .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kouscmcllv .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#kouscmcllv .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#kouscmcllv .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#kouscmcllv .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#kouscmcllv .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#kouscmcllv .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#kouscmcllv .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#kouscmcllv .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#kouscmcllv .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#kouscmcllv .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#kouscmcllv .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#kouscmcllv .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kouscmcllv .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#kouscmcllv .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#kouscmcllv .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kouscmcllv .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#kouscmcllv .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#kouscmcllv .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kouscmcllv .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kouscmcllv .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#kouscmcllv .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#kouscmcllv .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#kouscmcllv .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kouscmcllv .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kouscmcllv .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#kouscmcllv .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#kouscmcllv .gt_left {
+  text-align: left;
+}
+
+#kouscmcllv .gt_center {
+  text-align: center;
+}
+
+#kouscmcllv .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#kouscmcllv .gt_font_normal {
+  font-weight: normal;
+}
+
+#kouscmcllv .gt_font_bold {
+  font-weight: bold;
+}
+
+#kouscmcllv .gt_font_italic {
+  font-style: italic;
+}
+
+#kouscmcllv .gt_super {
+  font-size: 65%;
+}
+
+#kouscmcllv .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#kouscmcllv .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#kouscmcllv .gt_slash_mark {
+  font-size: 0.7em;
+  line-height: 0.7em;
+  vertical-align: 0.15em;
+}
+
+#kouscmcllv .gt_fraction_numerator {
+  font-size: 0.6em;
+  line-height: 0.6em;
+  vertical-align: 0.45em;
+}
+
+#kouscmcllv .gt_fraction_denominator {
+  font-size: 0.6em;
+  line-height: 0.6em;
+  vertical-align: -0.05em;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Overall</strong>, N = 1,566<sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>0</strong>, N = 1,163<sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>1</strong>, N = 403<sup class="gt_footnote_marks">1</sup></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">WEIGHT IN KILOGRAMS  IN 1971</td>
+<td class="gt_row gt_center">69 (60, 80)</td>
+<td class="gt_row gt_center">68 (59, 79)</td>
+<td class="gt_row gt_center">71 (61, 81)</td></tr>
+    <tr><td class="gt_row gt_left">AGE IN 1971</td>
+<td class="gt_row gt_center">43 (33, 53)</td>
+<td class="gt_row gt_center">42 (33, 51)</td>
+<td class="gt_row gt_center">46 (35, 56)</td></tr>
+    <tr><td class="gt_row gt_left">MARITAL STATUS IN 1971  1: Under 17, 2: Married, 3: Widowed, 4: Never married, 5: Divorced, 6: Separated, 8: Unknown</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">2</td>
+<td class="gt_row gt_center">1,237 (79%)</td>
+<td class="gt_row gt_center">906 (78%)</td>
+<td class="gt_row gt_center">331 (82%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">3</td>
+<td class="gt_row gt_center">88 (5.6%)</td>
+<td class="gt_row gt_center">64 (5.5%)</td>
+<td class="gt_row gt_center">24 (6.0%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">4</td>
+<td class="gt_row gt_center">93 (5.9%)</td>
+<td class="gt_row gt_center">74 (6.4%)</td>
+<td class="gt_row gt_center">19 (4.7%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">5</td>
+<td class="gt_row gt_center">92 (5.9%)</td>
+<td class="gt_row gt_center">74 (6.4%)</td>
+<td class="gt_row gt_center">18 (4.5%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">6</td>
+<td class="gt_row gt_center">55 (3.5%)</td>
+<td class="gt_row gt_center">45 (3.9%)</td>
+<td class="gt_row gt_center">10 (2.5%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">8</td>
+<td class="gt_row gt_center">1 (&lt;0.1%)</td>
+<td class="gt_row gt_center">0 (0%)</td>
+<td class="gt_row gt_center">1 (0.2%)</td></tr>
+    <tr><td class="gt_row gt_left">0: WHITE 1: BLACK OR OTHER IN 1971</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">0</td>
+<td class="gt_row gt_center">1,360 (87%)</td>
+<td class="gt_row gt_center">993 (85%)</td>
+<td class="gt_row gt_center">367 (91%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">1</td>
+<td class="gt_row gt_center">206 (13%)</td>
+<td class="gt_row gt_center">170 (15%)</td>
+<td class="gt_row gt_center">36 (8.9%)</td></tr>
+    <tr><td class="gt_row gt_left">0: MALE 1: FEMALE</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">0</td>
+<td class="gt_row gt_center">762 (49%)</td>
+<td class="gt_row gt_center">542 (47%)</td>
+<td class="gt_row gt_center">220 (55%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">1</td>
+<td class="gt_row gt_center">804 (51%)</td>
+<td class="gt_row gt_center">621 (53%)</td>
+<td class="gt_row gt_center">183 (45%)</td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="4"><sup class="gt_footnote_marks">1</sup> Median (IQR); n (%)</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+]
+]
+---
+
+class: title title-1
+
+# Table 1!
+
+<div id="tbbwftrekm" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#tbbwftrekm .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#tbbwftrekm .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#tbbwftrekm .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#tbbwftrekm .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#tbbwftrekm .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tbbwftrekm .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#tbbwftrekm .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#tbbwftrekm .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#tbbwftrekm .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#tbbwftrekm .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#tbbwftrekm .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#tbbwftrekm .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#tbbwftrekm .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#tbbwftrekm .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#tbbwftrekm .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#tbbwftrekm .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#tbbwftrekm .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tbbwftrekm .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#tbbwftrekm .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#tbbwftrekm .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tbbwftrekm .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#tbbwftrekm .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#tbbwftrekm .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tbbwftrekm .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tbbwftrekm .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#tbbwftrekm .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#tbbwftrekm .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#tbbwftrekm .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#tbbwftrekm .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tbbwftrekm .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#tbbwftrekm .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#tbbwftrekm .gt_left {
+  text-align: left;
+}
+
+#tbbwftrekm .gt_center {
+  text-align: center;
+}
+
+#tbbwftrekm .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#tbbwftrekm .gt_font_normal {
+  font-weight: normal;
+}
+
+#tbbwftrekm .gt_font_bold {
+  font-weight: bold;
+}
+
+#tbbwftrekm .gt_font_italic {
+  font-style: italic;
+}
+
+#tbbwftrekm .gt_super {
+  font-size: 65%;
+}
+
+#tbbwftrekm .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#tbbwftrekm .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#tbbwftrekm .gt_slash_mark {
+  font-size: 0.7em;
+  line-height: 0.7em;
+  vertical-align: 0.15em;
+}
+
+#tbbwftrekm .gt_fraction_numerator {
+  font-size: 0.6em;
+  line-height: 0.6em;
+  vertical-align: 0.45em;
+}
+
+#tbbwftrekm .gt_fraction_denominator {
+  font-size: 0.6em;
+  line-height: 0.6em;
+  vertical-align: -0.05em;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Overall</strong>, N = 1,566<sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>0</strong>, N = 1,163<sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>1</strong>, N = 403<sup class="gt_footnote_marks">1</sup></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">WEIGHT IN KILOGRAMS  IN 1971</td>
+<td class="gt_row gt_center">69 (60, 80)</td>
+<td class="gt_row gt_center">68 (59, 79)</td>
+<td class="gt_row gt_center">71 (61, 81)</td></tr>
+    <tr><td class="gt_row gt_left">AGE IN 1971</td>
+<td class="gt_row gt_center">43 (33, 53)</td>
+<td class="gt_row gt_center">42 (33, 51)</td>
+<td class="gt_row gt_center">46 (35, 56)</td></tr>
+    <tr><td class="gt_row gt_left">MARITAL STATUS IN 1971  1: Under 17, 2: Married, 3: Widowed, 4: Never married, 5: Divorced, 6: Separated, 8: Unknown</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">2</td>
+<td class="gt_row gt_center">1,237 (79%)</td>
+<td class="gt_row gt_center">906 (78%)</td>
+<td class="gt_row gt_center">331 (82%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">3</td>
+<td class="gt_row gt_center">88 (5.6%)</td>
+<td class="gt_row gt_center">64 (5.5%)</td>
+<td class="gt_row gt_center">24 (6.0%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">4</td>
+<td class="gt_row gt_center">93 (5.9%)</td>
+<td class="gt_row gt_center">74 (6.4%)</td>
+<td class="gt_row gt_center">19 (4.7%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">5</td>
+<td class="gt_row gt_center">92 (5.9%)</td>
+<td class="gt_row gt_center">74 (6.4%)</td>
+<td class="gt_row gt_center">18 (4.5%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">6</td>
+<td class="gt_row gt_center">55 (3.5%)</td>
+<td class="gt_row gt_center">45 (3.9%)</td>
+<td class="gt_row gt_center">10 (2.5%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">8</td>
+<td class="gt_row gt_center">1 (&lt;0.1%)</td>
+<td class="gt_row gt_center">0 (0%)</td>
+<td class="gt_row gt_center">1 (0.2%)</td></tr>
+    <tr><td class="gt_row gt_left">0: WHITE 1: BLACK OR OTHER IN 1971</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">0</td>
+<td class="gt_row gt_center">1,360 (87%)</td>
+<td class="gt_row gt_center">993 (85%)</td>
+<td class="gt_row gt_center">367 (91%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">1</td>
+<td class="gt_row gt_center">206 (13%)</td>
+<td class="gt_row gt_center">170 (15%)</td>
+<td class="gt_row gt_center">36 (8.9%)</td></tr>
+    <tr><td class="gt_row gt_left">0: MALE 1: FEMALE</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">0</td>
+<td class="gt_row gt_center">762 (49%)</td>
+<td class="gt_row gt_center">542 (47%)</td>
+<td class="gt_row gt_center">220 (55%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">1</td>
+<td class="gt_row gt_center">804 (51%)</td>
+<td class="gt_row gt_center">621 (53%)</td>
+<td class="gt_row gt_center">183 (45%)</td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="4"><sup class="gt_footnote_marks">1</sup> Median (IQR); n (%)</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+.box-1[`install.packages("gtsummary")`]
+
+.box-1[Create Table 1 split by `qsmk`, including an `overall` column and using all variables in your propensity score model]
+
+.box-1[Knit, commit, push to GitHub]
+
+<div class="countdown" id="timer_621bfaa6" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+
+```r
+library(survey)
+svy_des &lt;- svydesign(
+  ids = ~ 1,
+  data = nhefs_complete_uc,
+  weights = ~ w_ate
+)
+```
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+
+```r
+*library(survey)
+svy_des &lt;- svydesign(
+  ids = ~ 1,
+  data = nhefs_complete_uc,
+  weights = ~ w_ate
+)
+```
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+
+```r
+library(survey)
+*svy_des &lt;- svydesign(
+  ids = ~ 1,
+  data = nhefs_complete_uc,
+  weights = ~ w_ate
+)
+```
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+
+```r
+library(survey)
+svy_des &lt;- svydesign(
+* ids = ~ 1,
+  data = nhefs_complete_uc,
+  weights = ~ w_ate
+)
+```
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+
+```r
+library(survey)
+svy_des &lt;- svydesign(
+  ids = ~ 1,
+* data = nhefs_complete_uc,
+  weights = ~ w_ate
+)
+```
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+
+```r
+library(survey)
+svy_des &lt;- svydesign(
+  ids = ~ 1,
+  data = nhefs_complete_uc,
+* weights = ~ w_ate
+)
+```
+
+---
+
+
+class: title title-1
+
+# Weighted Table 1
+
+
+```r
+svy_des %&gt;%
+  tbl_svysummary(by = qsmk,
+              include = c("wt71",
+                          "age",
+                          "marital",
+                          "race",
+                          "sex")) %&gt;%
+  add_overall()
+```
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+
+```r
+*svy_des %&gt;%
+  tbl_svysummary(by = qsmk, 
+              include = c("wt71",
+                          "age",
+                          "marital",
+                          "race",
+                          "sex")) %&gt;%
+  add_overall()
+```
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+
+```r
+svy_des %&gt;%
+* tbl_svysummary(by = qsmk,
+              include = c("wt71",
+                          "age",
+                          "marital",
+                          "race",
+                          "sex")) %&gt;%
+  add_overall()
+```
+
+---
+
+class: title title-1
+
+# Weighted Table 1
+
+<div id="osqfkreoor" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#osqfkreoor .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#osqfkreoor .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#osqfkreoor .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#osqfkreoor .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#osqfkreoor .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#osqfkreoor .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#osqfkreoor .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#osqfkreoor .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#osqfkreoor .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#osqfkreoor .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#osqfkreoor .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#osqfkreoor .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#osqfkreoor .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#osqfkreoor .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#osqfkreoor .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#osqfkreoor .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#osqfkreoor .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#osqfkreoor .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#osqfkreoor .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#osqfkreoor .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#osqfkreoor .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#osqfkreoor .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#osqfkreoor .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#osqfkreoor .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#osqfkreoor .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#osqfkreoor .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#osqfkreoor .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#osqfkreoor .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#osqfkreoor .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#osqfkreoor .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#osqfkreoor .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#osqfkreoor .gt_left {
+  text-align: left;
+}
+
+#osqfkreoor .gt_center {
+  text-align: center;
+}
+
+#osqfkreoor .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#osqfkreoor .gt_font_normal {
+  font-weight: normal;
+}
+
+#osqfkreoor .gt_font_bold {
+  font-weight: bold;
+}
+
+#osqfkreoor .gt_font_italic {
+  font-style: italic;
+}
+
+#osqfkreoor .gt_super {
+  font-size: 65%;
+}
+
+#osqfkreoor .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#osqfkreoor .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#osqfkreoor .gt_slash_mark {
+  font-size: 0.7em;
+  line-height: 0.7em;
+  vertical-align: 0.15em;
+}
+
+#osqfkreoor .gt_fraction_numerator {
+  font-size: 0.6em;
+  line-height: 0.6em;
+  vertical-align: 0.45em;
+}
+
+#osqfkreoor .gt_fraction_denominator {
+  font-size: 0.6em;
+  line-height: 0.6em;
+  vertical-align: -0.05em;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Overall</strong>, N = 3,138<sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>0</strong>, N = 1,565<sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>1</strong>, N = 1,573<sup class="gt_footnote_marks">1</sup></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">WEIGHT IN KILOGRAMS  IN 1971</td>
+<td class="gt_row gt_center">69 (59, 79)</td>
+<td class="gt_row gt_center">69 (60, 80)</td>
+<td class="gt_row gt_center">69 (59, 79)</td></tr>
+    <tr><td class="gt_row gt_left">AGE IN 1971</td>
+<td class="gt_row gt_center">43 (33, 53)</td>
+<td class="gt_row gt_center">43 (33, 52)</td>
+<td class="gt_row gt_center">43 (33, 53)</td></tr>
+    <tr><td class="gt_row gt_left">MARITAL STATUS IN 1971  1: Under 17, 2: Married, 3: Widowed, 4: Never married, 5: Divorced, 6: Separated, 8: Unknown</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">2</td>
+<td class="gt_row gt_center">2,477 (79%)</td>
+<td class="gt_row gt_center">1,233 (79%)</td>
+<td class="gt_row gt_center">1,244 (79%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">3</td>
+<td class="gt_row gt_center">167 (5.3%)</td>
+<td class="gt_row gt_center">89 (5.7%)</td>
+<td class="gt_row gt_center">78 (5.0%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">4</td>
+<td class="gt_row gt_center">181 (5.8%)</td>
+<td class="gt_row gt_center">94 (6.0%)</td>
+<td class="gt_row gt_center">87 (5.5%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">5</td>
+<td class="gt_row gt_center">183 (5.8%)</td>
+<td class="gt_row gt_center">94 (6.0%)</td>
+<td class="gt_row gt_center">89 (5.7%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">6</td>
+<td class="gt_row gt_center">121 (3.9%)</td>
+<td class="gt_row gt_center">55 (3.5%)</td>
+<td class="gt_row gt_center">66 (4.2%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">8</td>
+<td class="gt_row gt_center">8 (0.3%)</td>
+<td class="gt_row gt_center">0 (0%)</td>
+<td class="gt_row gt_center">8 (0.5%)</td></tr>
+    <tr><td class="gt_row gt_left">0: WHITE 1: BLACK OR OTHER IN 1971</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">0</td>
+<td class="gt_row gt_center">2,720 (87%)</td>
+<td class="gt_row gt_center">1,359 (87%)</td>
+<td class="gt_row gt_center">1,361 (87%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">1</td>
+<td class="gt_row gt_center">418 (13%)</td>
+<td class="gt_row gt_center">206 (13%)</td>
+<td class="gt_row gt_center">212 (13%)</td></tr>
+    <tr><td class="gt_row gt_left">0: MALE 1: FEMALE</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">0</td>
+<td class="gt_row gt_center">1,516 (48%)</td>
+<td class="gt_row gt_center">761 (49%)</td>
+<td class="gt_row gt_center">755 (48%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">1</td>
+<td class="gt_row gt_center">1,622 (52%)</td>
+<td class="gt_row gt_center">804 (51%)</td>
+<td class="gt_row gt_center">818 (52%)</td></tr>
+  </tbody>
+  
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="4"><sup class="gt_footnote_marks">1</sup> Median (IQR); n (%)</td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+.box-1[`install.packages("survey")`]
+
+.box-1[Create weighted Table 1. Compare this to your Table 1 from the previous exercise - which column does it resemble the most?]
+
+.box-1[Knit, commit, push to GitHub]
+
+<div class="countdown" id="timer_621bfaa7" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+.small[
+# Average treatment effect among the treated
+]
+
+.box-1[
+`$$ATT = E[Y(1) - Y(0) | X = 1]$$`
+
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+
+`$$w_{ATT} = \frac{e_i X_i}{e_i} + \frac{e_i(1-X_i)}{1-e_i}$$`
+]
+
+--
+&lt;br&gt;
+.box-inv-1[What is this when X=1?]
+---
+class: title title-1
+
+# ATT
+
+&lt;img src="10-propensity-score-weights_files/figure-html/unnamed-chunk-26-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+.box-1[Calculate the `w_att`. What is the range of possible weights?]
+
+.box-1[Plot a mirrored histogram of this pseudo-population. What do you notice?]
+
+.box-1[Create weighted Table 1. Compare this to your unweighted Table 1 - which column does it resemble the most?]
+
+.box-1[Knit, commit, push to GitHub]
+
+<div class="countdown" id="timer_621bfcd4" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: title title-1
+.small[
+# Average treatment effect among the controls
+]
+
+.box-1[
+`$$ATC = E[Y(1) - Y(0) | X = 0]$$`
+]
+
+
+--
+&lt;br&gt;
+
+.box-1[
+
+`$$w_{ATC} = \frac{(1 - e_i) X_i}{e_i} + \frac{(1 - e_i)(1-X_i)}{1-e_i}$$`
+]
+
+--
+
+&lt;br&gt;
+.box-inv-1[What is this when X=0?]
+
+---
+
+class: title title-1
+
+# ATC
+
+&lt;img src="10-propensity-score-weights_files/figure-html/unnamed-chunk-27-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+.box-1[Calculate the `w_atc`. What is the range of possible weights?]
+
+.box-1[Plot a mirrored histogram of this pseudo-population. What do you notice?]
+
+.box-1[Create weighted Table 1. Compare this to your unweighted Table 1 - which column does it resemble the most?]
+
+.box-1[Knit, commit, push to GitHub]
+
+<div class="countdown" id="timer_621bfdd6" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: title title-1
+
+.small[
+# Average treatment effect among matchable
+]
+
+.box-1[
+`$$ATM_d = E[Y(1) - Y(0) | M_d = 1]$$`
+]
+
+--
+&lt;br&gt;
+
+.box-inv-1[
+
+`$$w_{ATM} = \frac{\textrm{min}\{e_i, 1-e_i\}}{X_i e_i + (1 - X_i)(1 - e_i)}$$`
+]
+
+---
+
+class: title title-1
+.small[
+# Average treatment effect among matchable
+]
+
+
+```r
+nhefs_complete_uc &lt;- nhefs_complete_uc %&gt;%
+  mutate( 
+*   w_atm = pmin(.fitted, 1 - .fitted) /
+*     qsmk * .fitted + (1 - qsmk) * (1 - .fitted)
+  )
+```
+
+---
+
+class: title title-1
+
+# ATM
+
+&lt;img src="10-propensity-score-weights_files/figure-html/unnamed-chunk-29-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+.box-1[Calculate the `w_atm`. What is the range of possible weights?]
+
+.box-1[Plot a mirrored histogram of this pseudo-population. What do you notice?]
+
+.box-1[Create weighted Table 1. Compare this to your unweighted Table 1 - which column does it resemble the most (if any)?]
+
+.box-1[Knit, commit, push to GitHub]
+
+<div class="countdown" id="timer_621bfc8e" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: title title-1
+
+.small[
+# Average treatment effect among the overlap
+]
+
+.box-inv-1[
+Target population: overlap population
+]
+
+--
+
+.box-1[Similar to the "evenly matchable"]
+
+--
+
+.box-1[Creates a "pseudo-population" that has excellent variance properties]
+
+--
+
+.box-1[
+`$$w_{ATO} = (1-e_i)X_i + e_i (1-X_i)$$`
+]
+---
+
+class: title title-1
+
+.small[
+# Average treatment effect among the overlap
+]
+
+
+.box-1[
+`$$w_{ATO} = (1-e_i)X_i + e_i (1-X_i)$$`
+]
+
+--
+
+.box-inv-1[
+When the conditional probability of receiving the exposure is small, what does this approximate?
+]
+
+--
+
+.box-1[
+
+`$$e_i\approx 0$$`
+
+`\(w_{ATT}\)`
+]
+
+---
+
+class: title title-1
+
+.small[
+# Average treatment effect among the overlap
+]
+
+
+.box-1[
+`$$w_{ATO} = (1-e_i)X_i + e_i (1-X_i)$$`
+]
+
+--
+
+.box-1[
+
+`$$e_i\approx 1$$`
+
+`\(w_{ATC}\)`
+]
+---
+
+--
+
+.box-inv-1[
+When the conditional probability of receiving the exposure is large, what does this approximate?
+]
+
+---
+class: title title-1
+
+# ATM
+
+&lt;img src="10-propensity-score-weights_files/figure-html/unnamed-chunk-30-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+.box-1[Calculate the `w_ato`. What is the range of possible weights?]
+
+.box-1[Plot a mirrored histogram of this pseudo-population. What do you notice?]
+
+.box-1[Create weighted Table 1. Compare this to your unweighted Table 1 - which column does it resemble the most (if any)?]
+
+.box-1[Knit, commit, push to GitHub]
+
+<div class="countdown" id="timer_621bfc10" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
