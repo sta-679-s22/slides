@@ -1,0 +1,402 @@
+---
+title: "Propensity score matching"
+author: "Lucy D'Agostino McGowan"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: "libs"
+    css: ["default", "css/style.css"]
+    seal: false
+    anchor_sections: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      navigation:
+        scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
+                      fig.retina = 3, fig.align = "center")
+```
+
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("tile_view"))
+```
+
+class: center middle main-title section-title-1
+
+# Propensity score matching
+
+.class-info[
+
+**Session 12**
+
+.light[STA 379/679: Causal Inference <br>
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+
+class: title title-1
+
+# Matching: ATT
+
+```{r, include = FALSE}
+library(broom)
+library(tidyverse)
+library(causaldata)
+nhefs_complete_uc <- nhefs_complete %>% 
+  filter(censored == 0)
+```
+
+.small[
+```{r, eval = FALSE}
+library(MatchIt)
+m <- matchit(qsmk ~ wt71 + age + marital + race + sex, 
+  data = nhefs_complete_uc)
+m
+```
+]
+
+---
+class: title title-1
+
+# Matching: ATT
+
+.small[
+```{r, eval = FALSE}
+library(MatchIt) #<<
+m <- matchit(qsmk ~ wt71 + age + marital + race + sex, 
+  data = nhefs_complete_uc)
+m
+```
+]
+
+---
+
+
+class: title title-1
+
+# Matching: ATT
+
+.small[
+```{r, eval = FALSE}
+library(MatchIt)
+m <- matchit(qsmk ~ wt71 + age + marital + race + sex, #<<
+  data = nhefs_complete_uc)
+m
+```
+]
+
+---
+class: title title-1
+
+# Matching: ATT
+
+.small[
+```{r}
+library(MatchIt)
+m <- matchit(qsmk ~ wt71 + age + marital + race + sex, 
+  data = nhefs_complete_uc)
+m
+```
+]
+---
+class: title title-1
+
+# Matching: ATT
+
+.small[
+```{r, highlight.output = 6}
+library(MatchIt)
+m <- matchit(qsmk ~ wt71 + age + marital + race + sex, 
+  data = nhefs_complete_uc)
+m
+```
+]
+---
+
+class: title title-1
+
+# Matching: ATT
+
+.small[
+```{r, eval = FALSE}
+matched_data <- get_matches(m, id = "i")
+glimpse(matched_data)
+```
+]
+---
+class: title title-1
+
+# Matching: ATT
+
+.small[
+```{r, eval = FALSE}
+matched_data <- get_matches(m, id = "i") #<<
+glimpse(matched_data)
+```
+]
+
+---
+
+class: title title-1
+
+# Matching: ATT
+
+.small[
+```{r, eval = FALSE}
+matched_data <- get_matches(m, id = "i")
+glimpse(matched_data) #<<
+```
+]
+
+---
+class: title title-1
+
+# Matching: ATT
+
+.small[
+```{r}
+matched_data <- get_matches(m, id = "i")
+glimpse(matched_data)
+```
+]
+
+---
+
+class: title title-1
+
+# Matching: ATT
+
+.small[
+```{r, highlight.output = 1}
+matched_data <- get_matches(m, id = "i")
+glimpse(matched_data)
+```
+]
+
+---
+
+class: title title-1
+
+# Matching: ATT
+
+.small[
+```{r, highlight.output = 2}
+matched_data <- get_matches(m, id = "i")
+glimpse(matched_data)
+```
+]
+
+---
+class: title title-1
+
+# Matching: ATT
+
+.small[
+```{r, highlight.output = 3}
+matched_data <- get_matches(m, id = "i")
+glimpse(matched_data)
+```
+]
+---
+class: title title-1
+
+# Matching: ATT
+
+.small[
+```{r, highlight.output = 4}
+matched_data <- get_matches(m, id = "i")
+glimpse(matched_data)
+```
+]
+---
+
+
+class: title title-1
+
+# Matching: ATC
+
+.small[
+```{r, eval = FALSE}
+library(MatchIt)
+m <- matchit(qsmk ~ wt71 + age + marital + race + sex, 
+  data = nhefs_complete_uc,
+  estimand = "ATC")
+m
+```
+]
+
+---
+
+class: title title-1
+
+# Matching: ATC
+
+.small[
+```{r, eval = FALSE}
+library(MatchIt)
+m <- matchit(qsmk ~ wt71 + age + marital + race + sex, 
+  data = nhefs_complete_uc,
+  estimand = "ATC") #<<
+m
+```
+]
+
+---
+
+class: title title-1
+
+# Matching: ATC
+
+.small[
+```{r}
+library(MatchIt)
+m <- matchit(qsmk ~ wt71 + age + marital + race + sex, 
+  data = nhefs_complete_uc,
+  estimand = "ATC")
+m
+```
+]
+---
+
+class: title title-1
+
+# Matching: ATC
+
+.small[
+```{r, highlight.output = 6}
+library(MatchIt)
+m <- matchit(qsmk ~ wt71 + age + marital + race + sex, 
+  data = nhefs_complete_uc,
+  estimand = "ATC")
+m
+```
+]
+
+---
+
+class: title title-1
+
+# Matching ATM
+
+.small[
+```{r, eval = FALSE}
+library(MatchIt)
+m <- matchit(qsmk ~ wt71 + age + marital + race + sex, 
+  data = nhefs_complete_uc,
+  link = "linear.logit",
+  caliper = 0.1)
+m
+```
+]
+
+---
+
+class: title title-1
+
+# Matching ATM
+
+.small[
+```{r, eval = FALSE}
+library(MatchIt)
+m <- matchit(qsmk ~ wt71 + age + marital + race + sex, 
+  data = nhefs_complete_uc,
+  link = "linear.logit", #<<
+  caliper = 0.1)
+m
+```
+]
+
+---
+
+class: title title-1
+
+# Matching ATM
+
+.small[
+```{r, eval = FALSE}
+library(MatchIt)
+m <- matchit(qsmk ~ wt71 + age + marital + race + sex, 
+  data = nhefs_complete_uc,
+  link = "linear.logit",
+  caliper = 0.1) #<<
+m
+```
+]
+
+--
+
+.box-1[Only matches propensity scores withing 0.1 standard deviations on the linear-logit scale]
+
+---
+class: title title-1
+
+# Matching ATM
+
+.small[
+```{r}
+library(MatchIt)
+m <- matchit(qsmk ~ wt71 + age + marital + race + sex, 
+  data = nhefs_complete_uc,
+  link = "linear.logit",
+  caliper = 0.1) 
+m
+```
+]
+
+---
+
+class: title title-1
+# Matching ATM
+
+
+.small[
+```{r, highlight.output = 7}
+library(MatchIt)
+m <- matchit(qsmk ~ wt71 + age + marital + race + sex, 
+  data = nhefs_complete_uc,
+  link = "linear.logit",
+  caliper = 0.1) 
+m
+```
+]
+
+---
+
+class: title title-1
+
+# Matching ATM
+
+.small[
+```{r}
+matched_data <- get_matches(m, id = "i")
+glimpse(matched_data)
+```
+]
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-1[Open `appex-09` from last class]
+
+.box-1[Using the same propensity score model, calculate ATM matches with a caliper of 0.05]
+
+.box-1[Extract your matched data set and create a Table 1 of just this data]
+
+.box-1[Knit, commit, push to GitHub]
+
+`r countdown::countdown(10)`
+
