@@ -697,7 +697,7 @@ class: title title-1
 
 --
 
-.box-1[Otherwise, we can *condition* on measured covariates in order to blog all backdoor paths]
+.box-1[Otherwise, we can *condition* on measured covariates in order to block all backdoor paths]
 
 ---
 
