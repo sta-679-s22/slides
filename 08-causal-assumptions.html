@@ -4,7 +4,7 @@
     <title>Causal assumptions</title>
     <meta charset="utf-8" />
     <meta name="author" content="Lucy D’Agostino McGowan" />
-    <meta name="date" content="2022-02-15" />
+    <meta name="date" content="2022-03-15" />
     <script src="libs/header-attrs-2.11/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
@@ -580,15 +580,15 @@ class: title title-1
 ```r
 # Z = 1
 d %&gt;%
-  filter(unit_1 == 1 | unit_3 == 1) %&gt;% 
-  summarise(e1 = sum(assignment_probability) / n())
+  summarise(e1 = (sum(assignment_probability[unit_1 == 1]) + 
+              sum(assignment_probability[unit_3 == 1])) / 2)
 ```
 
 ```
 ## # A tibble: 1 × 1
 ##      e1
 ##   &lt;dbl&gt;
-## 1 0.125
+## 1   0.5
 ```
 
 ]
@@ -605,15 +605,15 @@ class: title title-1
 ```r
 # Z = 1
 d %&gt;%
-* filter(unit_1 == 1 | unit_3 == 1) %&gt;%
-  summarise(e1 = sum(assignment_probability) / n())
+  summarise(e1 = (sum(assignment_probability[unit_1 == 1]) + 
+              sum(assignment_probability[unit_3 == 1])) / 2)
 ```
 
 ```
 ## # A tibble: 1 × 1
 ##      e1
 ##   &lt;dbl&gt;
-## 1 0.125
+## 1   0.5
 ```
 ]
 
@@ -634,15 +634,15 @@ class: title title-1
 ```r
 # Z = 1
 d %&gt;%
-  filter(unit_1 == 1 | unit_3 == 1) %&gt;%  
-* summarise(e1 = sum(assignment_probability) / n())
+* summarise(e1 = (sum(assignment_probability[unit_1 == 1]) +
+              sum(assignment_probability[unit_3 == 1])) / 2)
 ```
 
 ```
 ## # A tibble: 1 × 1
 ##      e1
 ##   &lt;dbl&gt;
-## 1 0.125
+## 1   0.5
 ```
 ]
 
@@ -663,15 +663,15 @@ class: title title-1
 ```r
 # Z = 1
 d %&gt;%
-  filter(unit_1 == 1 | unit_3 == 1) %&gt;%  
-* summarise(e1 = sum(assignment_probability) / n())
+  summarise(e1 = (sum(assignment_probability[unit_1 == 1]) + 
+*             sum(assignment_probability[unit_3 == 1])) / 2)
 ```
 
 ```
 ## # A tibble: 1 × 1
 ##      e1
 ##   &lt;dbl&gt;
-## 1 0.125
+## 1   0.5
 ```
 ]
 
@@ -690,17 +690,16 @@ class: title title-1
 .small[
 
 ```r
-# Z = 1
+# Z = 0
 d %&gt;%
-  filter(unit_2 == 1) %&gt;%  
-* summarise(e1 = sum(assignment_probability) / n())
+  summarise(e1 = sum(assignment_probability[unit_2 == 1]) / 1)
 ```
 
 ```
 ## # A tibble: 1 × 1
 ##      e1
 ##   &lt;dbl&gt;
-## 1  0.25
+## 1     1
 ```
 ]
 

@@ -463,8 +463,8 @@ class: title title-1
 ```{r}
 # Z = 1
 d %>%
-  filter(unit_1 == 1 | unit_3 == 1) %>% 
-  summarise(e1 = sum(assignment_probability) / n())
+  summarise(e1 = (sum(assignment_probability[unit_1 == 1]) + 
+              sum(assignment_probability[unit_3 == 1])) / 2)
 ```
 
 ]
@@ -480,8 +480,8 @@ class: title title-1
 ```{r}
 # Z = 1
 d %>%
-  filter(unit_1 == 1 | unit_3 == 1) %>% #<<
-  summarise(e1 = sum(assignment_probability) / n())
+  summarise(e1 = (sum(assignment_probability[unit_1 == 1]) + 
+              sum(assignment_probability[unit_3 == 1])) / 2)
 ```
 ]
 
@@ -501,8 +501,8 @@ class: title title-1
 ```{r}
 # Z = 1
 d %>%
-  filter(unit_1 == 1 | unit_3 == 1) %>%  
-  summarise(e1 = sum(assignment_probability) / n()) #<<
+  summarise(e1 = (sum(assignment_probability[unit_1 == 1]) + #<<
+              sum(assignment_probability[unit_3 == 1])) / 2)
 ```
 ]
 
@@ -522,8 +522,8 @@ class: title title-1
 ```{r, highlight.ouput = 4}
 # Z = 1
 d %>%
-  filter(unit_1 == 1 | unit_3 == 1) %>%  
-  summarise(e1 = sum(assignment_probability) / n()) #<<
+  summarise(e1 = (sum(assignment_probability[unit_1 == 1]) + 
+              sum(assignment_probability[unit_3 == 1])) / 2) #<<
 ```
 ]
 
@@ -541,10 +541,9 @@ class: title title-1
 
 .small[
 ```{r, highlight.ouput = 4}
-# Z = 1
+# Z = 0
 d %>%
-  filter(unit_2 == 1) %>%  
-  summarise(e1 = sum(assignment_probability) / n()) #<<
+  summarise(e1 = sum(assignment_probability[unit_2 == 1]) / 1)
 ```
 ]
 

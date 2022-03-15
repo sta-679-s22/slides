@@ -451,18 +451,40 @@ class: title title-1
 
 --
 .box-1[
-Estimand: `\(E[Y(1) - Y(0)]\)`
+Estimand: `\(\tau = E[Y(1) - Y(0)]\)`
 ]
 
 --
 .box-1[
-Estimator: `\(\frac{1}{N}\sum_{i=1}^N\left(\frac{Y^{obs}X_i}{N_e/N }-\frac{Y^{obs}(1-X_i)}{N_c/N}\right)\)`
+Estimator: `\(\hat\tau = \frac{1}{N}\sum_{i=1}^N\left(\frac{Y^{obs}X_i}{N_e/N }-\frac{Y^{obs}(1-X_i)}{N_c/N}\right)\)`
 ]
 
 --
 
 .box-1[Unbiased?]
 ---
+
+class: title title-1
+
+# Randomized Trials
+
+.box-1[
+
+`$$E[\hat\tau | Y(1), Y(0)]=\\ E\left[\frac{1}{N}\sum_{i=1}^N\left(\frac{Y(1)X_i}{N_e/N }-\frac{Y(0)(1-X_i)}{N_c/N}\right)\Big|Y(1), Y(0)\right]$$`
+]
+
+---
+
+class: title title-1
+
+# Randomized Trials
+
+.box-1[
+`$$E[\hat\tau | Y(1), Y(0)]=\\\frac{1}{N}\sum_{i=1}^N\left(\frac{Y(1)E[X_i|Y(1), Y(0)]}{N_e/N }-\frac{Y(0)E[(1-X_i)|Y(1), Y(0)]}{N_c/N}\right)$$`
+]
+
+---
+
 class: section-title-1 title-1 middle
 
 # Propensity score: The average unit assignment probability for units where `\(Z_i=z\)`
@@ -516,6 +538,8 @@ class: title title-1
 .huge[
 [https://bit.ly/sta-679-ae-8](https://bit.ly/sta-679-ae-8)
 ]
+
+
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
