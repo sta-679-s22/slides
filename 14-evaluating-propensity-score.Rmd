@@ -1,0 +1,1667 @@
+---
+title: "Evaluating your propensity score model"
+author: "Lucy D'Agostino McGowan"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: "libs"
+    css: ["default", "css/style.css"]
+    seal: false
+    anchor_sections: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      navigation:
+        scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
+                      fig.retina = 3, fig.align = "center")
+```
+
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("tile_view"))
+```
+
+class: center middle main-title section-title-1
+
+# Evaluating your propensity score model
+
+.class-info[
+
+**Session 14**
+
+.light[STA 379/679: Causal Inference <br>
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+class: title title-1
+
+# Checking balance
+
+.box-1.medium[Love Plots]
+
+--
+
+.box-1.medium[eCDF plots]
+
+---
+class: title title-1
+
+# Standardized Mean Difference (SMD)
+
+$$\LARGE d = \frac{\bar{x}_{exposed}-\bar{x}_{unexposed}}{\sqrt{\frac{s^2_{exposed}+s^2_{unexposed}}{2}}}$$
+--
+<br>
+.box-1[Rule of thumb: SMD < 0.1]
+---
+
+class: title title-1
+
+# Customer satisfaction data
+
+```{r, include = FALSE}
+library(tidyverse)
+customer_satisfaction <- read_csv("../lab-02-propensity-score/customer_satisfaction.csv")
+```
+
+.small[
+```{r, message = FALSE, warning = FALSE, eval = FALSE}
+library(tidyverse)
+library(broom)
+
+glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
+      education + gender + former_customer_service + previous_spend, 
+    data = customer_satisfaction) %>%
+  augment(data = customer_satisfaction, type.predict = "response") %>%
+  mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
+           (satisfied_customer_service * .fitted + 
+              (1 - satisfied_customer_service) * (1 - .fitted))
+  ) -> customer_satisfaction
+```
+]
+
+---
+
+class: title title-1
+
+# Customer satisfaction data
+
+.small[
+```{r, message = FALSE, warning = FALSE, eval = FALSE}
+library(tidyverse)
+library(broom)
+
+glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
+      education + gender + former_customer_service + previous_spend, 
+    data = customer_satisfaction) %>%
+  augment(data = customer_satisfaction, type.predict = "response") %>%
+  mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
+           (satisfied_customer_service * .fitted + 
+              (1 - satisfied_customer_service) * (1 - .fitted))
+  ) -> customer_satisfaction
+```
+]
+
+.box-1[Which confounders did I identify?]
+
+---
+
+class: title title-1
+
+# Customer satisfaction data
+
+.small[
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(broom)
+
+glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + #<<
+      education + gender + former_customer_service + previous_spend, #<<
+    data = customer_satisfaction) %>%
+  augment(data = customer_satisfaction, type.predict = "response") %>%
+  mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
+           (satisfied_customer_service * .fitted + 
+              (1 - satisfied_customer_service) * (1 - .fitted))
+  ) -> customer_satisfaction
+```
+]
+---
+
+class: title title-1
+
+# Customer satisfaction data
+
+.small[
+```{r, message = FALSE, warning = FALSE, eval = FALSE}
+library(tidyverse)
+library(broom)
+
+glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
+      education + gender + former_customer_service + previous_spend, 
+    data = customer_satisfaction) %>%
+  augment(data = customer_satisfaction, type.predict = "response") %>%
+  mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
+           (satisfied_customer_service * .fitted + 
+              (1 - satisfied_customer_service) * (1 - .fitted))
+  ) -> customer_satisfaction
+```
+]
+
+.box-1[What estimand am I interested in?]
+---
+class: title title-1
+# Customer satisfaction data
+
+.small[
+```{r, message = FALSE, warning = FALSE, eval = FALSE}
+library(tidyverse)
+library(broom)
+
+glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
+      education + gender + former_customer_service + previous_spend, 
+    data = customer_satisfaction) %>%
+  augment(data = customer_satisfaction, type.predict = "response") %>%
+  mutate(atm_wts = pmin(.fitted, 1 - .fitted) /  #<<
+           (satisfied_customer_service * .fitted + #<<
+              (1 - satisfied_customer_service) * (1 - .fitted)) #<<
+  ) -> customer_satisfaction
+```
+]
+
+.box-1[What estimand am I interested in?]
+---
+
+class: title title-1
+
+# SMD in R
+
+```{r, message = FALSE, warning = FALSE, eval = FALSE}
+library(smd)
+library(tidyverse)
+df %>% 
+  # w is optional
+  summarise(smd = smd(confounder_1, 
+                      exposure, 
+                      w = wts)$estimate)
+```
+
+---
+class: title title-1
+
+# SMD in R
+
+.small[
+```{r, message = FALSE, warning = FALSE}
+library(smd)
+library(tidyverse)
+customer_satisfaction %>% 
+  # w is optional
+  summarize(smd = smd(income, 
+                      satisfied_customer_service, 
+                      w = atm_wts)$estimate)
+```
+]
+
+
+---
+
+class: title title-1
+
+# SMD in R
+
+```{r,  message = FALSE, warning = FALSE, eval = FALSE}
+smds <- df %>% 
+  summarise( 
+    across( 
+      c(confounder_1, confounder_2, ...), 
+      list(
+        unweighted = ~smd(.x, exposure)$estimate, 
+        weighted = ~smd(.x, exposure, wts)$estimate 
+      )
+    )
+  )
+```
+---
+
+class: title title-1
+
+# SMD in R
+
+```{r,  message = FALSE, warning = FALSE, eval = FALSE}
+smds <- df %>% 
+  summarise( 
+    across( 
+      c(confounder_1, confounder_2, ...),  #<<
+      list(
+        unweighted = ~smd(.x, exposure)$estimate, 
+        weighted = ~smd(.x, exposure, wts)$estimate 
+      )
+    )
+  )
+```
+
+---
+
+class: title title-1
+
+# SMD in R
+
+```{r,  message = FALSE, warning = FALSE, eval = FALSE}
+smds <- df %>% 
+  summarise( 
+    across( 
+      c(confounder_1, confounder_2, ...), 
+      list(
+        unweighted = ~smd(.x, exposure)$estimate, #<<
+        weighted = ~smd(.x, exposure, wts)$estimate #<<
+      )
+    )
+  )
+```
+
+---
+
+class: title title-1
+
+# SMD in R
+
+.small[
+```{r,  message = FALSE, warning = FALSE}
+smds <- customer_satisfaction %>% 
+  summarise( 
+    across( 
+      c(income, married, n_kids, has_pets, age, 
+        education, gender, former_customer_service, previous_spend), 
+      list(
+        unweighted = ~smd(.x, satisfied_customer_service)$estimate, 
+        weighted = ~smd(.x, satisfied_customer_service, atm_wts)$estimate 
+      )
+    )
+  )
+```
+]
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-1[Go to our Github organization and open `appex-10`]
+
+.box-1[Fit a propensity score model for `satisfied_customer_service` (you can use the one you chose for Lab 2)]
+
+.box-1[Calculate the `ate` and `ato` weights]
+
+.box-1[Calculate the standardized mean differences (unweighted, `ate` weighted and `ato` weighted) for all of the variables (excluding the outcome, `next_spend`)]
+
+.box-1[Knit, commit, push to GitHub]
+
+`r countdown::countdown(10)`
+---
+
+class: title title-1
+
+# SMD in R
+
+.small[
+```{r}
+smds
+```
+]
+
+---
+
+class: title title-1
+
+# SMD in R
+
+```{r, eval = FALSE}
+plot_df <- smds %>% 
+  pivot_longer( 
+    everything(),
+    values_to = "SMD", 
+    names_to = c("variable", "Method"), 
+    names_pattern = "(.*)_(.*)"
+  )
+```
+
+---
+
+class: title title-1
+
+# SMD in R
+
+```{r, eval = FALSE}
+plot_df <- smds %>% 
+  pivot_longer( #<<
+    everything(),
+    values_to = "SMD", 
+    names_to = c("variable", "Method"), 
+    names_pattern = "(.*)_(.*)"
+  )
+```
+
+---
+
+class: title title-1
+
+# SMD in R
+
+```{r, eval = FALSE}
+plot_df <- smds %>% 
+  pivot_longer( 
+    everything(), #<<
+    values_to = "SMD", 
+    names_to = c("variable", "Method"), 
+    names_pattern = "(.*)_(.*)"
+  )
+```
+
+---
+
+class: title title-1
+
+# SMD in R
+
+```{r, eval = FALSE}
+plot_df <- smds %>% 
+  pivot_longer( 
+    everything(),
+    values_to = "SMD",  #<<
+    names_to = c("variable", "Method"), 
+    names_pattern = "(.*)_(.*)"
+  )
+```
+
+---
+class: title title-1
+
+# SMD in R
+
+```{r}
+plot_df <- smds %>% 
+  pivot_longer( 
+    everything(),
+    values_to = "SMD", 
+    names_to = c("variable", "Method"), #<<
+    names_pattern = "(.*)_(.*)"#<<
+  )
+```
+
+---
+class: title title-1
+
+# SMD in R
+
+```{r}
+plot_df <- smds %>% 
+  pivot_longer( 
+    everything(),
+    values_to = "SMD", 
+    names_to = c("variable", "Method"),
+    names_pattern = "(.*)_(.*)"
+  ) %>%
+  arrange(Method, abs(SMD)) %>%
+  mutate(variable = fct_inorder(variable))
+```
+
+
+---
+
+class: title title-1
+
+# SMD in R
+
+.small[
+```{r}
+plot_df
+```
+]
+
+---
+
+class: title title-1
+
+# Love Plot
+
+.left-code[
+```{r, eval = FALSE}
+ggplot(
+  data = plot_df,
+  aes(x = abs(SMD), y = variable, 
+      group = Method, color = Method)
+) +  
+  geom_line(orientation = "y") +
+  geom_point() + 
+  geom_vline(xintercept = 0.1, 
+             color = "black", size = 0.1)
+```
+]
+
+---
+
+class: title title-1
+
+# Love Plot
+
+.left-code[
+```{r, eval = FALSE}
+ggplot(
+  data = plot_df,
+  aes(x = abs(SMD), y = variable, #<<
+      group = Method, color = Method) #<<
+) +  
+  geom_line(orientation = "y") +
+  geom_point() + 
+  geom_vline(xintercept = 0.1, 
+             color = "black", size = 0.1)
+```
+]
+
+---
+
+class: title title-1
+
+# Love Plot
+
+.left-code[
+```{r, eval = FALSE}
+ggplot(
+  data = plot_df,
+  aes(x = abs(SMD), y = variable, 
+      group = Method, color = Method)
+) +  
+  geom_line(orientation = "y") + #<<
+  geom_point() + 
+  geom_vline(xintercept = 0.1, 
+             color = "black", size = 0.1)
+```
+]
+
+---
+
+class: title title-1
+
+# Love Plot
+
+.left-code[
+```{r, eval = FALSE}
+ggplot(
+  data = plot_df,
+  aes(x = abs(SMD), y = variable, 
+      group = Method, color = Method)
+) +  
+  geom_line(orientation = "y") +
+  geom_point() + #<<
+  geom_vline(xintercept = 0.1, 
+             color = "black", size = 0.1)
+```
+]
+
+---
+
+class: title title-1
+
+# Love Plot
+
+.left-code[
+```{r, eval = FALSE}
+ggplot(
+  data = plot_df,
+  aes(x = abs(SMD), y = variable, 
+      group = Method, color = Method)
+) +  
+  geom_line(orientation = "y") +
+  geom_point() + 
+  geom_vline(xintercept = 0.1,  #<<
+             color = "black", size = 0.1) #<<
+```
+]
+
+---
+
+class: title title-1
+
+# Love Plot
+
+.left-code[
+```{r, eval = FALSE}
+ggplot(
+  data = plot_df,
+  aes(x = abs(SMD), y = variable, 
+      group = Method, color = Method)
+) +  
+  geom_line(orientation = "y") +
+  geom_point() + 
+  geom_vline(xintercept = 0.1,  
+             color = "black", size = 0.1) 
+```
+
+]
+
+.right-plot[
+
+```{r, echo = FALSE}
+ggplot(
+  data = plot_df,
+  aes(x = abs(SMD), y = variable, 
+      group = Method, color = Method)
+) +  
+  geom_line(orientation = "y") +
+  geom_point() + 
+  geom_vline(xintercept = 0.1,  #<<
+             color = "black", size = 0.1) #<<
+```
+
+]
+---
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-1[Pivot your standardized mean difference output to make it plot-able]
+
+.box-1[Arrange your data frame by method and (absolute) standardized mean difference]
+
+.box-1[Create a Love Plot of your standardized mean differences]
+
+.box-1[Knit, commit, push to GitHub]
+
+`r countdown::countdown(10)`
+
+---
+
+
+class: title title-1
+
+# Compare Matching
+
+.small[
+```{r, eval = FALSE}
+library(MatchIt)
+matched_smds <- matchit(satisfied_customer_service ~ income + married +  
+                          n_kids + has_pets + age + education + gender + 
+                          former_customer_service + previous_spend, 
+                        data = customer_satisfaction, caliper = 0.5) %>%
+  get_matches() %>%
+  summarise( 
+    across( 
+      c(income, married, n_kids, has_pets, age, 
+        education, gender, former_customer_service, previous_spend), 
+      list(
+        matched = ~smd(.x, satisfied_customer_service)$estimate
+      )
+    )
+  )
+```
+]
+---
+
+class: title title-1
+
+# Compare Matching
+
+.small[
+```{r, eval = FALSE}
+library(MatchIt)#<<
+matched_smds <- matchit(satisfied_customer_service ~ income + married +  
+                          n_kids + has_pets + age + education + gender + 
+                          former_customer_service + previous_spend, 
+                        data = customer_satisfaction, caliper = 0.5) %>%
+  get_matches() %>%
+  summarise( 
+    across( 
+      c(income, married, n_kids, has_pets, age, 
+        education, gender, former_customer_service, previous_spend), 
+      list(
+        matched = ~smd(.x, satisfied_customer_service)$estimate
+      )
+    )
+  )
+```
+]
+
+---
+
+class: title title-1
+
+# Compare Matching
+
+.small[
+```{r, eval = FALSE}
+library(MatchIt)
+matched_smds <- matchit(satisfied_customer_service ~ income + married +  #<<
+                          n_kids + has_pets + age + education + gender + #<<
+                          former_customer_service + previous_spend, #<<
+                        data = customer_satisfaction, caliper = 0.5) %>%
+  get_matches() %>%
+  summarise( 
+    across( 
+      c(income, married, n_kids, has_pets, age, 
+        education, gender, former_customer_service, previous_spend), 
+      list(
+        matched = ~smd(.x, satisfied_customer_service)$estimate
+      )
+    )
+  )
+```
+]
+
+---
+
+class: title title-1
+
+# Compare Matching
+
+.small[
+```{r, eval = FALSE}
+library(MatchIt)
+matched_smds <- matchit(satisfied_customer_service ~ income + married +  
+                          n_kids + has_pets + age + education + gender + 
+                          former_customer_service + previous_spend, 
+                        data = customer_satisfaction, caliper = 0.5) %>% #<<
+  get_matches() %>%
+  summarise( 
+    across( 
+      c(income, married, n_kids, has_pets, age, 
+        education, gender, former_customer_service, previous_spend), 
+      list(
+        matched = ~smd(.x, satisfied_customer_service)$estimate
+      )
+    )
+  )
+```
+]
+
+---
+
+class: title title-1
+
+# Compare Matching
+
+.small[
+```{r, eval = FALSE}
+library(MatchIt)
+matched_smds <- matchit(satisfied_customer_service ~ income + married +  
+                          n_kids + has_pets + age + education + gender + 
+                          former_customer_service + previous_spend, 
+                        data = customer_satisfaction, caliper = 0.5) %>%
+  get_matches() %>% #<<
+  summarise( 
+    across( 
+      c(income, married, n_kids, has_pets, age, 
+        education, gender, former_customer_service, previous_spend), 
+      list(
+        matched = ~smd(.x, satisfied_customer_service)$estimate
+      )
+    )
+  )
+```
+]
+
+---
+
+class: title title-1
+
+# Compare Matching
+
+.small[
+```{r}
+library(MatchIt)
+matched_smds <- matchit(satisfied_customer_service ~ income + married +  
+                          n_kids + has_pets + age + education + gender + 
+                          former_customer_service + previous_spend, 
+                        data = customer_satisfaction, caliper = 0.5) %>%
+  get_matches() %>%
+  summarise( #<<
+    across( #<<
+      c(income, married, n_kids, has_pets, age, #<<
+        education, gender, former_customer_service, previous_spend), #<<
+      list(#<<
+        matched = ~smd(.x, satisfied_customer_service)$estimate#<<
+      )#<<
+    )#<<
+  )#<<
+```
+]
+
+---
+
+class: title title-1
+
+# Compare Matching
+
+.small[
+```{r}
+matched_smds
+```
+]
+
+---
+
+class: title title-1
+
+# Compare Matching
+
+```{r, eval = FALSE}
+plot_df_all <- matched_smds %>%
+  pivot_longer( 
+    everything(),
+    values_to = "SMD", 
+    names_to = c("variable", "Method"),
+    names_pattern = "(.*)_(.*)"
+  ) %>%
+  bind_rows(plot_df)
+```
+
+---
+
+class: title title-1
+
+# Compare Matching
+
+```{r, eval = FALSE}
+plot_df_all <- matched_smds %>% #<<
+  pivot_longer( 
+    everything(),
+    values_to = "SMD", 
+    names_to = c("variable", "Method"),
+    names_pattern = "(.*)_(.*)"
+  ) %>%
+  bind_rows(plot_df)
+```
+
+---
+
+class: title title-1
+
+# Compare Matching
+
+```{r, eval = FALSE}
+plot_df_all <- matched_smds %>% 
+  pivot_longer(  #<<
+    everything(), #<<
+    values_to = "SMD", #<<
+    names_to = c("variable", "Method"),#<<
+    names_pattern = "(.*)_(.*)"#<<
+  ) %>%
+  bind_rows(plot_df)
+```
+
+---
+
+class: title title-1
+
+# Compare Matching
+
+```{r, eval = FALSE}
+plot_df_all <- matched_smds %>% 
+  pivot_longer( 
+    everything(),
+    values_to = "SMD", 
+    names_to = c("variable", "Method"),
+    names_pattern = "(.*)_(.*)"
+  ) %>%
+  bind_rows(plot_df) #<<
+```
+
+---
+
+class: title title-1
+
+# Compare Matching
+
+```{r}
+plot_df_all <- matched_smds %>% 
+  pivot_longer( 
+    everything(),
+    values_to = "SMD", 
+    names_to = c("variable", "Method"),
+    names_pattern = "(.*)_(.*)"
+  ) %>%
+  bind_rows(plot_df) %>%
+  arrange(Method, abs(SMD)) %>%
+  mutate(variable = fct_inorder(variable))
+```
+
+---
+
+class: title title-1
+
+# Love Plot
+
+.left-code[
+```{r, eval = FALSE}
+ggplot(
+  data = plot_df_all,
+  aes(x = abs(SMD), y = variable, 
+      group = Method, color = Method)
+) +  
+  geom_line(orientation = "y") +
+  geom_point() + 
+  geom_vline(xintercept = 0.1,  
+             color = "black", size = 0.1) 
+```
+]
+
+.right-plot[
+```{r, echo = FALSE}
+ggplot(
+  data = plot_df_all,
+  aes(x = abs(SMD), y = variable, 
+      group = Method, color = Method)
+) +  
+  geom_line(orientation = "y") +
+  geom_point() + 
+  geom_vline(xintercept = 0.1,  #<<
+             color = "black", size = 0.1) #<<
+```
+]
+
+---
+
+class: title title-1
+
+# What if we changed the caliper?
+
+.small[
+```{r}
+matched_smds <- matchit(satisfied_customer_service ~ income + married +  
+                          n_kids + has_pets + age + education + gender + 
+                          former_customer_service + previous_spend, 
+                        data = customer_satisfaction, caliper = 0.01) %>%
+  get_matches() %>%
+  summarise( 
+    across( 
+      c(income, married, n_kids, has_pets, age, 
+        education, gender, former_customer_service, previous_spend), 
+      list(
+        matched.calp.01 = ~smd(.x, satisfied_customer_service)$estimate
+      )
+    )
+  )
+```
+]
+
+```{r, echo = FALSE}
+plot_df_all <- matched_smds %>% #<<
+  pivot_longer( 
+    everything(),
+    values_to = "SMD", 
+    names_to = c("variable", "Method"),
+    names_pattern = "(.*)_(.*)"
+  ) %>%
+  bind_rows(plot_df_all) %>%
+  arrange(Method, abs(SMD)) %>%
+  mutate(variable = fct_inorder(variable))
+```
+
+---
+
+class: title title-1
+
+# Love Plot
+
+.left-code[
+```{r, eval = FALSE}
+ggplot(
+  data = plot_df_all,
+  aes(x = abs(SMD), y = variable, 
+      group = Method, color = Method)
+) +  
+  geom_line(orientation = "y") +
+  geom_point() + 
+  geom_vline(xintercept = 0.1,  
+             color = "black", size = 0.1) 
+```
+]
+
+.right-plot[
+```{r, echo = FALSE}
+ggplot(
+  data = plot_df_all,
+  aes(x = abs(SMD), y = variable, 
+      group = Method, color = Method)
+) +  
+  geom_line(orientation = "y") +
+  geom_point() + 
+  geom_vline(xintercept = 0.1,  #<<
+             color = "black", size = 0.1) #<<
+```
+]
+
+---
+class: title title-1
+
+# ECDF
+
+For continuous variables, it can be helpful to look at the _whole_ distribution pre and post-weighting rather than a single summary measure
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, eval = TRUE}
+ggplot(customer_satisfaction, aes(x = previous_spend, group = satisfied_customer_service, color = factor(satisfied_customer_service))) +
+  stat_ecdf() +
+  scale_color_manual("Satisfied with Customer Service", values = c("#5154B8", "#5DB854"),
+                     labels = c("No", "Yes")) + 
+  scale_x_continuous("Previous spending", label = scales::dollar) + 
+  ylab("Proportion <= x") 
+```
+
+---
+
+class: title title-1
+
+# Unweighted ECDF
+
+.small[
+```{r, message = FALSE, warning = FALSE, eval = FALSE}
+ggplot(customer_satisfaction, 
+       aes(x = previous_spend, group = satisfied_customer_service, 
+           color = factor(satisfied_customer_service))) +
+  stat_ecdf() +
+  scale_color_manual("Satisfied with Customer Service", 
+                     values = c("#5154B8", "#5DB854"),
+                     labels = c("No", "Yes")) + 
+  scale_x_continuous("Previous spending", label = scales::dollar) + 
+  ylab("Proportion <= x") 
+```
+]
+
+---
+
+class: title title-1
+
+# Unweighted ECDF
+
+.small[
+```{r, message = FALSE, warning = FALSE, eval = FALSE}
+ggplot(customer_satisfaction, #<<
+       aes(x = previous_spend, group = satisfied_customer_service, #<<
+           color = factor(satisfied_customer_service))) + #<<
+  stat_ecdf() +
+  scale_color_manual("Satisfied with Customer Service", 
+                     values = c("#5154B8", "#5DB854"),
+                     labels = c("No", "Yes")) + 
+  scale_x_continuous("Previous spending", label = scales::dollar) + 
+  ylab("Proportion <= x") 
+```
+]
+
+---
+
+class: title title-1
+
+# Unweighted ECDF
+
+.small[
+```{r, message = FALSE, warning = FALSE, eval = FALSE}
+ggplot(customer_satisfaction, 
+       aes(x = previous_spend, group = satisfied_customer_service, 
+           color = factor(satisfied_customer_service))) +
+  stat_ecdf() + #<<
+  scale_color_manual("Satisfied with Customer Service", 
+                     values = c("#5154B8", "#5DB854"),
+                     labels = c("No", "Yes")) + 
+  scale_x_continuous("Previous spending", label = scales::dollar) + 
+  ylab("Proportion <= x") 
+```
+]
+
+---
+
+class: title title-1
+
+# Unweighted ECDF
+
+.small[
+```{r, message = FALSE, warning = FALSE, eval = FALSE}
+ggplot(customer_satisfaction, 
+       aes(x = previous_spend, group = satisfied_customer_service, 
+           color = factor(satisfied_customer_service))) +
+  stat_ecdf() +
+  scale_color_manual("Satisfied with Customer Service", #<< 
+                     values = c("#5154B8", "#5DB854"), #<<
+                     labels = c("No", "Yes")) +  #<<
+  scale_x_continuous("Previous spending", label = scales::dollar) + 
+  ylab("Proportion <= x") 
+```
+]
+
+---
+
+class: title title-1
+
+# Unweighted ECDF
+
+.small[
+```{r, message = FALSE, warning = FALSE, eval = FALSE}
+ggplot(customer_satisfaction, 
+       aes(x = previous_spend, group = satisfied_customer_service, 
+           color = factor(satisfied_customer_service))) +
+  stat_ecdf() +
+  scale_color_manual("Satisfied with Customer Service", 
+                     values = c("#5154B8", "#5DB854"),
+                     labels = c("No", "Yes")) + 
+  scale_x_continuous("Previous spending", label = scales::dollar) +  #<<
+  ylab("Proportion <= x") 
+```
+]
+
+---
+
+class: title title-1
+
+# Unweighted ECDF
+
+.small[
+```{r, message = FALSE, warning = FALSE, eval = FALSE}
+ggplot(customer_satisfaction, 
+       aes(x = previous_spend, group = satisfied_customer_service, 
+           color = factor(satisfied_customer_service))) +
+  stat_ecdf() +
+  scale_color_manual("Satisfied with Customer Service", 
+                     values = c("#5154B8", "#5DB854"),
+                     labels = c("No", "Yes")) + 
+  scale_x_continuous("Previous spending", label = scales::dollar) + 
+  ylab("Proportion <= x")  #<<
+```
+]
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-1[Create an unweighted eCDF looking at `age`]
+
+.box-1[Knit, commit, push to GitHub]
+
+`r countdown::countdown(6)`
+
+---
+class: title title-1
+
+# Weighted  ECDF 
+
+.small[
+```{r, echo = FALSE}
+ecdf_1 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 1) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ecdf_0 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 0) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ggplot(ecdf_1, aes(x = previous_spend, y = cum_pct)) +
+  geom_line(color = "#5DB854") +
+  geom_line(data = ecdf_0, 
+            aes(x = previous_spend, y = cum_pct), 
+            color = "#5154B8") + 
+  xlab("Previous spending") + 
+  ylab("Proportion <= x") 
+```
+]
+
+---
+
+class: title title-1
+
+# Weighted  ECDF 
+
+.small[
+```{r, eval = FALSE}
+ecdf_1 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 1) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ecdf_0 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 0) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ggplot(ecdf_1, aes(x = previous_spend, y = cum_pct)) +
+  geom_line(color = "#5DB854") +
+  geom_line(data = ecdf_0, 
+            aes(x = previous_spend, y = cum_pct), 
+            color = "#5154B8") + 
+  xlab("Previous spending") + 
+  ylab("Proportion <= x") 
+```
+]
+---
+
+class: title title-1
+
+# Weighted  ECDF 
+
+.small[
+```{r, eval = FALSE}
+ecdf_1 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 1) %>% #<<
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ecdf_0 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 0) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ggplot(ecdf_1, aes(x = previous_spend, y = cum_pct)) +
+  geom_line(color = "#5DB854") +
+  geom_line(data = ecdf_0, 
+            aes(x = previous_spend, y = cum_pct), 
+            color = "#5154B8") + 
+  xlab("Previous spending") + 
+  ylab("Proportion <= x") 
+```
+]
+
+---
+
+class: title title-1
+
+# Weighted  ECDF 
+
+.small[
+```{r, eval = FALSE}
+ecdf_1 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 1) %>%
+  arrange(previous_spend) %>% #<<
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ecdf_0 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 0) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ggplot(ecdf_1, aes(x = previous_spend, y = cum_pct)) +
+  geom_line(color = "#5DB854") +
+  geom_line(data = ecdf_0, 
+            aes(x = previous_spend, y = cum_pct), 
+            color = "#5154B8") + 
+  xlab("Previous spending") + 
+  ylab("Proportion <= x") 
+```
+]
+
+---
+
+
+class: title title-1
+
+# Weighted  ECDF 
+
+.small[
+```{r, eval = FALSE}
+ecdf_1 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 1) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts)) #<<
+ecdf_0 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 0) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ggplot(ecdf_1, aes(x = previous_spend, y = cum_pct)) +
+  geom_line(color = "#5DB854") +
+  geom_line(data = ecdf_0, 
+            aes(x = previous_spend, y = cum_pct),
+            color = "#5154B8") + 
+  xlab("Previous spending") + 
+  ylab("Proportion <= x") 
+```
+]
+---
+
+class: title title-1
+
+# Weighted  ECDF 
+.small[
+```{r, eval = FALSE}
+ecdf_1 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 1) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ecdf_0 <- customer_satisfaction %>% #<<
+  filter(satisfied_customer_service == 0) %>% #<<
+  arrange(previous_spend) %>% #<<
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts)) #<<
+ggplot(ecdf_1, aes(x = previous_spend, y = cum_pct)) +
+  geom_line(color = "#5DB854") +
+  geom_line(data = ecdf_0,
+            aes(x = previous_spend, y = cum_pct), 
+            color = "#5154B8") + 
+  xlab("Previous spending") + 
+  ylab("Proportion <= x") 
+```
+]
+---
+class: title title-1
+
+# Weighted  ECDF 
+.small[
+```{r, eval = FALSE}
+ecdf_1 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 1) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ecdf_0 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 0) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ggplot(ecdf_1, aes(x = previous_spend, y = cum_pct)) + #<<
+  geom_line(color = "#5DB854") +
+  geom_line(data = ecdf_0, 
+            aes(x = previous_spend, y = cum_pct), 
+            color = "#5154B8") + 
+  xlab("Previous spending") + 
+  ylab("Proportion <= x") 
+```
+]
+---
+
+class: title title-1
+
+# Weighted  ECDF 
+
+.small[
+```{r, eval = FALSE}
+ecdf_1 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 1) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ecdf_0 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 0) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ggplot(ecdf_1, aes(x = previous_spend, y = cum_pct)) +
+  geom_line(color = "#5DB854") + #<<
+  geom_line(data = ecdf_0, 
+            aes(x = previous_spend, y = cum_pct), 
+            color = "#5154B8") + 
+  xlab("Previous spending") + 
+  ylab("Proportion <= x") 
+```
+]
+---
+
+class: title title-1
+
+# Weighted  ECDF 
+
+.small[
+```{r, eval = FALSE}
+ecdf_1 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 1) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ecdf_0 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 0) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ggplot(ecdf_1, aes(x = previous_spend, y = cum_pct)) +
+  geom_line(color = "#5DB854") +
+  geom_line(data = ecdf_0, #<<
+            aes(x = previous_spend, y = cum_pct), #<<
+            color = "#5154B8") +  #<<
+  xlab("Previous spending") + 
+  ylab("Proportion <= x") 
+```
+
+]
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-1[Create an weighted eCDF looking at `age` with the `ate` weights]
+
+.box-1[Create an weighted eCDF looking at `age` with the `ato` weights]
+
+.box-1[Knit, commit, push to GitHub]
+
+`r countdown::countdown(6)`
+
+---
+
+class: title title-1
+
+# Iterate on your propensity score model!
+
+
+.box-1.medium[Decrease your caliper if doing matching]
+
+--
+
+.box-1.medium[Allow for more degrees of freedom for variables that look imbalanced]
+
+--
+
+.box-inv-1.medium[Polynomial terms // splines]
+
+
+
+---
+
+class: title title-1
+
+# Iterate on your propensity score model
+
+.box-1[`previous_spend` modeled as a 3rd degree polynomial]
+
+.small[
+```{r}
+glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
+      education + gender + former_customer_service + 
+      poly(previous_spend, 3), 
+    data = customer_satisfaction) %>%
+  augment(data = customer_satisfaction, type.predict = "response") %>%
+  mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
+           (satisfied_customer_service * .fitted + 
+              (1 - satisfied_customer_service) * (1 - .fitted))
+  ) -> customer_satisfaction
+```
+]
+
+---
+
+class: title title-1
+
+# Iterate on your propensity score model
+
+.box-1[`previous_spend` modeled as a 3rd degree polynomial]
+
+.small[
+```{r, eval = FALSE}
+glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
+      education + gender + former_customer_service + 
+      poly(previous_spend, 3), #<<
+    data = customer_satisfaction) %>%
+  augment(data = customer_satisfaction, type.predict = "response") %>%
+  mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
+           (satisfied_customer_service * .fitted + 
+              (1 - satisfied_customer_service) * (1 - .fitted))
+  ) -> customer_satisfaction
+```
+]
+---
+
+class: title title-1
+
+# Iterate on your propensity score model
+
+.box-1.small[`previous_spend` modeled as a 3rd degree polynomial]
+
+```{r, echo = FALSE, fig.height = 5}
+customer_satisfaction %>%
+  summarise(
+    across( 
+      c(income, married, n_kids, has_pets, age, 
+        education, gender, former_customer_service, previous_spend), 
+      list(
+        unweighted = ~smd(.x, satisfied_customer_service)$estimate, 
+        weighted = ~smd(.x, satisfied_customer_service, atm_wts)$estimate 
+      )
+    )
+  ) %>%
+  pivot_longer(
+    everything(),
+    values_to = "SMD", 
+    names_to = c("variable", "Method"),
+    names_pattern = "(.*)_(.*)"
+  ) %>%
+  arrange(Method, abs(SMD)) %>%
+  mutate(variable = fct_inorder(variable)) %>%
+  ggplot(
+  aes(x = abs(SMD), y = variable, 
+      group = Method, color = Method)
+) +  
+  geom_line(orientation = "y") +
+  geom_point() + 
+  geom_vline(xintercept = 0.1,  
+             color = "black", size = 0.1)
+```
+
+---
+
+class: title title-1
+
+# Iterate on your propensity score model
+
+.box-1.small[`previous_spend` modeled as a 3rd degree polynomial]
+
+```{r, echo = FALSE, fig.height = 5}
+ecdf_1 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 1) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ecdf_0 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 0) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ggplot(ecdf_1, aes(x = previous_spend, y = cum_pct)) +
+  geom_line(color = "#5DB854") +
+  geom_line(data = ecdf_0, #<<
+            aes(x = previous_spend, y = cum_pct), #<<
+            color = "#5154B8") +  #<<
+  xlab("Previous spending") + 
+  ylab("Proportion <= x") 
+```
+
+---
+
+
+class: title title-1
+
+# Iterate on your propensity score model
+
+.box-1[`previous_spend` modeled as a natural spline with 3 degrees of freedom]
+
+.small[
+```{r}
+glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
+      education + gender + former_customer_service + 
+      splines::ns(previous_spend, 3), 
+    data = customer_satisfaction) %>%
+  augment(data = customer_satisfaction, type.predict = "response") %>%
+  mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
+           (satisfied_customer_service * .fitted + 
+              (1 - satisfied_customer_service) * (1 - .fitted))
+  ) -> customer_satisfaction
+```
+]
+---
+
+class: title title-1
+
+# Iterate on your propensity score model
+
+.box-1.small[`previous_spend` modeled as a natural spline with 3 degrees of freedom]
+
+.small[
+```{r, eval = FALSE}
+glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
+      education + gender + former_customer_service + 
+      splines::ns(previous_spend, 3), #<<
+    data = customer_satisfaction) %>%
+  augment(data = customer_satisfaction, type.predict = "response") %>%
+  mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
+           (satisfied_customer_service * .fitted + 
+              (1 - satisfied_customer_service) * (1 - .fitted))
+  ) -> customer_satisfaction
+```
+]
+---
+
+class: title title-1
+
+# Iterate on your propensity score model
+
+.box-1.small[`previous_spend` modeled as a natural spline with 3 degrees of freedom]
+
+```{r, echo = FALSE, fig.height = 5}
+customer_satisfaction %>%
+  summarise(
+    across( 
+      c(income, married, n_kids, has_pets, age, 
+        education, gender, former_customer_service, previous_spend), 
+      list(
+        unweighted = ~smd(.x, satisfied_customer_service)$estimate, 
+        weighted = ~smd(.x, satisfied_customer_service, atm_wts)$estimate 
+      )
+    )
+  ) %>%
+  pivot_longer(
+    everything(),
+    values_to = "SMD", 
+    names_to = c("variable", "Method"),
+    names_pattern = "(.*)_(.*)"
+  ) %>%
+  arrange(Method, abs(SMD)) %>%
+  mutate(variable = fct_inorder(variable)) %>%
+  ggplot(
+  aes(x = abs(SMD), y = variable, 
+      group = Method, color = Method)
+) +  
+  geom_line(orientation = "y") +
+  geom_point() + 
+  geom_vline(xintercept = 0.1,  
+             color = "black", size = 0.1)
+```
+
+---
+
+class: title title-1
+
+# Iterate on your propensity score model
+
+.box-1[`previous_spend` modeled as a natural spline with 3 degrees of freedom]
+
+```{r, echo = FALSE, fig.height = 5}
+ecdf_1 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 1) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ecdf_0 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 0) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ggplot(ecdf_1, aes(x = previous_spend, y = cum_pct)) +
+  geom_line(color = "#5DB854") +
+  geom_line(data = ecdf_0, #<<
+            aes(x = previous_spend, y = cum_pct), #<<
+            color = "#5154B8") +  #<<
+  xlab("Previous spending") + 
+  ylab("Proportion <= x") 
+```
+
+
+---
+
+
+
+class: title title-1
+
+# Iterate on your propensity score model
+
+.box-1.small[`previous_spend` modeled as a natural spline with 8 degrees of freedom]
+
+.small[
+```{r}
+glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
+      education + gender + former_customer_service + 
+      splines::ns(previous_spend, 8), #<<
+    data = customer_satisfaction) %>%
+  augment(data = customer_satisfaction, type.predict = "response") %>%
+  mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
+           (satisfied_customer_service * .fitted + 
+              (1 - satisfied_customer_service) * (1 - .fitted))
+  ) -> customer_satisfaction
+```
+]
+---
+
+class: title title-1
+
+# Iterate on your propensity score model
+
+.box-1.small[`previous_spend` modeled as a natural spline with 8 degrees of freedom]
+
+```{r, echo = FALSE, fig.height = 5}
+customer_satisfaction %>%
+  summarise(
+    across( 
+      c(income, married, n_kids, has_pets, age, 
+        education, gender, former_customer_service, previous_spend), 
+      list(
+        unweighted = ~smd(.x, satisfied_customer_service)$estimate, 
+        weighted = ~smd(.x, satisfied_customer_service, atm_wts)$estimate 
+      )
+    )
+  ) %>%
+  pivot_longer(
+    everything(),
+    values_to = "SMD", 
+    names_to = c("variable", "Method"),
+    names_pattern = "(.*)_(.*)"
+  ) %>%
+  arrange(Method, abs(SMD)) %>%
+  mutate(variable = fct_inorder(variable)) %>%
+  ggplot(
+  aes(x = abs(SMD), y = variable, 
+      group = Method, color = Method)
+) +  
+  geom_line(orientation = "y") +
+  geom_point() + 
+  geom_vline(xintercept = 0.1,  
+             color = "black", size = 0.1)
+```
+
+---
+
+class: title title-1
+
+# Iterate on your propensity score model
+
+.box-1[`previous_spend` modeled as a natural spline with 8 degrees of freedom]
+
+```{r, echo = FALSE, fig.height = 5}
+ecdf_1 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 1) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ecdf_0 <- customer_satisfaction %>%
+  filter(satisfied_customer_service == 0) %>%
+  arrange(previous_spend) %>%
+  mutate(cum_pct = cumsum(atm_wts) / sum(atm_wts))
+ggplot(ecdf_1, aes(x = previous_spend, y = cum_pct)) +
+  geom_line(color = "#5DB854") +
+  geom_line(data = ecdf_0, #<<
+            aes(x = previous_spend, y = cum_pct), #<<
+            color = "#5154B8") +  #<<
+  xlab("Previous spending") + 
+  ylab("Proportion <= x") 
+```
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+.box-1[Update your propensity score model to include at least one natural spline]
+
+.box-1[Recreate your Love Plot and eCDF plots to examine how (whether) this impacts your results]
+
+.box-1[Knit, commit, push to GitHub]
+
+`r countdown::countdown(10)`
+
