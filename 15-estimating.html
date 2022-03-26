@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Estimating Causal Effects</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lucy D’Agostino McGowan" />
+    <meta name="date" content="2022-03-26" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+class: center middle main-title section-title-1
+
+# Estimating Causal Effects
+
+.class-info[
+
+**Session 15**
+
+.light[STA 379/679: Causal Inference &lt;br&gt;
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+
+class: title title-1
+
+# Weighted Estimator
+
+.box-1[
+`$$\hat{\tau} = \frac{\sum_{i=1}^n Y_i X_i w_i}{\sum_{i=1}^nX_iw_i}-\frac{\sum_{i=1}^n Y_i (1-X_i) w_i}{\sum_{i=1}^n(1-X_i)w_i}$$`
+]
+
+---
+class: title title-1
+
+# Weighted Estimator
+
+.box-1[
+
+`$$\hat{\tau}_{ATE} = \frac{1}{n}\sum_{i=1}^n\left\{\frac{X_iY_i}{\hat{e}(\mathbf{Z_i})}-\frac{(1-X_i)Y_i}{1-\hat{e}(\mathbf{Z_i})}\right\}$$`
+]
+
+--
+&lt;br&gt;
+
+.box-1[
+Is this an unbiased estimator for `\(\tau_{ATE}\)`?
+]
+
+---
+
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[We can show that]
+
+.box-inv-1[
+
+`$$E\left[\frac{Y_i^{obs}X_i}{e(Z_i)}\right] = E[Y_i(1)]$$`
+
+]
+
+--
+&lt;br&gt;
+
+.box-inv-1[
+
+`$$E\left[\frac{Y_i^{obs}(1 - X_i)}{1 - e(Z_i)}\right] = E[Y_i(0)]$$`
+
+]
+
+---
+
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$E\left[\frac{Y_i^{obs}X_i}{e(Z_i)}\right]=E\left[E\left[\frac{Y_i^{obs}X_i}{e(Z_i)}\Big|Z_i\right]\right]$$`
+]
+
+--
+
+.box-inv-1.medium[Why?]
+
+--
+
+.box-1[Law of iterated expectations]
+
+---
+
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$E\left[E\left[\frac{Y_i^{obs}X_i}{e(Z_i)}\Big|Z_i\right]\right] = E\left[E\left[\frac{Y_i(1)X_i}{e(Z_i)}\Big|Z_i\right]\right]$$`
+]
+
+---
+
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$E\left[E\left[\frac{\color{orange}{Y_i^{obs}}X_i}{e(Z_i)}\Big|Z_i\right]\right] = E\left[E\left[\frac{\color{orange}{Y_i(1)}X_i}{e(Z_i)}\Big|Z_i\right]\right]$$`
+]
+
+--
+
+.box-inv-1.medium[Why?]
+
+--
+
+.box-1[We're only looking at the observations where `\(X_i = 1\)`]
+
+---
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$=E\left[E\left[\frac{Y_i(1)X_i}{e(Z_i)}\Big|Z_i\right]\right]=E\left[\frac{E[Y_i(1)|Z_i]E_X[X_i|Z_i]}{e(Z_i)}\right]$$`
+]
+
+---
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$=E\left[E\left[\frac{\color{orange}{Y_i(1)X_i}}{e(Z_i)}\Big|\color{orange}{Z_i}\right]\right]=E\left[\frac{\color{orange}{E[Y_i(1)|Z_i]E_X[X_i|Z_i]}}{e(Z_i)}\right]$$`
+]
+
+--
+
+.box-inv-1.medium[Why?]
+
+--
+
+.box-1[
+Unconfoundedness (we can split `\(E[Y(1)X]=E[Y(1)]E[X]\)`)
+]
+
+---
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$E\left[\frac{E[Y_i(1)|Z_i]E_X[X_i|Z_i]}{e(Z_i)}\right]=E[E[Y_i(1)|Z_i]]$$`
+]
+---
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$E\left[\frac{E[Y_i(1)|Z_i]\color{orange}{E_X[X_i|Z_i]}}{\color{orange}{e(Z_i)}}\right]=E[E[Y_i(1)|Z_i]]$$`
+]
+
+--
+
+.box-inv-1.medium[Why?]
+
+--
+
+.box-1[
+propensity score definition: `\(e(Z_i)=E_X[X_i|Z_i]\)`
+]
+
+---
+class: title title-1
+
+# Using the propensity score
+.footer[Imbens and Rubin (2015) Causal Inference]
+
+.box-1[
+
+`$$E[E[Y_i(1)|Z_i]]=E[Y_i(1)]$$`
+]
+
+--
+
+.box-inv-1.medium[Why?]
+
+--
+
+.box-1[
+Law of iterated expectation
+]
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+.box-1[Open `appex-10`]
+
+.box-1[Calculate the ATE and ATO estimates for the effect of `satisfied_customer_service` on `next_spend`]
+
+.box-1[Knit, commit, push to GitHub]
+
+<div class="countdown" id="timer_623fa91a" style="right:0;bottom:0;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
