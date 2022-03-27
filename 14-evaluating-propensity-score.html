@@ -4,7 +4,7 @@
     <title>Evaluating your propensity score model</title>
     <meta charset="utf-8" />
     <meta name="author" content="Lucy D’Agostino McGowan" />
-    <meta name="date" content="2022-03-22" />
+    <meta name="date" content="2022-03-26" />
     <script src="libs/header-attrs-2.11/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
@@ -52,7 +52,7 @@ class: title title-1
 
 # Standardized Mean Difference (SMD)
 
-`$$\LARGE d = \frac{\bar{x}_{exposed}-\bar{x}_{unexposed}}{\sqrt{\frac{s^2_{exposed}+s^2_{unexposed}}{2}}}$$`
+`$$\LARGE d = \frac{\bar{z}_{exposed}-\bar{z}_{unexposed}}{\sqrt{\frac{s^2_{exposed}+s^2_{unexposed}}{2}}}$$`
 --
 &lt;br&gt;
 .box-1[Rule of thumb: SMD &lt; 0.1]
@@ -72,6 +72,7 @@ library(broom)
 
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + previous_spend, 
+    family = binomial(),
     data = customer_satisfaction) %&gt;%
   augment(data = customer_satisfaction, type.predict = "response") %&gt;%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -95,6 +96,7 @@ library(broom)
 
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + previous_spend, 
+        family = binomial(),
     data = customer_satisfaction) %&gt;%
   augment(data = customer_satisfaction, type.predict = "response") %&gt;%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -120,6 +122,7 @@ library(broom)
 
 *glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age +
 *     education + gender + former_customer_service + previous_spend,
+    family = binomial(),
     data = customer_satisfaction) %&gt;%
   augment(data = customer_satisfaction, type.predict = "response") %&gt;%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -142,6 +145,7 @@ library(broom)
 
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + previous_spend, 
+    family = binomial(),
     data = customer_satisfaction) %&gt;%
   augment(data = customer_satisfaction, type.predict = "response") %&gt;%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -164,6 +168,7 @@ library(broom)
 
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + previous_spend, 
+    family = binomial(),
     data = customer_satisfaction) %&gt;%
   augment(data = customer_satisfaction, type.predict = "response") %&gt;%
 * mutate(atm_wts = pmin(.fitted, 1 - .fitted) /
@@ -212,7 +217,7 @@ customer_satisfaction %&gt;%
 ## # A tibble: 1 × 1
 ##      smd
 ##    &lt;dbl&gt;
-## 1 0.0169
+## 1 0.0297
 ```
 ]
 
@@ -315,7 +320,7 @@ class: title title-1
 
 .box-1[Knit, commit, push to GitHub]
 
-<div class="countdown" id="timer_623a38b6" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_623faafa" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 ---
@@ -334,7 +339,7 @@ smds
 ## # A tibble: 1 × 18
 ##   income_unweighted income_weighted married_unweighted married_weighted
 ##               &lt;dbl&gt;           &lt;dbl&gt;              &lt;dbl&gt;            &lt;dbl&gt;
-## 1            0.0168          0.0169             0.0357           0.0344
+## 1            0.0168          0.0297             0.0357           0.0350
 ## # … with 14 more variables: n_kids_unweighted &lt;dbl&gt;, n_kids_weighted &lt;dbl&gt;,
 ## #   has_pets_unweighted &lt;dbl&gt;, has_pets_weighted &lt;dbl&gt;, age_unweighted &lt;dbl&gt;,
 ## #   age_weighted &lt;dbl&gt;, education_unweighted &lt;dbl&gt;, education_weighted &lt;dbl&gt;,
@@ -462,26 +467,26 @@ plot_df
 
 ```
 ## # A tibble: 18 × 3
-##    variable                Method          SMD
-##    &lt;fct&gt;                   &lt;chr&gt;         &lt;dbl&gt;
-##  1 gender                  unweighted  0.0161 
-##  2 income                  unweighted  0.0168 
-##  3 has_pets                unweighted -0.0285 
-##  4 married                 unweighted  0.0357 
-##  5 former_customer_service unweighted  0.0616 
-##  6 n_kids                  unweighted -0.203  
-##  7 age                     unweighted  0.340  
-##  8 education               unweighted -0.664  
-##  9 previous_spend          unweighted -1.02   
-## 10 n_kids                  weighted    0.00553
-## 11 has_pets                weighted    0.00898
-## 12 former_customer_service weighted    0.0145 
-## 13 income                  weighted    0.0169 
-## 14 gender                  weighted    0.0179 
-## 15 married                 weighted    0.0344 
-## 16 education               weighted   -0.0352 
-## 17 age                     weighted    0.0424 
-## 18 previous_spend          weighted   -0.216
+##    variable                Method             SMD
+##    &lt;fct&gt;                   &lt;chr&gt;            &lt;dbl&gt;
+##  1 gender                  unweighted  0.0161    
+##  2 income                  unweighted  0.0168    
+##  3 has_pets                unweighted -0.0285    
+##  4 married                 unweighted  0.0357    
+##  5 former_customer_service unweighted  0.0616    
+##  6 n_kids                  unweighted -0.203     
+##  7 age                     unweighted  0.340     
+##  8 education               unweighted -0.664     
+##  9 previous_spend          unweighted -1.02      
+## 10 education               weighted    0.00000476
+## 11 former_customer_service weighted    0.00869   
+## 12 previous_spend          weighted    0.0138    
+## 13 gender                  weighted    0.0148    
+## 14 age                     weighted    0.0194    
+## 15 has_pets                weighted    0.0221    
+## 16 n_kids                  weighted    0.0226    
+## 17 income                  weighted    0.0297    
+## 18 married                 weighted    0.0350
 ```
 ]
 
@@ -630,7 +635,7 @@ class: title title-1
 
 .box-1[Knit, commit, push to GitHub]
 
-<div class="countdown" id="timer_623a3ae6" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_623faaed" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1133,7 +1138,7 @@ class: title title-1
 
 .box-1[Knit, commit, push to GitHub]
 
-<div class="countdown" id="timer_623a3af3" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_623fa9ac" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">06</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1368,7 +1373,7 @@ class: title title-1
 
 .box-1[Knit, commit, push to GitHub]
 
-<div class="countdown" id="timer_623a3778" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_623fa9eb" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">06</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -1405,6 +1410,7 @@ class: title title-1
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + 
       poly(previous_spend, 3), 
+    family = binomial(),
     data = customer_satisfaction) %&gt;%
   augment(data = customer_satisfaction, type.predict = "response") %&gt;%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -1428,6 +1434,7 @@ class: title title-1
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + 
 *     poly(previous_spend, 3),
+    family = binomial(),
     data = customer_satisfaction) %&gt;%
   augment(data = customer_satisfaction, type.predict = "response") %&gt;%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -1470,7 +1477,8 @@ class: title title-1
 ```r
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + 
-      splines::ns(previous_spend, 3), 
+      splines::ns(previous_spend, 3),
+    family = binomial(),
     data = customer_satisfaction) %&gt;%
   augment(data = customer_satisfaction, type.predict = "response") %&gt;%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -1493,6 +1501,7 @@ class: title title-1
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + 
 *     splines::ns(previous_spend, 3),
+    family = binomial(),
     data = customer_satisfaction) %&gt;%
   augment(data = customer_satisfaction, type.predict = "response") %&gt;%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -1538,6 +1547,7 @@ class: title title-1
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + 
 *     splines::ns(previous_spend, 8),
+    family = binomial(),
     data = customer_satisfaction) %&gt;%
   augment(data = customer_satisfaction, type.predict = "response") %&gt;%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -1578,7 +1588,7 @@ class: title title-1
 
 .box-1[Knit, commit, push to GitHub]
 
-<div class="countdown" id="timer_623a3987" style="right:0;bottom:0;" data-warnwhen="0">
+<div class="countdown" id="timer_623fabce" style="right:0;bottom:0;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 

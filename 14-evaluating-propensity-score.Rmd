@@ -59,7 +59,7 @@ class: title title-1
 
 # Standardized Mean Difference (SMD)
 
-$$\LARGE d = \frac{\bar{x}_{exposed}-\bar{x}_{unexposed}}{\sqrt{\frac{s^2_{exposed}+s^2_{unexposed}}{2}}}$$
+$$\LARGE d = \frac{\bar{z}_{exposed}-\bar{z}_{unexposed}}{\sqrt{\frac{s^2_{exposed}+s^2_{unexposed}}{2}}}$$
 --
 <br>
 .box-1[Rule of thumb: SMD < 0.1]
@@ -81,6 +81,7 @@ library(broom)
 
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + previous_spend, 
+    family = binomial(),
     data = customer_satisfaction) %>%
   augment(data = customer_satisfaction, type.predict = "response") %>%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -103,6 +104,7 @@ library(broom)
 
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + previous_spend, 
+        family = binomial(),
     data = customer_satisfaction) %>%
   augment(data = customer_satisfaction, type.predict = "response") %>%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -127,6 +129,7 @@ library(broom)
 
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + #<<
       education + gender + former_customer_service + previous_spend, #<<
+    family = binomial(),
     data = customer_satisfaction) %>%
   augment(data = customer_satisfaction, type.predict = "response") %>%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -148,6 +151,7 @@ library(broom)
 
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + previous_spend, 
+    family = binomial(),
     data = customer_satisfaction) %>%
   augment(data = customer_satisfaction, type.predict = "response") %>%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -169,6 +173,7 @@ library(broom)
 
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + previous_spend, 
+    family = binomial(),
     data = customer_satisfaction) %>%
   augment(data = customer_satisfaction, type.predict = "response") %>%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) /  #<<
@@ -1362,6 +1367,7 @@ class: title title-1
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + 
       poly(previous_spend, 3), 
+    family = binomial(),
     data = customer_satisfaction) %>%
   augment(data = customer_satisfaction, type.predict = "response") %>%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -1384,6 +1390,7 @@ class: title title-1
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + 
       poly(previous_spend, 3), #<<
+    family = binomial(),
     data = customer_satisfaction) %>%
   augment(data = customer_satisfaction, type.predict = "response") %>%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -1469,7 +1476,8 @@ class: title title-1
 ```{r}
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + 
-      splines::ns(previous_spend, 3), 
+      splines::ns(previous_spend, 3),
+    family = binomial(),
     data = customer_satisfaction) %>%
   augment(data = customer_satisfaction, type.predict = "response") %>%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -1491,6 +1499,7 @@ class: title title-1
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + 
       splines::ns(previous_spend, 3), #<<
+    family = binomial(),
     data = customer_satisfaction) %>%
   augment(data = customer_satisfaction, type.predict = "response") %>%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
@@ -1579,6 +1588,7 @@ class: title title-1
 glm(satisfied_customer_service ~ income + married + n_kids + has_pets + age + 
       education + gender + former_customer_service + 
       splines::ns(previous_spend, 8), #<<
+    family = binomial(),
     data = customer_satisfaction) %>%
   augment(data = customer_satisfaction, type.predict = "response") %>%
   mutate(atm_wts = pmin(.fitted, 1 - .fitted) / 
