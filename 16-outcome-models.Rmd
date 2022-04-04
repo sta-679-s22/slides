@@ -625,6 +625,109 @@ class: title title-1
 
 # Option 2: Robust Standard Errors
 
+
+.box-1[
+
+$$u(\theta)=\begin{pmatrix}(Y-\mu_1)Xe^{-1}\\(Y-\mu_0)(1-X)(1-e)^{-1}\end{pmatrix}\\\theta = (\mu_1, \mu_0)$$
+
+]
+
+--
+<br>
+.box-1[
+$e$ = the propensity score, this method assumes this is **fixed**
+]
+
+---
+
+
+class: title title-1
+
+# M-Estimation
+
+.box-1[
+$$\sqrt{n}(\hat\theta-\theta)\rightarrow^d N(0, \mathbf{A}^{-1}\mathbf{B}\mathbf{A}^{-T})$$
+]
+
+---
+
+class: title title-1
+
+# Sandwich estimator
+
+.box-1[
+
+$$\textrm{var}(\theta) = \mathbf{A}^{-1}\mathbf{B}\mathbf{A}^{-T}$$
+]
+
+--
+
+<br>
+
+.box-1[
+
+$$\mathbf{A} = -E\left[\frac{\partial \mathbf{u}(\theta)}{\partial\theta}\right]$$
+]
+---
+
+class: title title-1
+
+# Sandwich estimator
+
+.box-1[
+
+$$\textrm{var}(\theta) = \mathbf{A}^{-1}\mathbf{B}\mathbf{A}^{-T}$$
+]
+
+--
+
+<br>
+
+.box-1[
+
+$$\mathbf{B} = E[\mathbf{u}(\theta)\mathbf{u}(\theta)^T]$$
+]
+
+---
+
+class: title title-1
+
+# Estimating **A**
+
+.box-1[
+$$\mathbf{A} = -E\left[\frac{\partial \mathbf{u}(\theta)}{\partial\theta}\right]$$
+]
+
+--
+<br>
+
+.box-1[
+This is the "model-based" variance (what you would get out of your model by default!)
+]
+---
+
+class: title tile-1
+
+# Estimating **B**
+
+.box-1[
+
+$$\mathbf{B} = E[\mathbf{u}(\theta)\mathbf{u}(\theta)^T]$$
+]
+
+--
+<br>
+
+.box-1[
+This is your "robust" estimate of the information (the variance of the *score function* if you remember from statistical inference!)
+]
+
+---
+
+class: title title-1
+
+# Option 2: Robust Standard Errors
+
 ```{r, eval = FALSE}
 library(survey)
 des <- svydesign(
@@ -726,7 +829,7 @@ class: title title-1
 --
 
 .box-1[
-$$u(\theta)=\begin{pmatrix}(Y-\mu_1)Xe(\mathbf{Z}, \beta)^{-1}\\(Y-\mu_0)(1-X)(1-e(\mathbf{Z}, \beta))^{-1}\\\mathbf{Z}(X-e(\mathbf{Z}, \beta))\end{pmatrix}$$
+$$u(\theta)=\begin{pmatrix}(Y-\mu_1)Xe(\mathbf{Z}, \beta)^{-1}\\(Y-\mu_0)(1-X)(1-e(\mathbf{Z}, \beta))^{-1}\\\mathbf{Z}(X-e(\mathbf{Z}, \beta))\end{pmatrix}\\\theta = (\mu_1, \mu_0, \beta)$$
 ]
 
 --
@@ -745,7 +848,7 @@ class: title title-1
 
 
 .box-1[
-$$u(\theta)=\begin{pmatrix}(Y-\mu_1)\color{orange}{Xe(\mathbf{Z}, \beta)^{-1}}\\(Y-\mu_0)\color{orange}{(1-X)(1-e(\mathbf{Z}, \beta))^{-1}}\\\mathbf{Z}(X-e(\mathbf{Z}, \beta))\end{pmatrix}$$
+$$u(\theta)=\begin{pmatrix}(Y-\mu_1)\color{orange}{Xe(\mathbf{Z}, \beta)^{-1}}\\(Y-\mu_0)\color{orange}{(1-X)(1-e(\mathbf{Z}, \beta))^{-1}}\\\mathbf{Z}(X-e(\mathbf{Z}, \beta))\end{pmatrix}\\\theta = (\mu_1, \mu_0, \beta)$$
 ]
 
 --
@@ -764,7 +867,7 @@ class: title title-1
 
 
 .box-1[
-$$u(\theta)=\begin{pmatrix}(Y-\mu_1)Xe(\mathbf{Z}, \beta)^{-1}\\(Y-\mu_0)(1-X)(1-e(\mathbf{Z}, \beta))^{-1}\\\color{orange}{\mathbf{Z}(X-e(\mathbf{Z}, \beta))}\end{pmatrix}$$
+$$u(\theta)=\begin{pmatrix}(Y-\mu_1)Xe(\mathbf{Z}, \beta)^{-1}\\(Y-\mu_0)(1-X)(1-e(\mathbf{Z}, \beta))^{-1}\\\color{orange}{\mathbf{Z}(X-e(\mathbf{Z}, \beta))}\end{pmatrix}\\\theta = (\mu_1, \mu_0, \beta)$$
 ]
 
 --
