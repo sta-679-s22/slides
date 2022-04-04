@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Outcome Models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lucy D’Agostino McGowan" />
+    <meta name="date" content="2022-04-04" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+class: center middle main-title section-title-1
+
+# Outcome Models
+
+.class-info[
+
+**Session 16**
+
+.light[STA 379/679: Causal Inference &lt;br&gt;
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+
+class: title title-1
+
+# Weighted Estimator
+
+.box-1[
+`$$\hat{\tau} = \frac{\sum_{i=1}^n Y_i X_i w_i}{\sum_{i=1}^nX_iw_i}-\frac{\sum_{i=1}^n Y_i (1-X_i) w_i}{\sum_{i=1}^n(1-X_i)w_i}$$`
+]
+
+--
+
+.box-inv-1[
+What about the variability?
+]
+---
+class: title title-1
+
+# Example
+
+.small[
+
+```
+## # A tibble: 1,100 × 5
+##    coffee_town cups_of_coffee   age job   smoke
+##          &lt;dbl&gt;          &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;
+##  1           1              0  12.1 none  never
+##  2           0              0  14.6 none  never
+##  3           1              0  11.5 none  never
+##  4           0              1  18.8 easy  never
+##  5           0              0  15.0 none  never
+##  6           1              0  11.5 none  never
+##  7           1              0  15.5 none  never
+##  8           1              0  16.2 easy  never
+##  9           1              0  15.7 none  never
+## 10           0              0  13.1 none  never
+## # … with 1,090 more rows
+```
+]
+
+
+---
+
+class: title title-1
+
+# Example
+
+.box-1.medium[Causal Question]
+
+--
+
+.box-inv-1[What is the average causal effect of living in coffee town on the number of cups of coffee consumed across the whole population?]
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. Calculate a propensity score model estimating for the exposure `coffee_town`
+2. Calculate `ate` weights using the propensity score
+3. Knit commit &amp; push to GitHub
+
+<div class="countdown" id="timer_624aed16" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# Example
+
+.small[
+
+```r
+library(broom)
+
+coffee_town_df &lt;- 
+  glm(coffee_town ~ age + job + smoke, 
+      data = coffee_town_df,
+      family = binomial()) %&gt;%
+  augment(data = coffee_town_df, type.predict = "response") %&gt;%
+  mutate(
+    ate = coffee_town / .fitted + (1 - coffee_town)  / (1 - .fitted)
+  )
+```
+]
+
+---
+
+class: title title-1
+
+# Estimating the ATE
+
+.pull-left[
+.small[
+
+```r
+coffee_town_df %&gt;%
+  summarise(
+    ate = sum(cups_of_coffee * coffee_town * ate) / 
+      sum(coffee_town * ate) - 
+      sum(cups_of_coffee * (1 - coffee_town) * ate) / 
+      sum((1 - coffee_town) * ate))
+```
+
+```
+## # A tibble: 1 × 1
+##     ate
+##   &lt;dbl&gt;
+## 1 0.566
+```
+]
+]
+
+---
+
+
+class: title title-1
+
+# Estimating the ATE
+
+.pull-left[
+.small[
+
+```r
+coffee_town_df %&gt;%
+  summarise(
+*   ate = sum(cups_of_coffee * coffee_town * ate) /
+      sum(coffee_town * ate) - 
+      sum(cups_of_coffee * (1 - coffee_town) * ate) / 
+      sum((1 - coffee_town) * ate))
+```
+
+```
+## # A tibble: 1 × 1
+##     ate
+##   &lt;dbl&gt;
+## 1 0.566
+```
+]
+]
+
+---
+
+
+class: title title-1
+
+# Estimating the ATE
+
+.pull-left[
+.small[
+
+```r
+coffee_town_df %&gt;%
+  summarise(
+    ate = sum(cups_of_coffee * coffee_town * ate) / 
+*     sum(coffee_town * ate) -
+      sum(cups_of_coffee * (1 - coffee_town) * ate) / 
+      sum((1 - coffee_town) * ate))
+```
+
+```
+## # A tibble: 1 × 1
+##     ate
+##   &lt;dbl&gt;
+## 1 0.566
+```
+]
+]
+
+---
+
+
+class: title title-1
+
+# Estimating the ATE
+
+.pull-left[
+.small[
+
+```r
+coffee_town_df %&gt;%
+  summarise(
+    ate = sum(cups_of_coffee * coffee_town * ate) / 
+      sum(coffee_town * ate) - 
+*     sum(cups_of_coffee * (1 - coffee_town) * ate) /
+      sum((1 - coffee_town) * ate))
+```
+
+```
+## # A tibble: 1 × 1
+##     ate
+##   &lt;dbl&gt;
+## 1 0.566
+```
+]
+]
+
+---
+
+
+class: title title-1
+
+# Estimating the ATE
+
+.pull-left[
+.small[
+
+```r
+coffee_town_df %&gt;%
+  summarise(
+    ate = sum(cups_of_coffee * coffee_town * ate) / 
+      sum(coffee_town * ate) - 
+      sum(cups_of_coffee * (1 - coffee_town) * ate) / 
+*     sum((1 - coffee_town) * ate))
+```
+
+```
+## # A tibble: 1 × 1
+##     ate
+##   &lt;dbl&gt;
+## 1 0.566
+```
+]
+]
+
+---
+
+
+class: title title-1
+
+# Estimating the ATE
+
+.pull-left[
+.small[
+
+```r
+coffee_town_df %&gt;%
+  summarise(
+    ate = sum(cups_of_coffee * coffee_town * ate) / 
+      sum(coffee_town * ate) - 
+      sum(cups_of_coffee * (1 - coffee_town) * ate) / 
+      sum((1 - coffee_town) * ate))
+```
+
+```
+## # A tibble: 1 × 1
+##     ate
+##   &lt;dbl&gt;
+## 1 0.566
+```
+]
+]
+
+.pull-right[
+.small[
+
+```r
+lm(cups_of_coffee ~ coffee_town, 
+   weights = ate, 
+   data = coffee_town_df)
+```
+
+```
+## 
+## Call:
+## lm(formula = cups_of_coffee ~ coffee_town, data = coffee_town_df, 
+##     weights = ate)
+## 
+## Coefficients:
+## (Intercept)  coffee_town  
+##      2.2064       0.5656
+```
+]
+]
+
+---
+class: subtitle subtitle-1 middl
+
+# Warning: This may not be the right estimate! We haven't checked / iterated, this is just for example purposes
+
+---
+class: title-1 title
+
+# Estimating the ATE
+
+# Estimating the ATE
+
+.pull-left[
+.small[
+
+```r
+coffee_town_df %&gt;%
+  summarise(
+    ate = sum(cups_of_coffee * coffee_town * ate) / 
+      sum(coffee_town * ate) - 
+      sum(cups_of_coffee * (1 - coffee_town) * ate) / 
+      sum((1 - coffee_town) * ate))
+```
+
+```
+## # A tibble: 1 × 1
+##     ate
+##   &lt;dbl&gt;
+## 1 0.566
+```
+]
+]
+
+.pull-right[
+.small[
+
+```r
+lm(cups_of_coffee ~ coffee_town, 
+*  weights = ate,
+   data = coffee_town_df)
+```
+
+```
+## 
+## Call:
+## lm(formula = cups_of_coffee ~ coffee_town, data = coffee_town_df, 
+##     weights = ate)
+## 
+## Coefficients:
+## (Intercept)  coffee_town  
+##      2.2064       0.5656
+```
+]
+]
+---
+
+class: title title-1
+
+# Can we just use the CIs from `lm`?
+
+.small[
+
+```r
+lm(cups_of_coffee ~ coffee_town, 
+*  weights = ate,
+   data = coffee_town_df) %&gt;%
+  tidy(conf.int = TRUE)
+```
+
+```
+## # A tibble: 2 × 7
+##   term        estimate std.error statistic   p.value conf.low conf.high
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)    2.21     0.0593     37.2  1.04e-196    2.09      2.32 
+## 2 coffee_town    0.566    0.0869      6.51 1.15e- 10    0.395     0.736
+```
+]
+
+--
+
+.box-1[No!]
+
+---
+
+
+class: title title-1
+
+# Option 1: Bootstrap
+
+.small[
+
+```r
+fit_ipw &lt;- function(split, ...) {
+  .df &lt;- analysis(split)
+  # fit propensity score model
+  propensity_model &lt;- glm(
+    exposure ~ confounder_1 + confounder_2 + ...
+    family = binomial(), 
+    data = .df
+  )
+  # calculate inverse probability weights
+  .df &lt;- propensity_model %&gt;% 
+    augment(type.predict = "response", data = .df) %&gt;% 
+    mutate(wts = exposure / .fitted + (1 - exposure) / (1  - .fitted)) 
+  # fit correctly bootsrapped ipw model
+  lm(outcome ~ exposure, data = .df, weights = wts) %&gt;% 
+    tidy()
+}
+```
+]
+---
+
+class: title title-1
+
+# Option 1: Bootstrap
+
+.small[
+
+```r
+*fit_ipw &lt;- function(split, ...) {
+  .df &lt;- analysis(split)
+  # fit propensity score model
+  propensity_model &lt;- glm(
+    exposure ~ confounder_1 + confounder_2 + ...
+    family = binomial(), 
+    data = .df
+  )
+  # calculate inverse probability weights
+  .df &lt;- propensity_model %&gt;% 
+    augment(type.predict = "response", data = .df) %&gt;% 
+    mutate(wts = exposure / .fitted + (1 - exposure) / (1  - .fitted)) 
+  # fit correctly bootsrapped ipw model
+  lm(outcome ~ exposure, data = .df, weights = wts) %&gt;% 
+    tidy()
+*} 
+```
+]
+
+---
+
+
+class: title title-1
+
+# Option 1: Bootstrap
+
+.small[
+
+```r
+fit_ipw &lt;- function(split, ...) {
+* .df &lt;- analysis(split)
+  # fit propensity score model
+  propensity_model &lt;- glm(
+    exposure ~ confounder_1 + confounder_2 + ...
+    family = binomial(), 
+    data = .df
+  )
+  # calculate inverse probability weights
+  .df &lt;- propensity_model %&gt;% 
+    augment(type.predict = "response", data = .df) %&gt;% 
+    mutate(wts = exposure / .fitted + (1 - exposure) / (1  - .fitted)) 
+  # fit correctly bootsrapped ipw model
+  lm(outcome ~ exposure, data = .df, weights = wts) %&gt;% 
+    tidy()
+}
+```
+]
+
+---
+
+
+class: title title-1
+
+# Option 1: Bootstrap
+
+.small[
+
+```r
+fit_ipw &lt;- function(split, ...) {
+  .df &lt;- analysis(split)
+* # fit propensity score model
+* propensity_model &lt;- glm(
+*   exposure ~ confounder_1 + confounder_2 + ...
+*   family = binomial(),
+*   data = .df
+* )
+  # calculate inverse probability weights
+  .df &lt;- propensity_model %&gt;% 
+    augment(type.predict = "response", data = .df) %&gt;% 
+    mutate(wts = exposure / .fitted + (1 - exposure) / (1  - .fitted)) 
+  # fit correctly bootsrapped ipw model
+  lm(outcome ~ exposure, data = .df, weights = wts) %&gt;% 
+    tidy()
+}
+```
+]
+
+---
+
+class: title title-1
+
+# Option 1: Bootstrap
+
+.small[
+
+```r
+fit_ipw &lt;- function(split, ...) {
+  .df &lt;- analysis(split)
+  # fit propensity score model
+  propensity_model &lt;- glm(
+    exposure ~ confounder_1 + confounder_2 + ...
+    family = binomial(), 
+    data = .df
+  )
+* # calculate inverse probability weights
+* .df &lt;- propensity_model %&gt;%
+*   augment(type.predict = "response", data = .df) %&gt;%
+*   mutate(wts = exposure / .fitted + (1 - exposure) / (1  - .fitted))
+  # fit correctly bootsrapped ipw model
+  lm(outcome ~ exposure, data = .df, weights = wts) %&gt;% 
+    tidy()
+}
+```
+]
+
+---
+
+
+class: title title-1
+
+# Option 1: Bootstrap
+
+.small[
+
+```r
+fit_ipw &lt;- function(split, ...) {
+  .df &lt;- analysis(split)
+  # fit propensity score model
+  propensity_model &lt;- glm(
+    exposure ~ confounder_1 + confounder_2 + ...
+    family = binomial(), 
+    data = .df
+  )
+  # calculate inverse probability weights
+  .df &lt;- propensity_model %&gt;% 
+    augment(type.predict = "response", data = .df) %&gt;% 
+    mutate(wts = exposure / .fitted + (1 - exposure) / (1  - .fitted)) 
+* # fit correctly bootsrapped ipw model
+* lm(outcome ~ exposure, data = .df, weights = wts) %&gt;%
+*   tidy()
+}
+```
+]
+
+---
+
+class: title title-1
+
+# Option 1: Bootstrap
+
+.small[
+
+```r
+library(rsample)
+# fit ipw model to bootstrapped samples
+ipw_results &lt;- bootstraps(df, 1000, apparent = TRUE) %&gt;% 
+  mutate(results = map(splits, fit_ipw))
+```
+]
+---
+
+class: title title-1
+
+# Option 1: Bootstrap
+
+.small[
+
+```r
+*library(rsample)
+# fit ipw model to bootstrapped samples
+ipw_results &lt;- bootstraps(df, 1000, apparent = TRUE) %&gt;% 
+  mutate(results = map(splits, fit_ipw))
+```
+]
+
+---
+
+class: title title-1
+
+# Option 1: Bootstrap
+
+.small[
+
+```r
+library(rsample)
+# fit ipw model to bootstrapped samples
+*ipw_results &lt;- bootstraps(df, 1000, apparent = TRUE) %&gt;%
+  mutate(results = map(splits, fit_ipw))
+```
+]
+
+---
+
+class: title title-1
+
+# Option 1: Bootstrap
+
+.small[
+
+```r
+library(rsample)
+# fit ipw model to bootstrapped samples
+ipw_results &lt;- bootstraps(df, 1000, apparent = TRUE) %&gt;% 
+* mutate(results = map(splits, fit_ipw))
+```
+]
+
+---
+
+class: title title-1
+
+# Option 1: Bootstrap
+
+
+```r
+# get t-statistic-based CIs
+boot_estimate &lt;- int_t(ipw_results, results) %&gt;%
+  filter(term == "exposure")
+```
+
+---
+
+class: title title-1
+
+# Option 1: Bootstrap
+
+
+```r
+# get t-statistic-based CIs
+*boot_estimate &lt;- int_t(ipw_results, results) %&gt;%
+  filter(term == "exposure")
+```
+
+---
+
+class: title title-1
+
+# Option 1: Bootstrap
+
+
+```r
+# get t-statistic-based CIs
+boot_estimate &lt;- int_t(ipw_results, results) %&gt;%
+* filter(term == "exposure")
+```
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. `install.packages("rsample")`
+2. Create a function called that fits the propensity score model and the weighted outcome model for the effect between `coffee_town` and `cups_of_coffee`
+3. Using the `bootstraps()` and `int_t()` functions to estimate the final effect.
+4. Knit commit &amp; push to GitHub
+
+<div class="countdown" id="timer_624aee0d" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# Bootstrap estimate
+
+
+```
+## # A tibble: 1 × 6
+##   term        .lower .estimate .upper .alpha .method  
+##   &lt;chr&gt;        &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;    
+## 1 coffee_town 0.0402     0.538   1.17   0.05 student-t
+```
+
+--
+
+.box-1.medium[Naive estimate]
+
+
+```
+## # A tibble: 2 × 4
+##   term        estimate conf.low conf.high
+##   &lt;chr&gt;          &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)    2.21     2.09      2.32 
+## 2 coffee_town    0.566    0.395     0.736
+```
+
+---
+
+class: title title-1
+
+# Option 2: Robust Standard Errors
+
+
+```r
+library(survey)
+des &lt;- svydesign(
+  ids = ~1, 
+  data = coffee_town_df,
+  weights = ~ate
+)
+svyglm(cups_of_coffee ~ coffee_town, des) %&gt;%
+  tidy(conf.int = TRUE)
+```
+---
+
+class: title title-1
+
+# Option 2: Robust Standard Errors
+
+
+```r
+*library(survey)
+des &lt;- svydesign(
+  ids = ~1, 
+  data = coffee_town_df,
+  weights = ~ate
+)
+svyglm(cups_of_coffee ~ coffee_town, des) %&gt;%
+  tidy(conf.int = TRUE)
+```
+
+---
+class: title title-1
+
+# Option 2: Robust Standard Errors
+
+
+```r
+library(survey)
+*des &lt;- svydesign(
+* ids = ~1,
+* data = coffee_town_df,
+* weights = ~ate
+*) 
+svyglm(cups_of_coffee ~ coffee_town, des) %&gt;%
+  tidy(conf.int = TRUE)
+```
+
+---
+
+class: title title-1
+
+# Option 2: Robust Standard Errors
+
+
+```r
+library(survey)
+des &lt;- svydesign(
+  ids = ~1, 
+  data = coffee_town_df,
+  weights = ~ate
+)
+*svyglm(cups_of_coffee ~ coffee_town, des) %&gt;%
+  tidy(conf.int = TRUE)
+```
+
+---
+
+
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. Use the `svyglm` function from the survey package to model the average treatment effect with the robust standard errors.
+2. Knit commit &amp; push to GitHub
+
+<div class="countdown" id="timer_624aea96" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# Option 2: Robust Standard Errors
+
+
+```
+## # A tibble: 2 × 4
+##   term        estimate conf.low conf.high
+##   &lt;chr&gt;          &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)    2.21    2.15        2.26
+## 2 coffee_town    0.566   0.0857      1.05
+```
+
+---
+class: title title-1
+
+# Option 3: Sandwich estimator
+
+.box-1[(that takes the propensity score estimation into account)]
+
+--
+
+.box-1[
+`$$u(\theta)=\begin{pmatrix}(Y-\mu_1)Xe(\mathbf{Z}, \beta)^{-1}\\(Y-\mu_0)(1-X)(1-e(\mathbf{Z}, \beta))^{-1}\\\mathbf{Z}(X-e(\mathbf{Z}, \beta))\end{pmatrix}$$`
+]
+
+--
+&lt;br&gt;
+.box-1[
+`\(e(\mathbf{Z}, \beta)\)` = the propensity score
+]
+
+---
+
+class: title title-1
+
+# Option 3: Sandwich estimator
+
+.box-1[(that takes the propensity score estimation into account)]
+
+
+.box-1[
+`$$u(\theta)=\begin{pmatrix}(Y-\mu_1)\color{orange}{Xe(\mathbf{Z}, \beta)^{-1}}\\(Y-\mu_0)\color{orange}{(1-X)(1-e(\mathbf{Z}, \beta))^{-1}}\\\mathbf{Z}(X-e(\mathbf{Z}, \beta))\end{pmatrix}$$`
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[ATE Weight]
+
+---
+class: title title-1
+
+# Option 3: Sandwich estimator
+
+.box-1[(that takes the propensity score estimation into account)]
+
+
+
+.box-1[
+`$$u(\theta)=\begin{pmatrix}(Y-\mu_1)Xe(\mathbf{Z}, \beta)^{-1}\\(Y-\mu_0)(1-X)(1-e(\mathbf{Z}, \beta))^{-1}\\\color{orange}{\mathbf{Z}(X-e(\mathbf{Z}, \beta))}\end{pmatrix}$$`
+]
+
+--
+&lt;br&gt;
+.box-1[
+Estimating equation for the propensity score model
+]
+
+
+---
+
+class: title title-1
+
+# M-Estimation
+
+.box-1[
+`$$\sqrt{n}(\hat\theta-\theta)\rightarrow^d N(0, \mathbf{A}^{-1}\mathbf{B}\mathbf{A}^{-T})$$`
+]
+
+---
+
+class: title title-1
+
+# Sandwich estimator
+
+.box-1[
+
+`$$\textrm{var}(\theta) = \mathbf{A}^{-1}\mathbf{B}\mathbf{A}^{-T}$$`
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+
+`$$\mathbf{A} = -E\left[\frac{\partial \mathbf{u}(\theta)}{\partial\theta}\right]$$`
+]
+---
+
+class: title title-1
+
+# Sandwich estimator
+
+.box-1[
+
+`$$\textrm{var}(\theta) = \mathbf{A}^{-1}\mathbf{B}\mathbf{A}^{-T}$$`
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+
+`$$\mathbf{B} = E[\mathbf{u}(\theta)\mathbf{u}(\theta)^T]$$`
+]
+
+---
+
+class: title title-1
+
+# Estimating **A**
+
+.box-1[
+`$$\mathbf{A} = -E\left[\frac{\partial \mathbf{u}(\theta)}{\partial\theta}\right]$$`
+]
+
+--
+&lt;br&gt;
+
+.box-1[
+
+`$$\mathbf{A} = \begin{pmatrix}a_{11}&amp; 0&amp; a_{13}\\ 0 &amp; a_{22} &amp; a_{23}\\0&amp;0&amp;a_{33}\end{pmatrix}$$`
+]
+
+---
+
+class: title title-1
+
+# Estimating **A**
+
+.box-1[
+`\(a_{11} = E[X e(\mathbf{Z}, \beta)^{-1}]\)`
+]
+
+--
+&lt;br&gt;
+.box-1[Why?]
+
+.box-1[
+`$$-E\left[\frac{\partial(Y-\mu_1)Xe(\mathbf{Z}, \beta)^{-1}}{\partial \mu_1}\right]\\=-E[-Xe(\mathbf{Z}, \beta)^{-1}]$$`
+]
+---
+
+class: title title-1
+
+# Estimating **A**
+
+.box-1[
+`\(a_{11} = E[X e(\mathbf{Z}, \beta)^{-1}]\)`
+]
+
+--
+&lt;br&gt;
+.box-1[
+`\(a_{22} = E[(1-X) (1 - e(\mathbf{Z}, \beta))^{-1}]\)`
+]
+
+--
+&lt;br&gt;
+.box-1[
+`\(a_{33} = E[\mathbf{ZZ}^Te(\mathbf{Z}, \beta)(1-e(\mathbf{Z}, \beta))]\)`
+
+]
+
+---
+
+class: title title-1
+
+# Estimating **A**
+
+.box-1[
+`\(a_{13} = E[\mathbf{Z}^T(Y-\mu_1)Xe(\mathbf{Z}, \beta)^{-1}(1-e(\mathbf{X}, \beta))]\)`
+]
+
+--
+
+&lt;br&gt;
+.box-1[
+`\(a_{23} = E[\mathbf{ZZ}^T(X-e(\mathbf{Z}, \beta))^2]\)`
+]
+
+---
+
+class: title title-1
+
+# Estimating **A**
+
+.box-1[
+Condition on `\(\mathbf{Z}\)` and knowing `\(E[X | \mathbf{Z}] = e(\mathbf{Z}, \beta)\)`]
+
+--
+
+.box-1[
+`\(a_{11} = E[X e(\mathbf{Z}, \beta)^{-1}] = 1\)`
+]
+
+--
+
+.box-1[Why?]
+
+<div class="countdown" id="timer_624aec65" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# Estimating **A**
+
+.box-1[
+Condition on `\(\mathbf{Z}\)` and knowing `\(E[X | \mathbf{Z}] = e(\mathbf{Z}, \beta)\)`]
+
+--
+
+.box-1[
+`\(a_{22} = E[(1-X) (1 - e(\mathbf{Z}, \beta))^{-1}] = ?\)`
+]
+
+
+<div class="countdown" id="timer_624aec30" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# Estimating **A**
+
+.box-1[
+Condition on `\(\mathbf{Z}\)` and knowing `\(E[X | \mathbf{Z}] = e(\mathbf{Z}, \beta)\)`]
+
+--
+
+.box-1[
+`\(a_{22} = E[(1-X) (1 - e(\mathbf{Z}, \beta))^{-1}] = ?\)`
+]
+
+
+<div class="countdown" id="timer_624aebc1" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">04</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# Estimating **A**
+
+.box-1[
+Condition on `\(\mathbf{Z}\)` and knowing `\(E[X | \mathbf{Z}] = e(\mathbf{Z}, \beta)\)`]
+
+&lt;br&gt;
+.box-1[
+`\(\hat{a}_{33} = \mathbf{ZZ}^T\hat{e}(1-\hat{e})\)`
+
+]
+
+---
+
+class: title title-1
+
+# Estimating **B**
+
+.box-1[
+
+`$$\mathbf{B} = E[\mathbf{u}(\theta)\mathbf{u}(\theta)^T]$$`
+]
+
+--
+&lt;br&gt;
+.box-1[
+`$$\mathbf{B}=\begin{pmatrix}b_{11}&amp;0&amp;b_{13}\\0&amp;b_{22}&amp;b_{23}\\b_{13}^T&amp;b_{23}^T&amp; b_{33}\end{pmatrix}$$`
+]
+
+---
+class: title-1 title
+# Estimating **B**
+
+.box-1[
+`\(b_{11}=E[(Y_1-\mu_1)^2e^{-1}]\)`
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+`\(b_{13}=E[\mathbf{Z}^T(Y_1-\mu_1)(1-e)]\)`
+]
+
+---
+
+class: title-1 title
+# Estimating **B**
+
+.box-1[
+`\(b_{22}=E[(Y_0-\mu_0)^2(1-e)^{-1}]\)`
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+`\(b_{23}=-E[\mathbf{Z}^T(Y_0-\mu_0)e]\)`
+]
+
+--
+
+&lt;br&gt;
+.box-1[
+`\(b_{33}=E[\mathbf{ZZ}^Te(1-e)]\)`
+]
+
+---
+
+class: title title-1
+
+# Putting the variance together
+
+.box-1[
+`\(\textrm{var}(\hat\mu_1)=n^{-1}(b_{11}-b_{13}b_{33}^{-1}b_{13}^T)\)`
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+`\(\textrm{var}(\hat\mu_0)=n^{-1}(b_{22}-b_{23}b_{33}^{-1}b_{23}^T)\)`
+]
+
+--
+
+&lt;br&gt;
+
+.box-1[
+`\(\textrm{cov}(\hat\mu_1, \hat\mu_0)=-n^{-1}b_{13}b_{33}^{-1}b_{23}^T\)`
+]
+
+---
+
+class: title title-1
+
+# Doing it in R!
+
+.box-1[
+We need a bit of data manipulation
+]
+
+```r
+library(PSW) 
+coffee_town_df &lt;- coffee_town_df %&gt;%
+  mutate(job_hard = ifelse(job == "hard", 1, 0),
+         job_easy = ifelse(job == "easy", 1, 0),
+         smoke_former = ifelse(smoke == "former", 1, 0),
+         smoke_never = ifelse(smoke == "never", 1, 0)
+  ) %&gt;%
+  as.data.frame()
+```
+
+---
+
+class: title title-1
+
+# Doing it in R!
+
+.box-1[
+We need a bit of data manipulation
+]
+
+```r
+*library(PSW)
+coffee_town_df &lt;- coffee_town_df %&gt;%
+  mutate(job_hard = ifelse(job == "hard", 1, 0),
+         job_easy = ifelse(job == "easy", 1, 0),
+         smoke_former = ifelse(smoke == "former", 1, 0),
+         smoke_never = ifelse(smoke == "never", 1, 0)
+  ) %&gt;%
+  as.data.frame()
+```
+
+---
+
+class: title title-1
+
+# Doing it in R!
+
+.box-1[
+We need a bit of data manipulation
+]
+
+```r
+library(PSW) 
+coffee_town_df &lt;- coffee_town_df %&gt;%
+* mutate(job_hard = ifelse(job == "hard", 1, 0),
+         job_easy = ifelse(job == "easy", 1, 0),
+         smoke_former = ifelse(smoke == "former", 1, 0),
+         smoke_never = ifelse(smoke == "never", 1, 0)
+  ) %&gt;%
+  as.data.frame()
+```
+
+---
+class: title title-1
+
+# Doing it in R!
+
+.box-1[
+We need a bit of data manipulation
+]
+
+```r
+library(PSW) 
+coffee_town_df &lt;- coffee_town_df %&gt;%
+  mutate(job_hard = ifelse(job == "hard", 1, 0),
+*        job_easy = ifelse(job == "easy", 1, 0),
+         smoke_former = ifelse(smoke == "former", 1, 0),
+         smoke_never = ifelse(smoke == "never", 1, 0)
+  ) %&gt;%
+  as.data.frame()
+```
+
+---class: title title-1
+
+# Doing it in R!
+
+.box-1[
+We need a bit of data manipulation
+]
+
+```r
+library(PSW) 
+coffee_town_df &lt;- coffee_town_df %&gt;%
+  mutate(job_hard = ifelse(job == "hard", 1, 0),
+         job_easy = ifelse(job == "easy", 1, 0),
+*        smoke_former = ifelse(smoke == "former", 1, 0),
+         smoke_never = ifelse(smoke == "never", 1, 0)
+  ) %&gt;%
+  as.data.frame()
+```
+
+---
+class: title title-1
+
+# Doing it in R!
+
+.box-1[
+We need a bit of data manipulation
+]
+
+```r
+library(PSW) 
+coffee_town_df &lt;- coffee_town_df %&gt;%
+  mutate(job_hard = ifelse(job == "hard", 1, 0),
+         job_easy = ifelse(job == "easy", 1, 0),
+         smoke_former = ifelse(smoke == "former", 1, 0),
+*        smoke_never = ifelse(smoke == "never", 1, 0)
+  ) %&gt;%
+  as.data.frame()
+```
+
+---
+class: title title-1
+
+# Doing it in R!
+
+.box-1[
+We need a bit of data manipulation
+]
+
+```r
+library(PSW) 
+coffee_town_df &lt;- coffee_town_df %&gt;%
+  mutate(job_hard = ifelse(job == "hard", 1, 0),
+         job_easy = ifelse(job == "easy", 1, 0),
+         smoke_former = ifelse(smoke == "former", 1, 0),
+         smoke_never = ifelse(smoke == "never", 1, 0)
+  ) %&gt;%
+* as.data.frame()
+```
+
+
+---
+
+class: title title-1
+
+# Doing it in R!
+.small[
+
+```r
+mod &lt;- psw(data = coffee_town_df, 
+    form.ps = 
+      "coffee_town ~ age + job_hard + job_easy +
+       smoke_former + smoke_never",
+    weight = "ATE",
+    wt = TRUE,
+    out.var = "cups_of_coffee", 
+    family = "gaussian")
+```
+
+]
+
+
+---
+
+
+class: title title-1
+
+# Doing it in R!
+.small[
+
+```r
+*mod &lt;- psw(data = coffee_town_df,
+    form.ps = 
+      "coffee_town ~ age + job_hard + job_easy +
+       smoke_former + smoke_never",
+    weight = "ATE",
+    wt = TRUE,
+    out.var = "cups_of_coffee", 
+    family = "gaussian")
+```
+
+]
+---
+
+
+class: title title-1
+
+# Doing it in R!
+.small[
+
+```r
+mod &lt;- psw(data = coffee_town_df, 
+*   form.ps =
+*     "coffee_town ~ age + job_hard + job_easy +
+*      smoke_former + smoke_never",
+    weight = "ATE",
+    wt = TRUE,
+    out.var = "cups_of_coffee", 
+    family = "gaussian")
+```
+
+]
+
+---
+
+
+class: title title-1
+
+# Doing it in R!
+.small[
+
+```r
+mod &lt;- psw(data = coffee_town_df, 
+    form.ps = 
+      "coffee_town ~ age + job_hard + job_easy +
+       smoke_former + smoke_never",
+*   weight = "ATE",
+    wt = TRUE,
+    out.var = "cups_of_coffee", 
+    family = "gaussian")
+```
+
+]
+---
+
+
+class: title title-1
+
+# Doing it in R!
+.small[
+
+```r
+mod &lt;- psw(data = coffee_town_df, 
+    form.ps = 
+      "coffee_town ~ age + job_hard + job_easy +
+       smoke_former + smoke_never",
+    weight = "ATE",
+*   wt = TRUE,
+    out.var = "cups_of_coffee", 
+    family = "gaussian")
+```
+
+]
+
+---
+
+
+class: title title-1
+
+# Doing it in R!
+.small[
+
+```r
+mod &lt;- psw(data = coffee_town_df, 
+    form.ps = 
+      "coffee_town ~ age + job_hard + job_easy +
+       smoke_former + smoke_never",
+    weight = "ATE",
+    wt = TRUE,
+*   out.var = "cups_of_coffee",
+    family = "gaussian")
+```
+
+]
+
+---
+
+
+class: title title-1
+
+# Doing it in R!
+.small[
+
+```r
+mod &lt;- psw(data = coffee_town_df, 
+    form.ps = 
+      "coffee_town ~ age + job_hard + job_easy +
+       smoke_former + smoke_never",
+    weight = "ATE",
+    wt = TRUE,
+    out.var = "cups_of_coffee", 
+*   family = "gaussian")
+```
+
+]
+
+
+---
+
+class: title title-1
+
+# Doing it in R!
+.small[
+
+```r
+mod$est.wt
+```
+
+```
+## [1] 0.5655656
+```
+
+```r
+# lb
+mod$est.wt - 1.96 * mod$std.wt
+```
+
+```
+## [1] 0.03946954
+```
+
+```r
+# ub
+mod$est.wt + 1.96 * mod$std.wt
+```
+
+```
+## [1] 1.091662
+```
+]
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. `install.packages("PSW")`
+2. Calculate the large sample variance sandwich estimator using the `psw` function
+3. Knit commit &amp; push to GitHub
+
+<div class="countdown" id="timer_624aed0b" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
