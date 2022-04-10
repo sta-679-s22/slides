@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Missing Data</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lucy D’Agostino McGowan" />
+    <meta name="date" content="2022-04-10" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+class: center middle main-title section-title-1
+
+# Missing Data
+
+.class-info[
+
+**Session 18**
+
+.light[STA 379/679: Causal Inference &lt;br&gt;
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+class: title title-1
+
+# Visualizing missingness
+
+.left-code[
+
+```r
+library(visdat)
+vis_dat(nhanes)
+```
+]
+
+.right-plot[
+&lt;img src="18-missing-data_files/figure-html/unnamed-chunk-2-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. `install.packages("visdat")`
+2. Load the causaldata package and use the `vis_dat()` function to examine the `nhefs` data frame
+3. Fit a linear model predicting `wt82` from `qsmk`
+4. Knit, commit, push to GitHub
+
+<div class="countdown" id="timer_625362cc" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+
+---
+class: title title-1
+
+# Types of Missing Data
+
+.pull-left-3[
+.box-inv-1[Missing completely at random]
+
+.box-1[The probability a variable is missing is the same for all observations]
+]
+--
+
+.pull-middle-3[
+.box-inv-1[Missing at random]
+
+.box-1[The probability a variable is missing depends only on available information (the other variables)]
+]
+
+--
+
+.pull-right-3[
+.box-inv-1[Missing not at random]
+
+.box-1[The probability a variable is missing depends on external factors]
+]
+
+---
+
+class: title title-1
+
+# Types of Missing Data
+
+.pull-left-3[
+.box-2[Missing completely at random]
+
+.box-2[The probability a variable is missing is the same for all observations]
+]
+
+
+.pull-middle-3[
+.box-inv-1[Missing at random]
+
+.box-1[The probability a variable is missing depends only on available information (the other variables)]
+]
+
+
+.pull-right-3[
+.box-2[Missing not at random]
+
+.box-2[The probability a variable is missing depends on external factors]
+]
+
+---
+
+class: title title-1
+
+# Imputation
+
+.box-1[Impute the mean/median or most common value for all missing variable]
+
+--
+
+.box-1[Use the observed variables to create a *model* to predict what the missing value would be]
+
+--
+
+.box-1[Use the observed variables to create many *models* to predict what the missing value would be (multiple imputation)]
+
+---
+
+class: title title-1
+
+# Predictive mean matching
+
+.box-inv-1[Variable A has some missing values]
+
+--
+
+.box-1[Calculates the predicted value of A for all observations using the other measured variables]
+
+--
+
+.box-1[For observation i, finds the set of observations that have the closest predicted value for variable A.]
+
+--
+
+.box-1[Randomly select one of the non-missing values of A from this set for the missing observation]
+
+---
+
+class: title title-1
+
+# Example
+
+.left-code[
+
+```r
+library(visdat)
+vis_dat(nhanes)
+```
+]
+
+.right-plot[
+&lt;img src="18-missing-data_files/figure-html/unnamed-chunk-4-1.png" width="504" style="display: block; margin: auto;" /&gt;
+]
+
+---
+class:  title title-1
+
+# Predictive mean matching
+
+
+```r
+library(mice)
+set.seed(1)
+nhanes_imp &lt;- mice(nhanes, m = 1, method = "pmm")
+```
+
+
+---
+
+class:  title title-1
+
+# Predictive mean matching
+
+
+```r
+*library(mice)
+set.seed(1)
+nhanes_imp &lt;- mice(nhanes, m = 1, method = "pmm")
+```
+
+---
+
+class:  title title-1
+
+# Predictive mean matching
+
+
+```r
+library(mice)
+set.seed(1)
+*nhanes_imp &lt;- mice(nhanes, m = 1, method = "pmm")
+```
+
+```
+## 
+##  iter imp variable
+##   1   1  bmi  hyp  chl
+##   2   1  bmi  hyp  chl
+##   3   1  bmi  hyp  chl
+##   4   1  bmi  hyp  chl
+##   5   1  bmi  hyp  chl
+```
+
+---
+
+class:  title title-1
+
+# Predictive mean matching
+
+.pull-left[
+
+```r
+nhanes_imp$imp$bmi
+```
+
+```
+##       1
+## 1  29.6
+## 3  27.2
+## 4  20.4
+## 6  25.5
+## 10 21.7
+## 11 22.0
+## 12 22.7
+## 16 26.3
+## 21 30.1
+```
+
+
+]
+
+.pull-right[
+
+```r
+nhanes %&gt;%
+  filter(bmi == 29.6)
+```
+
+```
+##    age  bmi hyp chl
+## 15   1 29.6   1  NA
+```
+]
+
+---
+
+
+class:  title title-1
+
+# Predictive mean matching
+
+
+```r
+complete(nhanes_imp)
+```
+
+```
+##    age  bmi hyp chl
+## 1    1 29.6   1 131
+## 2    2 22.7   1 187
+## 3    1 27.2   1 187
+## 4    3 20.4   2 204
+## 5    1 20.4   1 113
+## 6    3 25.5   2 184
+## 7    1 22.5   1 118
+## 8    1 30.1   1 187
+## 9    2 22.0   1 238
+## 10   2 21.7   2 131
+## 11   1 22.0   1 187
+## 12   2 22.7   1 187
+## 13   3 21.7   1 206
+## 14   2 28.7   2 204
+## 15   1 29.6   1 187
+## 16   1 26.3   1 187
+## 17   3 27.2   2 284
+## 18   2 26.3   2 199
+## 19   1 35.3   1 218
+## 20   3 25.5   2 218
+## 21   1 30.1   1 187
+## 22   1 33.2   1 229
+## 23   1 27.5   1 131
+## 24   3 24.9   1 284
+## 25   2 27.4   1 186
+```
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. `install.packages("mice")`
+2. Use the `mice()` function to create a single imputed dataset of the `nhefs` data using predictive mean matching
+3. Fit a linear model predicting `wt82` from `qsmk` on the imputed dataset
+4. Explore the help files for `?mice`. What types of univariate imputation methods are included?
+
+<div class="countdown" id="timer_62535fe9" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# Multiple imputation
+
+
+```r
+set.seed(1)
+nhanes_imp &lt;- mice(nhanes,
+                   m = 5, 
+                   method = "pmm")
+```
+
+---
+
+class: title title-1
+
+# Multiple imputation
+
+
+```r
+set.seed(1)
+nhanes_imp &lt;- mice(nhanes,
+*                  m = 5,
+                   method = "pmm")
+```
+---
+
+class: title title-1
+
+# Multiple imputation
+
+
+
+
+```r
+nhanes_imp$imp$bmi
+```
+
+```
+##       1    2    3    4    5
+## 1  27.2 35.3 27.2 29.6 24.9
+## 3  28.7 27.2 35.3 30.1 29.6
+## 4  25.5 20.4 22.0 20.4 25.5
+## 6  24.9 21.7 22.7 24.9 27.4
+## 10 28.7 22.7 20.4 20.4 22.7
+## 11 30.1 29.6 35.3 22.7 29.6
+## 12 22.0 27.2 26.3 27.4 22.5
+## 16 22.0 27.2 35.3 22.7 24.9
+## 21 26.3 29.6 27.2 29.6 27.2
+```
+
+---
+
+class: title title-1
+
+# Multiple imputation
+
+
+```r
+complete(nhanes_imp, 1)
+```
+
+```
+##    age  bmi hyp chl
+## 1    1 27.2   1 199
+## 2    2 22.7   1 187
+## 3    1 28.7   1 187
+## 4    3 25.5   1 218
+## 5    1 20.4   1 113
+## 6    3 24.9   1 184
+## 7    1 22.5   1 118
+## 8    1 30.1   1 187
+## 9    2 22.0   1 238
+## 10   2 28.7   1 206
+## 11   1 30.1   1 199
+## 12   2 22.0   1 187
+## 13   3 21.7   1 206
+## 14   2 28.7   2 204
+## 15   1 29.6   1 206
+## 16   1 22.0   1 187
+## 17   3 27.2   2 284
+## 18   2 26.3   2 199
+## 19   1 35.3   1 218
+## 20   3 25.5   2 199
+## 21   1 26.3   1 229
+## 22   1 33.2   1 229
+## 23   1 27.5   1 131
+## 24   3 24.9   1 206
+## 25   2 27.4   1 186
+```
+
+---
+
+class: title title-1
+
+# Multiple imputation
+
+
+```r
+complete(nhanes_imp, 2)
+```
+
+```
+##    age  bmi hyp chl
+## 1    1 35.3   1 284
+## 2    2 22.7   1 187
+## 3    1 27.2   1 187
+## 4    3 20.4   1 118
+## 5    1 20.4   1 113
+## 6    3 21.7   2 184
+## 7    1 22.5   1 118
+## 8    1 30.1   1 187
+## 9    2 22.0   1 238
+## 10   2 22.7   1 187
+## 11   1 29.6   1 206
+## 12   2 27.2   1 199
+## 13   3 21.7   1 206
+## 14   2 28.7   2 204
+## 15   1 29.6   1 186
+## 16   1 27.2   1 184
+## 17   3 27.2   2 284
+## 18   2 26.3   2 199
+## 19   1 35.3   1 218
+## 20   3 25.5   2 218
+## 21   1 29.6   1 204
+## 22   1 33.2   1 229
+## 23   1 27.5   1 131
+## 24   3 24.9   1 238
+## 25   2 27.4   1 186
+```
+
+---
+
+class: title title-1
+
+# Multiple imputation
+
+
+```r
+complete(nhanes_imp, 3)
+```
+
+```
+##    age  bmi hyp chl
+## 1    1 27.2   1 187
+## 2    2 22.7   1 187
+## 3    1 35.3   1 187
+## 4    3 22.0   1 184
+## 5    1 20.4   1 113
+## 6    3 22.7   2 184
+## 7    1 22.5   1 118
+## 8    1 30.1   1 187
+## 9    2 22.0   1 238
+## 10   2 20.4   1 187
+## 11   1 35.3   2 184
+## 12   2 26.3   1 206
+## 13   3 21.7   1 206
+## 14   2 28.7   2 204
+## 15   1 29.6   1 229
+## 16   1 35.3   2 187
+## 17   3 27.2   2 284
+## 18   2 26.3   2 199
+## 19   1 35.3   1 218
+## 20   3 25.5   2 206
+## 21   1 27.2   1 131
+## 22   1 33.2   1 229
+## 23   1 27.5   1 131
+## 24   3 24.9   1 284
+## 25   2 27.4   1 186
+```
+
+---
+
+class: title title-1
+
+# Multiple imputation
+
+
+```r
+complete(nhanes_imp, 4)
+```
+
+```
+##    age  bmi hyp chl
+## 1    1 29.6   1 187
+## 2    2 22.7   1 187
+## 3    1 30.1   1 187
+## 4    3 20.4   1 187
+## 5    1 20.4   1 113
+## 6    3 24.9   1 184
+## 7    1 22.5   1 118
+## 8    1 30.1   1 187
+## 9    2 22.0   1 238
+## 10   2 20.4   1 238
+## 11   1 22.7   1 131
+## 12   2 27.4   2 184
+## 13   3 21.7   1 206
+## 14   2 28.7   2 204
+## 15   1 29.6   1 229
+## 16   1 22.7   1 113
+## 17   3 27.2   2 284
+## 18   2 26.3   2 199
+## 19   1 35.3   1 218
+## 20   3 25.5   2 184
+## 21   1 29.6   1 206
+## 22   1 33.2   1 229
+## 23   1 27.5   1 131
+## 24   3 24.9   1 199
+## 25   2 27.4   1 186
+```
+
+---
+
+class: title title-1
+
+# Multiple imputation
+
+
+```r
+complete(nhanes_imp, 5)
+```
+
+```
+##    age  bmi hyp chl
+## 1    1 24.9   1 238
+## 2    2 22.7   1 187
+## 3    1 29.6   1 187
+## 4    3 25.5   2 238
+## 5    1 20.4   1 113
+## 6    3 27.4   1 184
+## 7    1 22.5   1 118
+## 8    1 30.1   1 187
+## 9    2 22.0   1 238
+## 10   2 22.7   1 187
+## 11   1 29.6   1 206
+## 12   2 22.5   1 187
+## 13   3 21.7   1 206
+## 14   2 28.7   2 204
+## 15   1 29.6   1 206
+## 16   1 24.9   1 238
+## 17   3 27.2   2 284
+## 18   2 26.3   2 199
+## 19   1 35.3   1 218
+## 20   3 25.5   2 187
+## 21   1 27.2   1 187
+## 22   1 33.2   1 229
+## 23   1 27.5   1 131
+## 24   3 24.9   1 218
+## 25   2 27.4   1 186
+```
+
+
+---
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. Use the `mice()` function to create a 5 imputed datasets of the `nhefs` data using predictive mean matching
+3. Fit a linear model predicting `wt82` from `qsmk` on each of the 5 imputed datasets
+4. Knit, commit, and push to GitHub
+
+<div class="countdown" id="timer_625361f5" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# Pool Results
+
+
+```r
+fit &lt;- with(data = nhanes_imp, lm(age ~ bmi))
+```
+
+---
+
+
+class: title title-1
+
+# Pool Results
+
+
+```r
+fit &lt;- with(data = nhanes_imp, lm(age ~ bmi))
+fit
+```
+
+```
+## call :
+## with.mids(data = nhanes_imp, expr = lm(age ~ bmi))
+## 
+## call1 :
+## mice(data = nhanes, m = 5, method = "pmm")
+## 
+## nmis :
+## age bmi hyp chl 
+##   0   9   8  10 
+## 
+## analyses :
+## [[1]]
+## 
+## Call:
+## lm(formula = age ~ bmi)
+## 
+## Coefficients:
+## (Intercept)          bmi  
+##     3.71598     -0.07405  
+## 
+## 
+## [[2]]
+## 
+## Call:
+## lm(formula = age ~ bmi)
+## 
+## Coefficients:
+## (Intercept)          bmi  
+##      4.5686      -0.1054  
+## 
+## 
+## [[3]]
+## 
+## Call:
+## lm(formula = age ~ bmi)
+## 
+## Coefficients:
+## (Intercept)          bmi  
+##     4.28034     -0.09311  
+## 
+## 
+## [[4]]
+## 
+## Call:
+## lm(formula = age ~ bmi)
+## 
+## Coefficients:
+## (Intercept)          bmi  
+##     3.84211     -0.07974  
+## 
+## 
+## [[5]]
+## 
+## Call:
+## lm(formula = age ~ bmi)
+## 
+## Coefficients:
+## (Intercept)          bmi  
+##     3.74803     -0.07538
+```
+
+---
+
+
+class: title title-1
+
+# Pool Results
+
+
+```r
+fit &lt;- with(data = nhanes_imp, lm(age ~ bmi))
+pool(fit)
+```
+
+```
+## Class: mipo    m = 5 
+##          term m    estimate        ubar            b           t dfcom       df
+## 1 (Intercept) 5  4.03102333 1.069419646 0.1415549368 1.239285570    23 16.86913
+## 2         bmi 5 -0.08554488 0.001494635 0.0001806221 0.001711381    23 17.25864
+##         riv    lambda       fmi
+## 1 0.1588394 0.1370676 0.2239293
+## 2 0.1450164 0.1266501 0.2128701
+```
+
+---
+
+
+class: title title-1
+
+# Pool Results
+
+
+```r
+fit &lt;- with(data = nhanes_imp, lm(age ~ bmi))
+*pool(fit)
+```
+
+```
+## Class: mipo    m = 5 
+##          term m    estimate        ubar            b           t dfcom       df
+## 1 (Intercept) 5  4.03102333 1.069419646 0.1415549368 1.239285570    23 16.86913
+## 2         bmi 5 -0.08554488 0.001494635 0.0001806221 0.001711381    23 17.25864
+##         riv    lambda       fmi
+## 1 0.1588394 0.1370676 0.2239293
+## 2 0.1450164 0.1266501 0.2128701
+```
+
+---
+
+
+class: title title-1
+
+# Pool Results
+
+
+```r
+with(data = nhanes_imp, lm(age ~ bmi)) %&gt;%
+  pool() %&gt;%
+  tidy()
+```
+
+```
+##          term    estimate  std.error statistic     p.value            b
+## 1 (Intercept)  4.03102333 1.11323204  3.621009 0.002132875 0.1415549368
+## 2         bmi -0.08554488 0.04136885 -2.067857 0.053982698 0.0001806221
+##         df dfcom       fmi    lambda m       riv        ubar
+## 1 16.86913    23 0.2239293 0.1370676 5 0.1588394 1.069419646
+## 2 17.25864    23 0.2128701 0.1266501 5 0.1450164 0.001494635
+```
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. Use the `with()` function to fit a model on each of your 5 imputed datasets.
+2. Use the `pool()` function to pool the results. Compare to your previous results
+3. Knit, commit, and push to GitHub
+
+<div class="countdown" id="timer_62535f89" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+nhanes$exp &lt;- rbinom(25, 1, 0.5)
+nhanes_imp &lt;- mice(nhanes, m = 5, method = "pmm")
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```r
+library(broom)
+fit_ps &lt;- function(data) {
+  glm(exp ~ age + bmi + chl, family = binomial(), data = data) %&gt;%
+    augment(data = data, type.predict = "response")
+}
+```
+
+--
+.box-1[Create a function to fit the propensity score model]
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+nhanes_imp %&gt;%
+  complete(action = "long") %&gt;%
+  group_by(.imp) %&gt;%
+  do(fit_ps(.))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+*nhanes_imp %&gt;%
+  complete(action = "long") %&gt;%
+  group_by(.imp) %&gt;%
+  do(fit_ps(.))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+nhanes_imp %&gt;%
+* complete(action = "long") %&gt;%
+  group_by(.imp) %&gt;%
+  do(fit_ps(.))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+nhanes_imp %&gt;%
+  complete(action = "long") %&gt;%
+* group_by(.imp) %&gt;%
+  do(fit_ps(.))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+nhanes_imp %&gt;%
+  complete(action = "long") %&gt;%
+  group_by(.imp) %&gt;%
+* do(fit_ps(.))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+nhanes_imp %&gt;%
+  complete(action = "long") %&gt;%
+  group_by(.imp) %&gt;%
+  do(fit_ps(.))  %&gt;%
+  ungroup()
+```
+
+```
+## # A tibble: 125 × 13
+##     .imp   .id   age   bmi   hyp   chl   exp .fitted .resid .std.resid   .hat
+##    &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;
+##  1     1     1     1  33.2     2   218     0   0.297 -0.840     -0.908 0.145 
+##  2     1     2     2  22.7     1   187     1   0.742  0.772      0.814 0.100 
+##  3     1     3     1  33.2     1   187     0   0.242 -0.744     -0.797 0.128 
+##  4     1     4     3  30.1     1   284     1   0.357  1.44       1.66  0.251 
+##  5     1     5     1  20.4     1   113     1   0.827  0.616      0.697 0.220 
+##  6     1     6     3  22.7     1   184     1   0.613  0.990      1.13  0.228 
+##  7     1     7     1  22.5     1   118     1   0.742  0.772      0.866 0.204 
+##  8     1     8     1  30.1     1   187     1   0.420  1.32       1.38  0.0935
+##  9     1     9     2  22       1   238     1   0.846  0.578      0.666 0.246 
+## 10     1    10     2  20.4     1   238     0   0.893 -2.12      -2.44  0.251 
+## # … with 115 more rows, and 2 more variables: .sigma &lt;dbl&gt;, .cooksd &lt;dbl&gt;
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+nhanes_imp %&gt;%
+  complete(action = "long") %&gt;%
+  group_by(.imp) %&gt;%
+  do(fit_ps(.))  %&gt;%
+  ungroup() %&gt;%
+  group_by(.id, exp) %&gt;%
+  summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
+  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+nhanes_imp %&gt;%
+  complete(action = "long") %&gt;%
+  group_by(.imp) %&gt;%
+  do(fit_ps(.))  %&gt;%
+  ungroup() %&gt;% 
+* group_by(.id, exp) %&gt;%
+  summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
+  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+nhanes_imp %&gt;%
+  complete(action = "long") %&gt;%
+  group_by(.imp) %&gt;%
+  do(fit_ps(.))  %&gt;%
+  ungroup() %&gt;%
+  group_by(.id, exp) %&gt;% 
+* summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
+  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+nhanes_imp %&gt;%
+  complete(action = "long") %&gt;%
+  group_by(.imp) %&gt;%
+  do(fit_ps(.))  %&gt;%
+  ungroup() %&gt;%
+  group_by(.id, exp) %&gt;%
+  summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
+* mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+nhanes_imp %&gt;%
+  complete(action = "long") %&gt;%
+  group_by(.imp) %&gt;%
+  do(fit_ps(.))  %&gt;%
+  ungroup() %&gt;%
+  group_by(.id, exp) %&gt;%
+  summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
+  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) 
+```
+
+```
+## # A tibble: 25 × 4
+##      .id   exp ps_avg    wt
+##    &lt;int&gt; &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt;
+##  1     1     0  0.303  1.43
+##  2     2     1  0.757  1.32
+##  3     3     0  0.325  1.48
+##  4     4     1  0.608  1.64
+##  5     5     1  0.904  1.11
+##  6     6     1  0.773  1.29
+##  7     7     1  0.842  1.19
+##  8     8     1  0.342  2.92
+##  9     9     1  0.754  1.33
+## 10    10     0  0.627  2.68
+## # … with 15 more rows
+```
+
+---
+
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. Create a function to calculate a propensity score model for `qsmk`
+2. Apply this function to each of your imputed datasets
+3. Average across the imputed datasets to get an averaged propensity score
+4. Calculate an ATE weight using the averaged propensity score
+
+<div class="countdown" id="timer_62535f79" style="right:0;bottom:0;font-size:1.5em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+nhanes_imp %&gt;%
+  complete(action = "long") %&gt;%
+  group_by(.imp) %&gt;%
+  do(fit_ps(.))  %&gt;%
+  ungroup() %&gt;%
+  group_by(.id, exp) %&gt;%
+  summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
+  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) %&gt;%
+  pull(wt)
+```
+
+```
+##  [1] 1.434407 1.321790 1.480435 1.643913 1.106094 1.293379 1.188058 2.922357
+##  [9] 1.326904 2.682297 1.841028 1.376285 1.357446 1.526695 2.772591 1.702504
+## [17] 1.473478 2.064122 1.115919 1.779082 1.580150 5.946267 2.293942 1.862007
+## [25] 1.807045
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+nhanes_imp %&gt;%
+  complete(action = "long") %&gt;%
+  group_by(.imp) %&gt;%
+  do(fit_ps(.))  %&gt;%
+  ungroup() %&gt;%
+  group_by(.id, exp) %&gt;%
+  summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
+  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) %&gt;%
+  pull(wt) -&gt; wts
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+
+```r
+with(nhanes_imp, lm(bmi ~ exp, weights = wts)) %&gt;%
+  pool() %&gt;%
+  tidy()
+```
+
+```
+##          term   estimate std.error statistic      p.value         b       df
+## 1 (Intercept) 27.7359264  1.392755 19.914432 4.804823e-12 0.3151392 14.70379
+## 2         exp -0.7591759  1.805404 -0.420502 6.792968e-01 0.3412653 17.29629
+##   dfcom       fmi    lambda m       riv     ubar
+## 1    23 0.2859010 0.1949549 5 0.2421664 1.561600
+## 2    23 0.2117988 0.1256391 5 0.1436925 2.849964
+```
+
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. Extract the weights into a vector
+2. Use the `with` and `pool` functions to pool the imputations, fitting a *weighted* model for `wt82` using `qsmk`
+
+<div class="countdown" id="timer_62536298" style="right:0;bottom:0;font-size:1.5em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: title title-1
+
+# Bootstrap
+
+.small[
+
+```r
+fit_ipw &lt;- function(split) {
+  .df &lt;- analysis(split)
+  
+  df_imp &lt;- mice(.df, m = 5, method = "pmm")
+  df_imp %&gt;%
+    complete(action = "long") %&gt;%
+    group_by(.imp) %&gt;%
+    do(fit_ps(.))  %&gt;%
+    ungroup() %&gt;%
+    group_by(.id, exp) %&gt;%
+    summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
+    mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) %&gt;%
+    pull(wt) -&gt; wts
+  
+  with(df_imp, lm(bmi ~ exp, weights = wts)) %&gt;%
+    pool() %&gt;%
+    tidy()
+}
+```
+]
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```r
+library(rsample)
+b &lt;- bootstraps(nhanes, B = 1000, apparent = TRUE) %&gt;%
+  mutate(results = map(splits, fit_ipw))
+int_t(b, results) %&gt;%
+  filter(term == "exp")
+```
+
+---
+
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. Use the bootstrap to estimate the uncertainty for the causal effect of `qsmk` on `wt82`
+2. Knit, Commit, Push to GitHub
+
+<div class="countdown" id="timer_6253620a" style="right:0;bottom:0;font-size:1.5em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

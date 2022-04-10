@@ -1,0 +1,780 @@
+---
+title: "Missing Data"
+author: "Lucy D'Agostino McGowan"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: "libs"
+    css: ["default", "css/style.css"]
+    seal: false
+    anchor_sections: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      navigation:
+        scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
+                      fig.retina = 3, fig.align = "center")
+```
+
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("tile_view"))
+library(tidyverse)
+```
+
+class: center middle main-title section-title-1
+
+# Missing Data
+
+.class-info[
+
+**Session 18**
+
+.light[STA 379/679: Causal Inference <br>
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+class: title title-1
+
+# Visualizing missingness
+
+.left-code[
+```{r, eval = FALSE}
+library(visdat)
+vis_dat(nhanes)
+```
+]
+
+.right-plot[
+```{r, echo = FALSE}
+library(visdat)
+library(mice)
+vis_dat(nhanes)
+```
+]
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+1. `install.packages("visdat")`
+2. Load the causaldata package and use the `vis_dat()` function to examine the `nhefs` data frame
+3. Fit a linear model predicting `wt82` from `qsmk`
+4. Knit, commit, push to GitHub
+
+`r countdown::countdown(5, font_size = "2em")`
+
+
+---
+class: title title-1
+
+# Types of Missing Data
+
+.pull-left-3[
+.box-inv-1[Missing completely at random]
+
+.box-1[The probability a variable is missing is the same for all observations]
+]
+--
+
+.pull-middle-3[
+.box-inv-1[Missing at random]
+
+.box-1[The probability a variable is missing depends only on available information (the other variables)]
+]
+
+--
+
+.pull-right-3[
+.box-inv-1[Missing not at random]
+
+.box-1[The probability a variable is missing depends on external factors]
+]
+
+---
+
+class: title title-1
+
+# Types of Missing Data
+
+.pull-left-3[
+.box-2[Missing completely at random]
+
+.box-2[The probability a variable is missing is the same for all observations]
+]
+
+
+.pull-middle-3[
+.box-inv-1[Missing at random]
+
+.box-1[The probability a variable is missing depends only on available information (the other variables)]
+]
+
+
+.pull-right-3[
+.box-2[Missing not at random]
+
+.box-2[The probability a variable is missing depends on external factors]
+]
+
+---
+
+class: title title-1
+
+# Imputation
+
+.box-1[Impute the mean/median or most common value for all missing variable]
+
+--
+
+.box-1[Use the observed variables to create a *model* to predict what the missing value would be]
+
+--
+
+.box-1[Use the observed variables to create many *models* to predict what the missing value would be (multiple imputation)]
+
+---
+
+class: title title-1
+
+# Predictive mean matching
+
+.box-inv-1[Variable A has some missing values]
+
+--
+
+.box-1[Calculates the predicted value of A for all observations using the other measured variables]
+
+--
+
+.box-1[For observation i, finds the set of observations that have the closest predicted value for variable A.]
+
+--
+
+.box-1[Randomly select one of the non-missing values of A from this set for the missing observation]
+
+---
+
+class: title title-1
+
+# Example
+
+.left-code[
+```{r, eval = FALSE}
+library(visdat)
+vis_dat(nhanes)
+```
+]
+
+.right-plot[
+```{r, echo = FALSE}
+library(visdat)
+library(mice)
+vis_dat(nhanes)
+```
+]
+
+---
+class:  title title-1
+
+# Predictive mean matching
+
+```{r, eval = FALSE}
+library(mice)
+set.seed(1)
+nhanes_imp <- mice(nhanes, m = 1, method = "pmm")
+```
+
+
+---
+
+class:  title title-1
+
+# Predictive mean matching
+
+```{r, eval = FALSE}
+library(mice) #<<
+set.seed(1)
+nhanes_imp <- mice(nhanes, m = 1, method = "pmm")
+```
+
+---
+
+class:  title title-1
+
+# Predictive mean matching
+
+```{r, output = "hide"}
+library(mice)
+set.seed(1)
+nhanes_imp <- mice(nhanes, m = 1, method = "pmm") #<<
+```
+
+---
+
+class:  title title-1
+
+# Predictive mean matching
+
+.pull-left[
+```{r}
+nhanes_imp$imp$bmi
+```
+
+
+]
+
+.pull-right[
+```{r}
+nhanes %>%
+  filter(bmi == 29.6)
+```
+]
+
+---
+
+
+class:  title title-1
+
+# Predictive mean matching
+
+```{r}
+complete(nhanes_imp)
+```
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+1. `install.packages("mice")`
+2. Use the `mice()` function to create a single imputed dataset of the `nhefs` data using predictive mean matching
+3. Fit a linear model predicting `wt82` from `qsmk` on the imputed dataset
+4. Explore the help files for `?mice`. What types of univariate imputation methods are included?
+
+`r countdown::countdown(8, font_size = "2em")`
+
+---
+
+class: title title-1
+
+# Multiple imputation
+
+```{r, eval = FALSE}
+set.seed(1)
+nhanes_imp <- mice(nhanes,
+                   m = 5, 
+                   method = "pmm")
+```
+
+---
+
+class: title title-1
+
+# Multiple imputation
+
+```{r, eval = FALSE}
+set.seed(1)
+nhanes_imp <- mice(nhanes,
+                   m = 5,  #<<
+                   method = "pmm")
+```
+---
+
+class: title title-1
+
+# Multiple imputation
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, results = "hide"}
+set.seed(1)
+nhanes_imp <- mice(nhanes,
+                   m = 5,  #<<
+                   method = "pmm")
+```
+
+```{r, echo  = TRUE}
+nhanes_imp$imp$bmi
+```
+
+---
+
+class: title title-1
+
+# Multiple imputation
+
+```{r}
+complete(nhanes_imp, 1)
+```
+
+---
+
+class: title title-1
+
+# Multiple imputation
+
+```{r}
+complete(nhanes_imp, 2)
+```
+
+---
+
+class: title title-1
+
+# Multiple imputation
+
+```{r}
+complete(nhanes_imp, 3)
+```
+
+---
+
+class: title title-1
+
+# Multiple imputation
+
+```{r}
+complete(nhanes_imp, 4)
+```
+
+---
+
+class: title title-1
+
+# Multiple imputation
+
+```{r}
+complete(nhanes_imp, 5)
+```
+
+
+---
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+1. Use the `mice()` function to create a 5 imputed datasets of the `nhefs` data using predictive mean matching
+3. Fit a linear model predicting `wt82` from `qsmk` on each of the 5 imputed datasets
+4. Knit, commit, and push to GitHub
+
+`r countdown::countdown(8, font_size = "2em")`
+
+---
+
+class: title title-1
+
+# Pool Results
+
+```{r}
+fit <- with(data = nhanes_imp, lm(age ~ bmi))
+```
+
+---
+
+
+class: title title-1
+
+# Pool Results
+
+```{r}
+fit <- with(data = nhanes_imp, lm(age ~ bmi))
+fit
+```
+
+---
+
+
+class: title title-1
+
+# Pool Results
+
+```{r}
+fit <- with(data = nhanes_imp, lm(age ~ bmi))
+pool(fit)
+```
+
+---
+
+
+class: title title-1
+
+# Pool Results
+
+```{r}
+fit <- with(data = nhanes_imp, lm(age ~ bmi))
+pool(fit) #<<
+```
+
+---
+
+
+class: title title-1
+
+# Pool Results
+
+```{r}
+with(data = nhanes_imp, lm(age ~ bmi)) %>%
+  pool() %>%
+  tidy()
+```
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+1. Use the `with()` function to fit a model on each of your 5 imputed datasets.
+2. Use the `pool()` function to pool the results. Compare to your previous results
+3. Knit, commit, and push to GitHub
+
+`r countdown::countdown(8, font_size = "2em")`
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r, message = FALSE, warning = FALSE, results = "hide"}
+nhanes$exp <- rbinom(25, 1, 0.5)
+nhanes_imp <- mice(nhanes, m = 5, method = "pmm")
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+```{r}
+library(broom)
+fit_ps <- function(data) {
+  glm(exp ~ age + bmi + chl, family = binomial(), data = data) %>%
+    augment(data = data, type.predict = "response")
+}
+
+```
+
+--
+.box-1[Create a function to fit the propensity score model]
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r, eval = FALSE}
+nhanes_imp %>%
+  complete(action = "long") %>%
+  group_by(.imp) %>%
+  do(fit_ps(.))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r, eval = FALSE}
+nhanes_imp %>% #<<
+  complete(action = "long") %>%
+  group_by(.imp) %>%
+  do(fit_ps(.))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r, eval = FALSE}
+nhanes_imp %>%
+  complete(action = "long") %>% #<<
+  group_by(.imp) %>%
+  do(fit_ps(.))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r, eval = FALSE}
+nhanes_imp %>%
+  complete(action = "long") %>%
+  group_by(.imp) %>% #<<
+  do(fit_ps(.))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r, eval = FALSE}
+nhanes_imp %>%
+  complete(action = "long") %>%
+  group_by(.imp) %>%
+  do(fit_ps(.)) #<<
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r}
+nhanes_imp %>%
+  complete(action = "long") %>%
+  group_by(.imp) %>%
+  do(fit_ps(.))  %>%
+  ungroup()
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r, eval = FALSE}
+nhanes_imp %>%
+  complete(action = "long") %>%
+  group_by(.imp) %>%
+  do(fit_ps(.))  %>%
+  ungroup() %>%
+  group_by(.id, exp) %>%
+  summarise(ps_avg = mean(.fitted), .groups = "drop") %>%
+  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r, eval = FALSE}
+nhanes_imp %>%
+  complete(action = "long") %>%
+  group_by(.imp) %>%
+  do(fit_ps(.))  %>%
+  ungroup() %>% 
+  group_by(.id, exp) %>% #<<
+  summarise(ps_avg = mean(.fitted), .groups = "drop") %>%
+  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r, eval = FALSE}
+nhanes_imp %>%
+  complete(action = "long") %>%
+  group_by(.imp) %>%
+  do(fit_ps(.))  %>%
+  ungroup() %>%
+  group_by(.id, exp) %>% 
+  summarise(ps_avg = mean(.fitted), .groups = "drop") %>% #<<
+  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg))
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r, eval = FALSE}
+nhanes_imp %>%
+  complete(action = "long") %>%
+  group_by(.imp) %>%
+  do(fit_ps(.))  %>%
+  ungroup() %>%
+  group_by(.id, exp) %>%
+  summarise(ps_avg = mean(.fitted), .groups = "drop") %>%
+  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) #<<
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r}
+nhanes_imp %>%
+  complete(action = "long") %>%
+  group_by(.imp) %>%
+  do(fit_ps(.))  %>%
+  ungroup() %>%
+  group_by(.id, exp) %>%
+  summarise(ps_avg = mean(.fitted), .groups = "drop") %>%
+  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) 
+```
+
+---
+
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+1. Create a function to calculate a propensity score model for `qsmk`
+2. Apply this function to each of your imputed datasets
+3. Average across the imputed datasets to get an averaged propensity score
+4. Calculate an ATE weight using the averaged propensity score
+
+`r countdown::countdown(8, font_size = "1.5em")`
+
+---
+
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r}
+nhanes_imp %>%
+  complete(action = "long") %>%
+  group_by(.imp) %>%
+  do(fit_ps(.))  %>%
+  ungroup() %>%
+  group_by(.id, exp) %>%
+  summarise(ps_avg = mean(.fitted), .groups = "drop") %>%
+  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) %>%
+  pull(wt)
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r}
+nhanes_imp %>%
+  complete(action = "long") %>%
+  group_by(.imp) %>%
+  do(fit_ps(.))  %>%
+  ungroup() %>%
+  group_by(.id, exp) %>%
+  summarise(ps_avg = mean(.fitted), .groups = "drop") %>%
+  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) %>%
+  pull(wt) -> wts
+```
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+
+```{r}
+with(nhanes_imp, lm(bmi ~ exp, weights = wts)) %>%
+  pool() %>%
+  tidy()
+```
+
+
+---
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+1. Extract the weights into a vector
+2. Use the `with` and `pool` functions to pool the imputations, fitting a *weighted* model for `wt82` using `qsmk`
+
+`r countdown::countdown(8, font_size = "1.5em")`
+
+---
+class: title title-1
+
+# Bootstrap
+
+.small[
+```{r}
+fit_ipw <- function(split) {
+  .df <- analysis(split)
+  
+  df_imp <- mice(.df, m = 5, method = "pmm")
+  df_imp %>%
+    complete(action = "long") %>%
+    group_by(.imp) %>%
+    do(fit_ps(.))  %>%
+    ungroup() %>%
+    group_by(.id, exp) %>%
+    summarise(ps_avg = mean(.fitted), .groups = "drop") %>%
+    mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) %>%
+    pull(wt) -> wts
+  
+  with(df_imp, lm(bmi ~ exp, weights = wts)) %>%
+    pool() %>%
+    tidy()
+}
+
+```
+]
+
+---
+
+class: title title-1
+
+# Adding in the PS weighting
+
+```{r, message = FALSE, warning = FALSE, results = "hide"}
+library(rsample)
+b <- bootstraps(nhanes, B = 1000, apparent = TRUE) %>%
+  mutate(results = map(splits, fit_ipw))
+int_t(b, results) %>%
+  filter(term == "exp")
+```
+
+---
+
+
+class: title title-1
+
+# `r fontawesome::fa("laptop")` Application Exercise
+
+1. Use the bootstrap to estimate the uncertainty for the causal effect of `qsmk` on `wt82`
+2. Knit, Commit, Push to GitHub
+
+`r countdown::countdown(8, font_size = "1.5em")`

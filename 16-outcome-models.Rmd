@@ -256,8 +256,6 @@ class: title-1 title
 
 # Estimating the ATE
 
-# Estimating the ATE
-
 .pull-left[
 .small[
 ```{r}
