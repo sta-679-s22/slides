@@ -60,10 +60,10 @@ class: title title-1
 
 1. `install.packages("visdat")`
 2. Load the causaldata package and use the `vis_dat()` function to examine the `nhefs` data frame
-3. Fit a linear model predicting `wt82` from `qsmk`
+3. Fit a linear model predicting `pregnancies` from `birthcontrol`
 4. Knit, commit, push to GitHub
 
-<div class="countdown" id="timer_625362cc" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<div class="countdown" id="timer_625391a4" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -312,10 +312,10 @@ class: title title-1
 
 1. `install.packages("mice")`
 2. Use the `mice()` function to create a single imputed dataset of the `nhefs` data using predictive mean matching
-3. Fit a linear model predicting `wt82` from `qsmk` on the imputed dataset
+3. Fit a linear model predicting `pregancies` from `birthcontrol` on the imputed dataset
 4. Explore the help files for `?mice`. What types of univariate imputation methods are included?
 
-<div class="countdown" id="timer_62535fe9" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<div class="countdown" id="timer_62538f98" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -579,10 +579,10 @@ class: title title-1
 # <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
 
 1. Use the `mice()` function to create a 5 imputed datasets of the `nhefs` data using predictive mean matching
-3. Fit a linear model predicting `wt82` from `qsmk` on each of the 5 imputed datasets
+3. Fit a linear model predicting `pregnancies` from `birthcontrol` on each of the 5 imputed datasets
 4. Knit, commit, and push to GitHub
 
-<div class="countdown" id="timer_625361f5" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<div class="countdown" id="timer_625390b1" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -751,7 +751,7 @@ class: title title-1
 2. Use the `pool()` function to pool the results. Compare to your previous results
 3. Knit, commit, and push to GitHub
 
-<div class="countdown" id="timer_62535f89" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<div class="countdown" id="timer_62538eb7" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
 
@@ -761,6 +761,26 @@ class: title title-1
 
 # Adding in the PS weighting
 
+.box-1[Across]
+
+--
+
+.box-inv-1[Create m imputed datasets, estimate the propensity score within each one then average across the m datasets, pool the results]
+
+--
+
+.box-1[Within]
+
+--
+
+.box-inv-1[Create m imputed datasets, estimate the propensity score within each one, run a seperate outcome model for each propensity score, pool the results.]
+
+---
+
+
+class: title title-1
+
+# Adding in the PS weighting
 
 
 ```r
@@ -770,398 +790,276 @@ nhanes_imp &lt;- mice(nhanes, m = 5, method = "pmm")
 
 ---
 
-class: title title-1
-
-# Adding in the PS weighting
-
-
-```r
-library(broom)
-fit_ps &lt;- function(data) {
-  glm(exp ~ age + bmi + chl, family = binomial(), data = data) %&gt;%
-    augment(data = data, type.predict = "response")
-}
-```
-
---
-.box-1[Create a function to fit the propensity score model]
-
----
 
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
 
+.box-1[From the makers of `MatchIt` we have a package that can handle the weights for you!]
 
 
 ```r
-nhanes_imp %&gt;%
-  complete(action = "long") %&gt;%
-  group_by(.imp) %&gt;%
-  do(fit_ps(.))
+library(MatchThem)
+nhanes_weighted &lt;- weightthem(exp ~ bmi + hyp + chl, 
+                              nhanes_imp,
+                              approach = "across",
+                              estimand = "ATE")
 ```
 
 ---
 
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
 
+.box-1[From the makers of `MatchIt` we have a package that can handle the weights for you!]
 
 
 ```r
-*nhanes_imp %&gt;%
-  complete(action = "long") %&gt;%
-  group_by(.imp) %&gt;%
-  do(fit_ps(.))
+*library(MatchThem)
+nhanes_weighted &lt;- weightthem(exp ~ bmi + hyp + chl, 
+                              nhanes_imp,
+                              approach = "across",
+                              estimand = "ATE")
 ```
 
 ---
 
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
 
+.box-1[From the makers of `MatchIt` we have a package that can handle the weights for you!]
 
 
 ```r
-nhanes_imp %&gt;%
-* complete(action = "long") %&gt;%
-  group_by(.imp) %&gt;%
-  do(fit_ps(.))
+library(MatchThem)
+*nhanes_weighted &lt;- weightthem(exp ~ bmi + hyp + chl,
+                              nhanes_imp,
+                              approach = "across",
+                              estimand = "ATE")
 ```
 
 ---
 
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
+
+.box-1[From the makers of `MatchIt` we have a package that can handle the weights for you!]
+
+
+```r
+library(MatchThem)
+nhanes_weighted &lt;- weightthem(exp ~ bmi + hyp + chl, 
+*                             nhanes_imp,
+                              approach = "across",
+                              estimand = "ATE")
+```
+
+---
+class: title title-1
+
+# MatchThem package
+
+.box-1[From the makers of `MatchIt` we have a package that can handle the weights for you!]
+
+
+```r
+library(MatchThem)
+nhanes_weighted &lt;- weightthem(exp ~ bmi + hyp + chl, 
+                              nhanes_imp,
+*                             approach = "across",
+                              estimand = "ATE") 
+```
+
+---
+class: title title-1
+
+# MatchThem package
+
+.box-1[From the makers of `MatchIt` we have a package that can handle the weights for you!]
+
+
+```r
+library(MatchThem)
+nhanes_weighted &lt;- weightthem(exp ~ bmi + hyp + chl, 
+                              nhanes_imp,
+                              approach = "across",
+*                             estimand = "ATE")
+```
+
+---
+class: title title-1
+
+# MatchThem package
 
 
 
 ```r
-nhanes_imp %&gt;%
-  complete(action = "long") %&gt;%
-* group_by(.imp) %&gt;%
-  do(fit_ps(.))
+library(survey)
+with(nhanes_weighted, svyglm(age ~ exp)) %&gt;%
+       pool() %&gt;%
+       tidy()
+```
+
+```
+##          term   estimate std.error statistic      p.value b       df dfcom
+## 1 (Intercept) 1.57185008 0.1910444 8.2276685 4.828489e-08 0 21.22865    23
+## 2         exp 0.06565242 0.3074550 0.2135351 8.329471e-01 0 21.22865    23
+##          fmi lambda m riv       ubar
+## 1 0.08254692      0 5   0 0.03649797
+## 2 0.08254692      0 5   0 0.09452855
+```
+
+---
+class: title title-1
+
+# MatchThem package
+
+
+
+```r
+*library(survey)
+with(nhanes_weighted, svyglm(age ~ exp)) %&gt;%
+       pool() %&gt;%
+       tidy()
+```
+
+```
+##          term   estimate std.error statistic      p.value b       df dfcom
+## 1 (Intercept) 1.57185008 0.1910444 8.2276685 4.828489e-08 0 21.22865    23
+## 2         exp 0.06565242 0.3074550 0.2135351 8.329471e-01 0 21.22865    23
+##          fmi lambda m riv       ubar
+## 1 0.08254692      0 5   0 0.03649797
+## 2 0.08254692      0 5   0 0.09452855
 ```
 
 ---
 
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
 
 
 
 ```r
-nhanes_imp %&gt;%
-  complete(action = "long") %&gt;%
-  group_by(.imp) %&gt;%
-* do(fit_ps(.))
+library(survey)
+*with(nhanes_weighted, svyglm(age ~ exp)) %&gt;%
+       pool() %&gt;%
+       tidy()
+```
+
+```
+##          term   estimate std.error statistic      p.value b       df dfcom
+## 1 (Intercept) 1.57185008 0.1910444 8.2276685 4.828489e-08 0 21.22865    23
+## 2         exp 0.06565242 0.3074550 0.2135351 8.329471e-01 0 21.22865    23
+##          fmi lambda m riv       ubar
+## 1 0.08254692      0 5   0 0.03649797
+## 2 0.08254692      0 5   0 0.09452855
 ```
 
 ---
 
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
 
 
 
 ```r
-nhanes_imp %&gt;%
-  complete(action = "long") %&gt;%
-  group_by(.imp) %&gt;%
-  do(fit_ps(.))  %&gt;%
-  ungroup()
+library(survey)
+with(nhanes_weighted, svyglm(age ~ exp)) %&gt;%
+*      pool() %&gt;%
+       tidy()
 ```
 
 ```
-## # A tibble: 125 × 13
-##     .imp   .id   age   bmi   hyp   chl   exp .fitted .resid .std.resid   .hat
-##    &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;
-##  1     1     1     1  33.2     2   218     0   0.297 -0.840     -0.908 0.145 
-##  2     1     2     2  22.7     1   187     1   0.742  0.772      0.814 0.100 
-##  3     1     3     1  33.2     1   187     0   0.242 -0.744     -0.797 0.128 
-##  4     1     4     3  30.1     1   284     1   0.357  1.44       1.66  0.251 
-##  5     1     5     1  20.4     1   113     1   0.827  0.616      0.697 0.220 
-##  6     1     6     3  22.7     1   184     1   0.613  0.990      1.13  0.228 
-##  7     1     7     1  22.5     1   118     1   0.742  0.772      0.866 0.204 
-##  8     1     8     1  30.1     1   187     1   0.420  1.32       1.38  0.0935
-##  9     1     9     2  22       1   238     1   0.846  0.578      0.666 0.246 
-## 10     1    10     2  20.4     1   238     0   0.893 -2.12      -2.44  0.251 
-## # … with 115 more rows, and 2 more variables: .sigma &lt;dbl&gt;, .cooksd &lt;dbl&gt;
+##          term   estimate std.error statistic      p.value b       df dfcom
+## 1 (Intercept) 1.57185008 0.1910444 8.2276685 4.828489e-08 0 21.22865    23
+## 2         exp 0.06565242 0.3074550 0.2135351 8.329471e-01 0 21.22865    23
+##          fmi lambda m riv       ubar
+## 1 0.08254692      0 5   0 0.03649797
+## 2 0.08254692      0 5   0 0.09452855
 ```
 
 ---
 
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
 
 
 
 ```r
-nhanes_imp %&gt;%
-  complete(action = "long") %&gt;%
-  group_by(.imp) %&gt;%
-  do(fit_ps(.))  %&gt;%
-  ungroup() %&gt;%
-  group_by(.id, exp) %&gt;%
-  summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
-  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg))
+library(survey)
+with(nhanes_weighted, svyglm(age ~ exp)) %&gt;%
+       pool() %&gt;%
+*      tidy()
+```
+
+```
+##          term   estimate std.error statistic      p.value b       df dfcom
+## 1 (Intercept) 1.57185008 0.1910444 8.2276685 4.828489e-08 0 21.22865    23
+## 2         exp 0.06565242 0.3074550 0.2135351 8.329471e-01 0 21.22865    23
+##          fmi lambda m riv       ubar
+## 1 0.08254692      0 5   0 0.03649797
+## 2 0.08254692      0 5   0 0.09452855
 ```
 
 ---
 
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
 
+.box-1[From the makers of `MatchIt` we have a package that can handle the weights for you!]
 
 
 ```r
-nhanes_imp %&gt;%
-  complete(action = "long") %&gt;%
-  group_by(.imp) %&gt;%
-  do(fit_ps(.))  %&gt;%
-  ungroup() %&gt;% 
-* group_by(.id, exp) %&gt;%
-  summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
-  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg))
+library(MatchThem)
+nhanes_weighted &lt;- weightthem(exp ~ bmi + hyp + chl, 
+                              nhanes_imp,
+*                             approach = "within",
+                              estimand = "ATE") 
 ```
 
 ---
-
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
 
 
 
 ```r
-nhanes_imp %&gt;%
-  complete(action = "long") %&gt;%
-  group_by(.imp) %&gt;%
-  do(fit_ps(.))  %&gt;%
-  ungroup() %&gt;%
-  group_by(.id, exp) %&gt;% 
-* summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
-  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg))
+library(survey)
+with(nhanes_weighted, svyglm(age ~ exp)) %&gt;%
+       pool() %&gt;%
+       tidy() 
+```
+
+```
+##          term   estimate std.error statistic      p.value           b        df
+## 1 (Intercept) 1.58535946 0.2354188 6.7342084 9.412533e-05 0.017759358  8.811045
+## 2         exp 0.03782741 0.3140540 0.1204487 9.053624e-01 0.005292547 19.462903
+##   dfcom       fmi     lambda m       riv       ubar
+## 1    23 0.4887464 0.38452637 5 0.6247650 0.03411080
+## 2    23 0.1476952 0.06439279 5 0.0688246 0.09227887
 ```
 
 ---
 
-class: title title-1
-
-# Adding in the PS weighting
-
-
-
-```r
-nhanes_imp %&gt;%
-  complete(action = "long") %&gt;%
-  group_by(.imp) %&gt;%
-  do(fit_ps(.))  %&gt;%
-  ungroup() %&gt;%
-  group_by(.id, exp) %&gt;%
-  summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
-* mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg))
-```
-
----
-
-class: title title-1
-
-# Adding in the PS weighting
-
-
-
-```r
-nhanes_imp %&gt;%
-  complete(action = "long") %&gt;%
-  group_by(.imp) %&gt;%
-  do(fit_ps(.))  %&gt;%
-  ungroup() %&gt;%
-  group_by(.id, exp) %&gt;%
-  summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
-  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) 
-```
-
-```
-## # A tibble: 25 × 4
-##      .id   exp ps_avg    wt
-##    &lt;int&gt; &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt;
-##  1     1     0  0.303  1.43
-##  2     2     1  0.757  1.32
-##  3     3     0  0.325  1.48
-##  4     4     1  0.608  1.64
-##  5     5     1  0.904  1.11
-##  6     6     1  0.773  1.29
-##  7     7     1  0.842  1.19
-##  8     8     1  0.342  2.92
-##  9     9     1  0.754  1.33
-## 10    10     0  0.627  2.68
-## # … with 15 more rows
-```
-
----
 
 
 class: title title-1
 
 # <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
 
-1. Create a function to calculate a propensity score model for `qsmk`
-2. Apply this function to each of your imputed datasets
-3. Average across the imputed datasets to get an averaged propensity score
-4. Calculate an ATE weight using the averaged propensity score
-
-<div class="countdown" id="timer_62535f79" style="right:0;bottom:0;font-size:1.5em;" data-warnwhen="0">
-<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
-</div>
-
----
-
-
-class: title title-1
-
-# Adding in the PS weighting
-
-
-
-```r
-nhanes_imp %&gt;%
-  complete(action = "long") %&gt;%
-  group_by(.imp) %&gt;%
-  do(fit_ps(.))  %&gt;%
-  ungroup() %&gt;%
-  group_by(.id, exp) %&gt;%
-  summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
-  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) %&gt;%
-  pull(wt)
-```
-
-```
-##  [1] 1.434407 1.321790 1.480435 1.643913 1.106094 1.293379 1.188058 2.922357
-##  [9] 1.326904 2.682297 1.841028 1.376285 1.357446 1.526695 2.772591 1.702504
-## [17] 1.473478 2.064122 1.115919 1.779082 1.580150 5.946267 2.293942 1.862007
-## [25] 1.807045
-```
-
----
-
-class: title title-1
-
-# Adding in the PS weighting
-
-
-
-```r
-nhanes_imp %&gt;%
-  complete(action = "long") %&gt;%
-  group_by(.imp) %&gt;%
-  do(fit_ps(.))  %&gt;%
-  ungroup() %&gt;%
-  group_by(.id, exp) %&gt;%
-  summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
-  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) %&gt;%
-  pull(wt) -&gt; wts
-```
-
----
-
-class: title title-1
-
-# Adding in the PS weighting
-
-
-
-```r
-with(nhanes_imp, lm(bmi ~ exp, weights = wts)) %&gt;%
-  pool() %&gt;%
-  tidy()
-```
-
-```
-##          term   estimate std.error statistic      p.value         b       df
-## 1 (Intercept) 27.7359264  1.392755 19.914432 4.804823e-12 0.3151392 14.70379
-## 2         exp -0.7591759  1.805404 -0.420502 6.792968e-01 0.3412653 17.29629
-##   dfcom       fmi    lambda m       riv     ubar
-## 1    23 0.2859010 0.1949549 5 0.2421664 1.561600
-## 2    23 0.2117988 0.1256391 5 0.1436925 2.849964
-```
-
-
----
-
-class: title title-1
-
-# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
-
-1. Extract the weights into a vector
-2. Use the `with` and `pool` functions to pool the imputations, fitting a *weighted* model for `wt82` using `qsmk`
-
-<div class="countdown" id="timer_62536298" style="right:0;bottom:0;font-size:1.5em;" data-warnwhen="0">
-<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
-</div>
-
----
-class: title title-1
-
-# Bootstrap
-
-.small[
-
-```r
-fit_ipw &lt;- function(split) {
-  .df &lt;- analysis(split)
-  
-  df_imp &lt;- mice(.df, m = 5, method = "pmm")
-  df_imp %&gt;%
-    complete(action = "long") %&gt;%
-    group_by(.imp) %&gt;%
-    do(fit_ps(.))  %&gt;%
-    ungroup() %&gt;%
-    group_by(.id, exp) %&gt;%
-    summarise(ps_avg = mean(.fitted), .groups = "drop") %&gt;%
-    mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) %&gt;%
-    pull(wt) -&gt; wts
-  
-  with(df_imp, lm(bmi ~ exp, weights = wts)) %&gt;%
-    pool() %&gt;%
-    tidy()
-}
-```
-]
-
----
-
-class: title title-1
-
-# Adding in the PS weighting
-
-
-```r
-library(rsample)
-b &lt;- bootstraps(nhanes, B = 1000, apparent = TRUE) %&gt;%
-  mutate(results = map(splits, fit_ipw))
-int_t(b, results) %&gt;%
-  filter(term == "exp")
-```
-
----
-
-
-class: title title-1
-
-# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
-
-1. Use the bootstrap to estimate the uncertainty for the causal effect of `qsmk` on `wt82`
+1. `install.packages("MatchThem")`
+2. Use the `weightthem()` function to estimate the uncertainty for the causal effect of `birthcontrol` on `pregnancies`
 2. Knit, Commit, Push to GitHub
 
-<div class="countdown" id="timer_6253620a" style="right:0;bottom:0;font-size:1.5em;" data-warnwhen="0">
+<div class="countdown" id="timer_6253918d" style="right:0;bottom:0;font-size:1.5em;" data-warnwhen="0">
 <code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
 </div>
     </textarea>

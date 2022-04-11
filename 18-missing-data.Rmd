@@ -71,7 +71,7 @@ class: title title-1
 
 1. `install.packages("visdat")`
 2. Load the causaldata package and use the `vis_dat()` function to examine the `nhefs` data frame
-3. Fit a linear model predicting `wt82` from `qsmk`
+3. Fit a linear model predicting `pregnancies` from `birthcontrol`
 4. Knit, commit, push to GitHub
 
 `r countdown::countdown(5, font_size = "2em")`
@@ -261,7 +261,7 @@ class: title title-1
 
 1. `install.packages("mice")`
 2. Use the `mice()` function to create a single imputed dataset of the `nhefs` data using predictive mean matching
-3. Fit a linear model predicting `wt82` from `qsmk` on the imputed dataset
+3. Fit a linear model predicting `pregancies` from `birthcontrol` on the imputed dataset
 4. Explore the help files for `?mice`. What types of univariate imputation methods are included?
 
 `r countdown::countdown(8, font_size = "2em")`
@@ -365,7 +365,7 @@ class: title title-1
 # `r fontawesome::fa("laptop")` Application Exercise
 
 1. Use the `mice()` function to create a 5 imputed datasets of the `nhefs` data using predictive mean matching
-3. Fit a linear model predicting `wt82` from `qsmk` on each of the 5 imputed datasets
+3. Fit a linear model predicting `pregnancies` from `birthcontrol` on each of the 5 imputed datasets
 4. Knit, commit, and push to GitHub
 
 `r countdown::countdown(8, font_size = "2em")`
@@ -447,6 +447,26 @@ class: title title-1
 
 # Adding in the PS weighting
 
+.box-1[Across]
+
+--
+
+.box-inv-1[Create m imputed datasets, estimate the propensity score within each one then average across the m datasets, pool the results]
+
+--
+
+.box-1[Within]
+
+--
+
+.box-inv-1[Create m imputed datasets, estimate the propensity score within each one, run a seperate outcome model for each propensity score, pool the results.]
+
+---
+
+
+class: title title-1
+
+# Adding in the PS weighting
 
 ```{r, message = FALSE, warning = FALSE, results = "hide"}
 nhanes$exp <- rbinom(25, 1, 0.5)
@@ -455,326 +475,206 @@ nhanes_imp <- mice(nhanes, m = 5, method = "pmm")
 
 ---
 
+
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
+
+.box-1[From the makers of `MatchIt` we have a package that can handle the weights for you!]
 
 ```{r}
-library(broom)
-fit_ps <- function(data) {
-  glm(exp ~ age + bmi + chl, family = binomial(), data = data) %>%
-    augment(data = data, type.predict = "response")
-}
-
-```
-
---
-.box-1[Create a function to fit the propensity score model]
-
----
-
-class: title title-1
-
-# Adding in the PS weighting
-
-
-```{r, eval = FALSE}
-nhanes_imp %>%
-  complete(action = "long") %>%
-  group_by(.imp) %>%
-  do(fit_ps(.))
+library(MatchThem)
+nhanes_weighted <- weightthem(exp ~ bmi + hyp + chl, 
+                              nhanes_imp,
+                              approach = "across",
+                              estimand = "ATE")
 ```
 
 ---
 
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
 
-
-```{r, eval = FALSE}
-nhanes_imp %>% #<<
-  complete(action = "long") %>%
-  group_by(.imp) %>%
-  do(fit_ps(.))
-```
-
----
-
-class: title title-1
-
-# Adding in the PS weighting
-
-
-```{r, eval = FALSE}
-nhanes_imp %>%
-  complete(action = "long") %>% #<<
-  group_by(.imp) %>%
-  do(fit_ps(.))
-```
-
----
-
-class: title title-1
-
-# Adding in the PS weighting
-
-
-```{r, eval = FALSE}
-nhanes_imp %>%
-  complete(action = "long") %>%
-  group_by(.imp) %>% #<<
-  do(fit_ps(.))
-```
-
----
-
-class: title title-1
-
-# Adding in the PS weighting
-
-
-```{r, eval = FALSE}
-nhanes_imp %>%
-  complete(action = "long") %>%
-  group_by(.imp) %>%
-  do(fit_ps(.)) #<<
-```
-
----
-
-class: title title-1
-
-# Adding in the PS weighting
-
+.box-1[From the makers of `MatchIt` we have a package that can handle the weights for you!]
 
 ```{r}
-nhanes_imp %>%
-  complete(action = "long") %>%
-  group_by(.imp) %>%
-  do(fit_ps(.))  %>%
-  ungroup()
+library(MatchThem) #<<
+nhanes_weighted <- weightthem(exp ~ bmi + hyp + chl, 
+                              nhanes_imp,
+                              approach = "across",
+                              estimand = "ATE")
 ```
 
 ---
 
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
 
+.box-1[From the makers of `MatchIt` we have a package that can handle the weights for you!]
 
-```{r, eval = FALSE}
-nhanes_imp %>%
-  complete(action = "long") %>%
-  group_by(.imp) %>%
-  do(fit_ps(.))  %>%
-  ungroup() %>%
-  group_by(.id, exp) %>%
-  summarise(ps_avg = mean(.fitted), .groups = "drop") %>%
-  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg))
+```{r}
+library(MatchThem)
+nhanes_weighted <- weightthem(exp ~ bmi + hyp + chl,  #<<
+                              nhanes_imp,
+                              approach = "across",
+                              estimand = "ATE")
 ```
 
 ---
 
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
 
+.box-1[From the makers of `MatchIt` we have a package that can handle the weights for you!]
 
-```{r, eval = FALSE}
-nhanes_imp %>%
-  complete(action = "long") %>%
-  group_by(.imp) %>%
-  do(fit_ps(.))  %>%
-  ungroup() %>% 
-  group_by(.id, exp) %>% #<<
-  summarise(ps_avg = mean(.fitted), .groups = "drop") %>%
-  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg))
+```{r}
+library(MatchThem)
+nhanes_weighted <- weightthem(exp ~ bmi + hyp + chl, 
+                              nhanes_imp, #<<
+                              approach = "across",
+                              estimand = "ATE")
 ```
 
 ---
-
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
 
+.box-1[From the makers of `MatchIt` we have a package that can handle the weights for you!]
 
-```{r, eval = FALSE}
-nhanes_imp %>%
-  complete(action = "long") %>%
-  group_by(.imp) %>%
-  do(fit_ps(.))  %>%
-  ungroup() %>%
-  group_by(.id, exp) %>% 
-  summarise(ps_avg = mean(.fitted), .groups = "drop") %>% #<<
-  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg))
+```{r}
+library(MatchThem)
+nhanes_weighted <- weightthem(exp ~ bmi + hyp + chl, 
+                              nhanes_imp,
+                              approach = "across", #<<
+                              estimand = "ATE") 
 ```
 
 ---
-
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
 
+.box-1[From the makers of `MatchIt` we have a package that can handle the weights for you!]
 
-```{r, eval = FALSE}
-nhanes_imp %>%
-  complete(action = "long") %>%
-  group_by(.imp) %>%
-  do(fit_ps(.))  %>%
-  ungroup() %>%
-  group_by(.id, exp) %>%
-  summarise(ps_avg = mean(.fitted), .groups = "drop") %>%
-  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) #<<
+```{r}
+library(MatchThem)
+nhanes_weighted <- weightthem(exp ~ bmi + hyp + chl, 
+                              nhanes_imp,
+                              approach = "across",
+                              estimand = "ATE") #<<
 ```
 
 ---
-
 class: title title-1
 
-# Adding in the PS weighting
+# MatchThem package
 
 
 ```{r}
-nhanes_imp %>%
-  complete(action = "long") %>%
-  group_by(.imp) %>%
-  do(fit_ps(.))  %>%
-  ungroup() %>%
-  group_by(.id, exp) %>%
-  summarise(ps_avg = mean(.fitted), .groups = "drop") %>%
-  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) 
+library(survey)
+with(nhanes_weighted, svyglm(age ~ exp)) %>%
+       pool() %>%
+       tidy()
 ```
 
 ---
+class: title title-1
+
+# MatchThem package
+
+
+```{r}
+library(survey) #<<
+with(nhanes_weighted, svyglm(age ~ exp)) %>%
+       pool() %>%
+       tidy()
+```
+
+---
+
+class: title title-1
+
+# MatchThem package
+
+
+```{r}
+library(survey)
+with(nhanes_weighted, svyglm(age ~ exp)) %>% #<<
+       pool() %>%
+       tidy()
+```
+
+---
+
+class: title title-1
+
+# MatchThem package
+
+
+```{r}
+library(survey)
+with(nhanes_weighted, svyglm(age ~ exp)) %>%
+       pool() %>% #<<
+       tidy()
+```
+
+---
+
+class: title title-1
+
+# MatchThem package
+
+
+```{r}
+library(survey)
+with(nhanes_weighted, svyglm(age ~ exp)) %>%
+       pool() %>%
+       tidy() #<<
+```
+
+---
+
+class: title title-1
+
+# MatchThem package
+
+.box-1[From the makers of `MatchIt` we have a package that can handle the weights for you!]
+
+```{r}
+library(MatchThem)
+nhanes_weighted <- weightthem(exp ~ bmi + hyp + chl, 
+                              nhanes_imp,
+                              approach = "within", #<<
+                              estimand = "ATE") 
+```
+
+---
+class: title title-1
+
+# MatchThem package
+
+
+```{r}
+library(survey)
+with(nhanes_weighted, svyglm(age ~ exp)) %>%
+       pool() %>%
+       tidy() 
+```
+
+---
+
 
 
 class: title title-1
 
 # `r fontawesome::fa("laptop")` Application Exercise
 
-1. Create a function to calculate a propensity score model for `qsmk`
-2. Apply this function to each of your imputed datasets
-3. Average across the imputed datasets to get an averaged propensity score
-4. Calculate an ATE weight using the averaged propensity score
-
-`r countdown::countdown(8, font_size = "1.5em")`
-
----
-
-
-class: title title-1
-
-# Adding in the PS weighting
-
-
-```{r}
-nhanes_imp %>%
-  complete(action = "long") %>%
-  group_by(.imp) %>%
-  do(fit_ps(.))  %>%
-  ungroup() %>%
-  group_by(.id, exp) %>%
-  summarise(ps_avg = mean(.fitted), .groups = "drop") %>%
-  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) %>%
-  pull(wt)
-```
-
----
-
-class: title title-1
-
-# Adding in the PS weighting
-
-
-```{r}
-nhanes_imp %>%
-  complete(action = "long") %>%
-  group_by(.imp) %>%
-  do(fit_ps(.))  %>%
-  ungroup() %>%
-  group_by(.id, exp) %>%
-  summarise(ps_avg = mean(.fitted), .groups = "drop") %>%
-  mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) %>%
-  pull(wt) -> wts
-```
-
----
-
-class: title title-1
-
-# Adding in the PS weighting
-
-
-```{r}
-with(nhanes_imp, lm(bmi ~ exp, weights = wts)) %>%
-  pool() %>%
-  tidy()
-```
-
-
----
-
-class: title title-1
-
-# `r fontawesome::fa("laptop")` Application Exercise
-
-1. Extract the weights into a vector
-2. Use the `with` and `pool` functions to pool the imputations, fitting a *weighted* model for `wt82` using `qsmk`
-
-`r countdown::countdown(8, font_size = "1.5em")`
-
----
-class: title title-1
-
-# Bootstrap
-
-.small[
-```{r}
-fit_ipw <- function(split) {
-  .df <- analysis(split)
-  
-  df_imp <- mice(.df, m = 5, method = "pmm")
-  df_imp %>%
-    complete(action = "long") %>%
-    group_by(.imp) %>%
-    do(fit_ps(.))  %>%
-    ungroup() %>%
-    group_by(.id, exp) %>%
-    summarise(ps_avg = mean(.fitted), .groups = "drop") %>%
-    mutate(wt = exp / ps_avg + (1 - exp) / (1 - ps_avg)) %>%
-    pull(wt) -> wts
-  
-  with(df_imp, lm(bmi ~ exp, weights = wts)) %>%
-    pool() %>%
-    tidy()
-}
-
-```
-]
-
----
-
-class: title title-1
-
-# Adding in the PS weighting
-
-```{r, message = FALSE, warning = FALSE, results = "hide"}
-library(rsample)
-b <- bootstraps(nhanes, B = 1000, apparent = TRUE) %>%
-  mutate(results = map(splits, fit_ipw))
-int_t(b, results) %>%
-  filter(term == "exp")
-```
-
----
-
-
-class: title title-1
-
-# `r fontawesome::fa("laptop")` Application Exercise
-
-1. Use the bootstrap to estimate the uncertainty for the causal effect of `qsmk` on `wt82`
+1. `install.packages("MatchThem")`
+2. Use the `weightthem()` function to estimate the uncertainty for the causal effect of `birthcontrol` on `pregnancies`
 2. Knit, Commit, Push to GitHub
 
 `r countdown::countdown(8, font_size = "1.5em")`
