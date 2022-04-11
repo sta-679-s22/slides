@@ -433,6 +433,50 @@ with(data = nhanes_imp, lm(age ~ bmi)) %>%
 
 class: title title-1
 
+# Pooling effect estimates
+
+.box-1.medium[
+$$\bar\theta = \frac{1}{m}\sum_{i=1}^m\theta_i$$
+]
+
+---
+
+class: title title-1
+
+# Pooling standard errors
+
+.box-1.medium[
+$$V_{Total} = V_{within} + V_{between} + \frac{V_{between}}{m}$$
+]
+
+--
+
+.box-1["Rubin's Rules"]
+
+---
+
+class: title title-1
+
+# Pooling standard errors
+
+.box-1.medium[
+$$V_{within} =\frac{1}{m}\sum_{i=1}^mSE_i^2$$
+]
+
+---
+
+class: title title-1
+
+# Pooling standard errors
+
+.box-1.medium[
+$$V_{between} =\frac{\sum_{i=1}^m(\theta_i-\bar{\theta})^2}{m-1}$$
+]
+
+---
+
+class: title title-1
+
 # `r fontawesome::fa("laptop")` Application Exercise
 
 1. Use the `with()` function to fit a model on each of your 5 imputed datasets.
@@ -678,3 +722,6 @@ class: title title-1
 2. Knit, Commit, Push to GitHub
 
 `r countdown::countdown(8, font_size = "1.5em")`
+
+---
+
