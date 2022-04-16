@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Sensitivity Analyses</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lucy D’Agostino McGowan" />
+    <meta name="date" content="2022-04-16" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+class: center middle main-title section-title-1
+
+# Sensitivity Analyses
+
+.class-info[
+
+**Session 19**
+
+.light[STA 379/679: Causal Inference &lt;br&gt;
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+
+class: title title-1
+
+# Unmeasured confounder
+
+.box-1.medium[Untestable (but necessary!) assumption]
+
+.box-1.medium[What happens if it is wrong?]
+
+--
+
+.box-inv-1.medium[Bias!]
+
+---
+
+class: title title-1
+
+# Meaningful confounders
+
+.box-1[How **imbalanced** is the unmeasured confounder between exposure groups?]
+
+--
+
+.box-1[How **predictive** is the unmeasured confounder of the outcome?]
+
+--
+
+.box-1[How **independent** is the unmeasured confounder from the measured confounders?]
+
+---
+
+class: title title-1
+
+# All you need
+
+.box-1.medium[Exposure-outcome effect]
+
+--
+
+.box-1.medium[Exposure-unmeasured confounder effect]
+
+--
+
+.box-1.medium[Outcome-unmeasured confounder effect]
+
+---
+
+class: title title-1
+
+# All you need
+
+.box-inv-1.medium[Exposure-outcome effect]
+
+
+
+.box-2.medium[Exposure-unmeasured confounder effect]
+
+
+
+.box-2.medium[Outcome-unmeasured confounder effect]
+
+---
+class: title title-1
+
+# Exposure-Outcome effect 
+
+.pull-left[
+
+.box-1[
+What we want
+]
+
+]
+
+.pull-right[
+
+.box-1[What we have]
+]
+---
+
+class: title title-1
+
+# Exposure-Outcome effect
+
+.pull-left[
+
+.box-1[
+What we want
+]
+
+&lt;br&gt;
+
+.box-inv-1[
+`$$Y \sim X | U + \mathbf{Z}$$`
+]
+]
+
+.pull-right[
+
+.box-1[What we have]
+]
+---
+
+class: title title-1
+
+# Exposure-Outcome effect
+
+.pull-left[
+
+.box-1[
+What we want
+]
+
+&lt;br&gt;
+
+.box-inv-1[
+`$$Y \sim X | U + \mathbf{Z}$$`
+]
+
+&lt;br&gt;
+
+.box-inv-1[
+`$$\beta_{Y \sim X | U + \mathbf{Z}}$$`
+]
+]
+
+.pull-right[
+
+.box-1[What we have]
+]
+---
+
+
+class: title title-1
+# Exposure-Outcome effect
+
+.pull-left[
+
+.box-1[
+What we want
+]
+
+&lt;br&gt;
+
+.box-inv-1[
+`$$Y \sim X | U + \mathbf{Z}$$`
+]
+
+&lt;br&gt;
+
+.box-inv-1[
+`$$\beta_{Y \sim X | U + \mathbf{Z}}$$`
+]
+]
+
+.pull-right[
+
+.box-1[What we have]
+
+&lt;br&gt;
+
+.box-inv-1[
+`$$Y \sim X | \mathbf{Z}$$`
+]
+
+&lt;br&gt;
+
+.box-inv-1[
+`$$\beta_{Y \sim X | \mathbf{Z}}$$`
+]
+]
+---
+
+class: title title-1
+
+# All you need
+
+.box-2.medium[Exposure-outcome effect]
+
+
+
+.box-inv-1.medium[Exposure-unmeasured confounder effect]
+
+
+
+.box-inv-1.medium[Outcome-unmeasured confounder effect]
+
+---
+
+class: title title-1
+
+# All you need
+
+.box-2.medium[Exposure-outcome effect]
+
+
+
+.box-inv-1.medium[Exposure-unmeasured confounder effect]
+
+&lt;br&gt;
+
+.box-1[
+`\(d\)`: the difference in the standardized mean between exposure groups
+]
+
+.box-inv-1.medium[Outcome-unmeasured confounder effect]
+
+---
+
+class: title title-1
+
+# All you need
+
+.box-2.medium[Exposure-outcome effect]
+
+
+
+.box-inv-1.medium[Exposure-unmeasured confounder effect]
+
+
+.box-inv-1.medium[Outcome-unmeasured confounder effect]
+
+&lt;br&gt;
+
+.box-1[
+`$$\beta_{Y\sim U | X + \mathbf{Z}}$$`
+]
+
+---
+
+class: title title-1
+
+# Sensitivity Analysis
+
+.box-1[
+`$$\beta_{Y\sim X |U +\mathbf{Z}} = \beta_{Y\sim X | \mathbf{Z}}-\beta_{Y\sim U|X+\mathbf{Z}}\times d$$`
+]
+
+---
+
+class: title title-1
+
+# tipr
+
+
+```r
+library(tipr)
+adjust_coef(effect = 1.5,
+            smd = 0.1,
+            outcome_association = 1)
+```
+
+---
+
+class: title title-1
+
+# tipr
+
+
+```r
+library(tipr)
+*adjust_coef(effect = 1.5,
+            smd = 0.1,
+            outcome_association = 1)
+```
+
+---
+
+class: title title-1
+
+# tipr
+
+
+```r
+library(tipr)
+adjust_coef(effect = 1.5,
+*           smd = 0.1,
+            outcome_association = 1)
+```
+
+---
+
+class: title title-1
+
+# tipr
+
+
+```r
+library(tipr)
+adjust_coef(effect = 1.5,
+            smd = 0.1,
+*           outcome_association = 1)
+```
+---
+
+class: title title-1
+
+# tipr
+
+
+```r
+library(tipr)
+adjust_coef(effect = 1.5,
+            smd = 0.1,
+            outcome_association = 1)
+```
+
+```
+## # A tibble: 1 × 4
+##   effect_adjusted effect_observed   smd outcome_association
+##             &lt;dbl&gt;           &lt;dbl&gt; &lt;dbl&gt;               &lt;dbl&gt;
+## 1             1.4             1.5   0.1                   1
+```
+
+---
+
+class: title title-1
+
+# tipr
+
+```
+The observed effect (1.5) is updated to 1.4 by a confounder with
+the following specifications:
+* estimated difference in scaled means: 0.1
+* estimated association between the unmeasured confounder and 
+*  the outcome: 1
+```
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. `devtools::install_github("LucyMcGowan/tipr")`
+2. You observed a causal effect of 2 (coefficient from a linear model). You think there could be an unmeasured confounder with a difference in scaled means of 0.5 and a outcome association of 1.2. Use the `adjust_coef()` function to update your observed effect
+3. Try to find an unmeasured confounder that would *nullify* your result (make it 0).
+4. Knit, commit, push to GitHub
+
+<div class="countdown" id="timer_625af845" style="right:0;bottom:0;font-size:1em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: title title-1
+
+# All you need
+
+.box-2.medium[Exposure-outcome effect]
+
+
+
+.box-inv-1.medium[Exposure-unmeasured confounder effect]
+
+
+
+.box-2.medium[Outcome-unmeasured confounder effect]
+
+---
+
+
+class: title title-1
+
+# All you need
+
+.box-2.medium[Exposure-outcome effect]
+
+
+
+.box-2.medium[Exposure-unmeasured confounder effect]
+
+
+
+.box-inv-1.medium[Outcome-unmeasured confounder effect]
+
+
+---
+
+class: title title-1
+
+# Tipping Point Analysis
+
+.box-1.medium[What will tip our confidence bound to cross the null?]
+
+---
+
+class: title title-1
+
+# Tipping Point Analysis
+
+.box-1[
+`$$0 = \beta_{Y\sim X | \mathbf{Z}}-\beta_{Y\sim U|X+\mathbf{Z}}\times d$$`
+]
+
+---
+
+class: title title-1
+
+# Tipping Point Analysis
+
+.box-1[
+`$$\beta_{Y\sim U |X+\mathbf{Z}, \textrm{tip} = 0} =\frac{\beta_{Y\sim X | \mathbf{Z}}}{d}$$`
+]
+
+---
+
+
+class: title title-1
+
+# tipr
+
+
+```r
+library(tipr)
+tip_lm(effect = 1.5,
+        smd = 0.1)
+```
+
+```
+## # A tibble: 1 × 4
+##   observed_effect   smd outcome_association n_unmeasured_confounders
+##             &lt;dbl&gt; &lt;dbl&gt;               &lt;dbl&gt;                    &lt;dbl&gt;
+## 1             1.5   0.1                  15                        1
+```
+
+---
+
+class: title title-1
+
+# tipr
+
+```
+The observed effect (1.5) WOULD be tipped by 1 unmeasured 
+confounder with the following specifications:
+  * estimated difference in scaled means between the 
+    unmeasured confounder in the exposed population and 
+    unexposed population: 0.1
+  * estimated association between the unmeasured confounder 
+    and the outcome: 15
+```
+
+---
+
+class: title title-1
+
+# tipr
+
+
+```r
+library(tipr)
+tip_lm(effect = 1.5,
+        outcome_association = 1)
+```
+
+```
+## # A tibble: 1 × 4
+##   observed_effect   smd outcome_association n_unmeasured_confounders
+##             &lt;dbl&gt; &lt;dbl&gt;               &lt;dbl&gt;                    &lt;dbl&gt;
+## 1             1.5   1.5                   1                        1
+```
+
+---
+
+
+class: title title-1
+
+# tipr
+
+```
+The observed effect (1.5) WOULD be tipped by 1 unmeasured 
+confounder with the following specifications:
+  * estimated difference in scaled means between the 
+    unmeasured confounder in the exposed population 
+    and unexposed population: 1.5
+  * estimated association between the unmeasured confounder 
+    and the outcome: 1
+```
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. You observed a causal effect of 2 (coefficient from a linear model). You think there could be an unmeasured confounder with a difference in scaled means of 0.5. Use the `tip_lb()` function to find an unmeasured confounder-outcome relationship that would be needed to render your causal effect inconclusive
+2. Knit, commit, push to GitHub
+
+<div class="countdown" id="timer_625af8da" style="right:0;bottom:0;font-size:1em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# Sensitivity analysis
+
+
+.box-1[Under the assumption that the sensitivity parameters are
+fixed, the variance of the observed effect is the same as the variance of the adjusted effect]
+
+.box-1[This allows all adjustments to apply to confidence intervals the same way they would apply to point estimates]
+
+---
+
+class: center, middle
+
+&lt;img src="img/table-sens.png" width = "70%"&gt;&lt;/img&gt;
+---
+class: center, middle
+
+&lt;img src="img/table-sens2.png" width = "70%"&gt;&lt;/img&gt;
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. Try applying these techniques to your Lab 04
+
+<div class="countdown" id="timer_625af689" style="right:0;bottom:0;font-size:1em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">08</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
