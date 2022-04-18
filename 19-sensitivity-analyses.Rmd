@@ -499,10 +499,10 @@ class: title title-1
 
 # `r fontawesome::fa("laptop")` Application Exercise
 
-1. You observed a causal effect of 2 (coefficient from a linear model). You think there could be an unmeasured confounder with a difference in scaled means of 0.5. Use the `tip_lb()` function to find an unmeasured confounder-outcome relationship that would be needed to render your causal effect inconclusive
+1. You observed a causal effect of 2 (coefficient from a linear model). You think there could be an unmeasured confounder with a difference in scaled means of 0.5. Use the `tip_lm()` function to find an unmeasured confounder-outcome relationship that would be needed to render your causal effect inconclusive
 2. Knit, commit, push to GitHub
 
-`r countdown::countdown(8, font_size = "1em")`
+`r countdown::countdown(4, font_size = "1em")`
 
 ---
 
