@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Communicating Statistics</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lucy D’Agostino McGowan" />
+    <meta name="date" content="2022-04-19" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link href="libs/countdown-0.3.5/countdown.css" rel="stylesheet" />
+    <script src="libs/countdown-0.3.5/countdown.js"></script>
+    <link rel="stylesheet" href="css/style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+class: center middle main-title section-title-1
+
+# Communicating Statistics
+
+.class-info[
+
+**Session 20**
+
+.light[STA 379/679: Causal Inference &lt;br&gt;
+Lucy D'Agostino McGowan
+]
+
+]
+---
+
+![](20-communicating-stats/20-communicating-stats.001.png)
+
+---
+
+![](20-communicating-stats/20-communicating-stats.002.png)
+
+
+---
+
+![](20-communicating-stats/20-communicating-stats.003.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.004.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.005.png)
+
+---
+
+![](20-communicating-stats/20-communicating-stats.006.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.007.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.008.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.009.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.010.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.011.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.012.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.013.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.014.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.015.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.016.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.017.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.018.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.019.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.020.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.021.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.022.png)
+
+---
+
+![](20-communicating-stats/20-communicating-stats.023.png)
+
+---
+
+
+
+![](20-communicating-stats/20-communicating-stats.024.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.025.png)
+---
+
+![](20-communicating-stats/20-communicating-stats.026.png)
+
+---
+
+class: section-title section-title-1 middle center
+
+# Putting your stats on the web!
+
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. Go to Github.com and create a (public) repo called "website-demo"
+2. Pull this into RStudio by creating a new project
+
+<div class="countdown" id="timer_625f5462" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+class: title title-1
+
+# Demo
+
+.box-1[_site.yml]
+
+.box-1[index.Rmd]
+
+.box-1[analysis.Rmd]
+
+---
+class: title title-1
+
+# YAML
+
+.box-1[We're going to start with a site configuration file called `_site.yml`]
+
+--
+
+.box-1[This is written in YAML, it contains information about your website]
+
+---
+class: title title-1
+# YAML
+
+```
+name: "example-website"
+navbar: 
+  title: "This is an example!"
+  left: 
+    - text: "Home"
+      href: index.html
+    - text: "Analysis"
+      href: analysis.html
+   right: 
+     - icon: fa-github fa-lg
+       href: https://github.com/lucymcgowan
+output:
+  html_document:
+    theme: flatly
+```
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. Using the previous example, create a YAML for your website
+
+<div class="countdown" id="timer_625f5408" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# index.Rmd
+
+```
+---
+title: "Example Website"
+---
+
+This is markdown
+
+  * I can include bullets
+
+## I can include headers
+
+&lt;img src = "img/img.jpg&gt;
+
+I can include &lt;i&gt; html&lt;/i&gt;
+
+```
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. Using the previous example, create an index.Rmd file
+2. Knit this file
+
+<div class="countdown" id="timer_625f55c9" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+
+class: title title-1
+
+# analysis.Rmd
+
+.box-1[You can put any R Code into these Rmd files!]
+
+.box-1[For example, let's copy your lab into a file called "analysis.Rmd"]
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. Copy your lab 04 into a file called analysis.Rmd
+2. Knit this file
+3. Commit and push your files to GitHub
+
+<div class="countdown" id="timer_625f568c" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# Deploying your website
+
+![](img/gh-settings.png)
+
+---
+
+class: title title-1
+
+# Deploying your website
+
+&lt;img src="img/gh-pages.png" width= "30%"&gt;&lt;/img&gt;
+
+
+---
+
+class: title title-1
+
+# Deploying your website
+
+![](img/gh-main.png)
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. Deploy your website
+2. See if you can update your theme (Available themes:
+https://bootswatch.com/3/)
+3. See if you can find different icons to include (https://fontawesome.com/icons)
+
+<div class="countdown" id="timer_625f52e9" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: section-title section-title-1 middle center
+
+# Personal website
+
+---
+
+class: section-title section-title-1 middle center
+
+# `install.packages("postcards")`
+
+---
+class: title title-1 center
+
+# jolla
+
+&lt;img src="img/jolla.png" width="50%"&gt;&lt;/img&gt;
+---
+class: title title-1 center
+
+# jolla-blue
+
+&lt;img src="img/jolla-blue.png" width="50%"&gt;&lt;/img&gt;
+
+
+---
+class: title title-1 center
+
+# trestles
+
+&lt;img src="img/trestles.png" width="50%"&gt;&lt;/img&gt;
+
+
+
+---
+class: title title-1 center
+
+# solana
+
+&lt;img src="img/solana.png" width="50%"&gt;&lt;/img&gt;
+
+---
+
+
+class: title title-1 center
+
+# onofre
+
+&lt;img src="img/onofre.png" width="50%"&gt;&lt;/img&gt;
+
+---
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. `install.packages("postcards")`
+2. Create a GitHub repo named YOUR_GITHUB_HANDLE.github.io (mine would be lucymcgowan.github.io)
+
+<div class="countdown" id="timer_625f5314" style="right:0;bottom:0;font-size:2em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">05</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: title title-1
+
+# postcards
+
+.box-1.medium[Create a new project using a `postcards` template]
+
+&lt;img src="img/postcards.png" width = "50%"&gt;&lt;/img&gt;
+
+---
+
+class: title title-1
+
+# postcards
+
+.box-1.medium[Add version control]
+
+&lt;img src = "img/version-control.png" width = "50%"&gt;&lt;/img&gt;
+
+---
+
+class: title title-1
+
+# postcards
+
+.box-1.medium[Add version control]
+
+&lt;center&gt;
+&lt;img src="img/git.png" width="50%"&gt;&lt;/img&gt;
+&lt;/center&gt;
+---
+
+class: title title-1
+
+# postcards
+
+.box-1.medium[Add version control]
+
+.box-1[In the terminal:]
+
+.small[
+```
+git remote add origin https://github.com/YOUR-GITHUB-HANDLE.github.io.git
+```
+]
+
+---
+
+
+class: title title-1
+
+# <svg aria-hidden="true" role="img" viewBox="0 0 640 512" style="height:1em;width:1.25em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z"/></svg> Application Exercise
+
+1. Create a project from the postcard template
+2. Add git to your project
+3. Connect to Github using the previous slide (via the terminal)
+4. Update the template to reflect your details!
+5. Update to enable Github pages
+
+<div class="countdown" id="timer_625f550e" style="right:0;bottom:0;font-size:1em;" data-warnwhen="0">
+<code class="countdown-time"><span class="countdown-digits minutes">10</span><span class="countdown-digits colon">:</span><span class="countdown-digits seconds">00</span></code>
+</div>
+
+---
+
+class: section-title section-title-1
+
+# flexdashboard
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

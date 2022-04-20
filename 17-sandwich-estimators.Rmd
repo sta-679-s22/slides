@@ -1,0 +1,122 @@
+---
+title: "Sandwich Estimators"
+author: "Lucy D'Agostino McGowan"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: "libs"
+    css: ["default", "css/style.css"]
+    seal: false
+    anchor_sections: false
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      navigation:
+        scroll: false
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, 
+                      fig.retina = 3, fig.align = "center")
+```
+
+
+```{r xaringanExtra, echo=FALSE}
+xaringanExtra::use_xaringan_extra(c("tile_view"))
+```
+
+class: center middle main-title section-title-1
+
+# Sandwich Estimators
+
+.class-info[
+
+**Session 17**
+
+.light[STA 379/679: Causal Inference <br>
+Lucy D'Agostino McGowan
+]
+
+]
+
+---
+
+class: title title-1
+
+# Weighted Estimator
+
+.box-1[
+$$\hat{\tau} = \frac{\sum_{i=1}^n Y_i X_i w_i}{\sum_{i=1}^nX_iw_i}-\frac{\sum_{i=1}^n Y_i (1-X_i) w_i}{\sum_{i=1}^n(1-X_i)w_i}$$
+]
+
+---
+class: title title-1
+
+# Weighted Estimator
+
+.box-1[
+
+$$\hat\mu_1 = \frac{\sum_{i=1}^n Y_i X_i w_i}{\sum_{i=1}^nX_iw_i}$$
+]
+
+--
+<br>
+.box-1[
+
+$$\hat\mu_0 = \frac{\sum_{i=1}^n Y_i (1-X_i) w_i}{\sum_{i=1}^n(1-X_i)w_i}$$
+]
+---
+class: title title-1
+
+# Weighted Estimator (ATE)
+
+
+$$\hat\mu_1 = \frac{\sum_{i=1}^n Y_i X_i \hat{e}_i^{-1}}{\sum_{i=1}^nX_i\hat{e}_i^{-1}}$$
+]
+
+--
+<br>
+.box-1[
+
+$$\hat\mu_0 = \frac{\sum_{i=1}^n Y_i (1-X_i)(1-\hat{e}_i)^{-1}}{\sum_{i=1}^n(1-X_i)(1-\hat{e}_i)^{-1}}$$
+]
+---
+class: title title-1
+# Assuming the propensity score is *fixed*
+
+.box-inv-1[
+Equivalently, we could simultaneously solve the following estimating equations $\sum_{i=1}^n\mathbf{u}(\theta| Y_i, X_i, e_i) = 0$ for the parameter $\theta = (\mu_1, \mu_0)^T$ where
+]
+
+--
+<br>
+.box-1[
+$$\mathbf{u}(\theta|Y, X, e)=\begin{pmatrix}(Y-\mu_1)Xe^{-1}\\(Y-\mu_0)(1-X)(1-e)^{-1}\end{pmatrix}$$
+]
+
+---
+
+class: title title-1
+
+# Assuming the propensity score is *fixed*
+
+.box-1[
+$\hat\theta$ is asymptotically normally distributed with a large sample variance equal to $n^{-1}\mathbf{A}^{-1}\mathbf{B}\mathbf{A}^{-T}$ where]
+
+--
+
+<br>
+
+.box-1[
+$$\mathbf{A}=-E\left[\frac{\partial\mathbf{u}}\right]$$
+]
+
+
+
+
+
+
